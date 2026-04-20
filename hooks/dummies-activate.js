@@ -11,7 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { getDefaultMode, safeWriteFlag } = require('./dummies-config');
+const { getDefaultMode, safeWriteFlag, recordSession } = require('./dummies-config');
 
 const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
 const flagPath = path.join(claudeDir, '.dummies-active');
@@ -28,6 +28,9 @@ if (mode === 'off') {
 
 // 1. Write flag file (symlink-safe)
 safeWriteFlag(flagPath, mode);
+
+// Record session start (increments sessionCount, sets installedAt on first run)
+recordSession();
 
 // 2. Emit SKILL.md as system context.
 //    Reads SKILL.md at runtime so edits to the source of truth propagate automatically — no

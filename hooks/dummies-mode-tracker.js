@@ -2,21 +2,26 @@
 // Claude for Dummies — UserPromptSubmit hook to track active evolution stage
 // Inspects user input for /dummy commands and writes stage to flag file.
 //
+// Also records prompt count + stage transitions for /dummy-stats, and emits
+// a STAGE CHANGE line when an upgrade/downgrade happens so that Level-up!
+// messages can be rendered by commands/dummy.toml.
+//
 // Based on the hook pattern from caveman (JuliusBrussee/caveman, MIT).
 
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { getDefaultMode, safeWriteFlag, readFlag } = require('./dummies-config');
+const {
+  getDefaultMode, safeWriteFlag, readFlag,
+  recordPrompt, recordStageChange
+} = require('./dummies-config');
 
 const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
 const flagPath = path.join(claudeDir, '.dummies-active');
 
 const STAGES = ['egg', 'chick', 'eagle', 'phoenix'];
-
-// User-facing command interface is numeric (/dummy 1|2|3|4). Internal storage
-// still uses stage names so hooks/statusline/SKILL.md share one vocabulary.
 const STAGES_BY_NUMBER = { '1': 'egg', '2': 'chick', '3': 'eagle', '4': 'phoenix' };
+const STAGE_NUMBER = { egg: 1, chick: 2, eagle: 3, phoenix: 4 };
 
 function shiftStage(current, delta) {
   const i = STAGES.indexOf(current);
@@ -33,19 +38,26 @@ process.stdin.on('end', () => {
     const prompt = (data.prompt || '').trim();
     const lower = prompt.toLowerCase();
 
-    // /expert — this response only, normal Claude. SKILL.md handles the behavior;
-    // hook just skips per-turn reinforcement so the "DUMMIES ACTIVE" line doesn't
-    // fight the "/expert = normal" rule.
+    // Record every prompt for /dummy-stats (cheap, best-effort).
+    recordPrompt();
+
+    // /expert — this response only, normal Claude. SKILL.md handles the behavior.
+    // Skip per-turn reinforcement so the "DUMMIES ACTIVE" line doesn't fight
+    // the "/expert = normal" rule.
     if (/^\/expert\b/.test(lower)) {
       return;
     }
+
+    // Snapshot the pre-command stage so we can detect transitions.
+    const before = readFlag(flagPath);
 
     // Natural-language deactivation first — takes priority over everything else.
     if (/\b(stop|disable|deactivate|turn off)\b.*\bdummies?\b/i.test(prompt) ||
         /\bdummies?\b.*\b(stop|disable|deactivate|turn off)\b/i.test(prompt) ||
         /\bnormal mode\b/i.test(prompt)) {
       try { fs.unlinkSync(flagPath); } catch (e) {}
-      return; // no reinforcement this turn
+      if (before) recordStageChange(before, 'off');
+      return;
     }
 
     // Natural-language activation ("activate dummies", "dummies mode", "talk like dummies").
@@ -79,12 +91,10 @@ process.stdin.on('end', () => {
         } else if (arg === 'harder') {
           newStage = shiftStage(readFlag(flagPath) || getDefaultMode(), +1);
         }
-        // '/dummy level' and other args fall through — Claude + SKILL.md render menu,
-        // no flag change. Stage names (egg/chick/eagle/phoenix) not accepted as args —
-        // numeric interface only for predictability.
+        // '/dummy level' and other args fall through — commands/dummy.toml renders
+        // the menu, no flag change. Stage names not accepted as args.
       }
-      // Sub-skills (/dummy-explain, /dummy-glossary, /dummy-analogy, /dummy-stats, /dummy-help)
-      // don't change the active stage; Claude reads the prompt + sub-skill file and responds.
+      // Sub-skills (/dummy-glossary, /dummy-stats, /dummy-help) don't change stage.
 
       if (unset) {
         try { fs.unlinkSync(flagPath); } catch (e) {}
@@ -93,22 +103,48 @@ process.stdin.on('end', () => {
       }
     }
 
+    // Detect stage transition vs snapshot.
+    const after = readFlag(flagPath);
+    let transitionLine = '';
+    if (after && after !== before) {
+      if (before) {
+        recordStageChange(before, after);
+        const oldN = STAGE_NUMBER[before] || 0;
+        const newN = STAGE_NUMBER[after] || 0;
+        const dir = newN > oldN ? 'upgrade' : (newN < oldN ? 'downgrade' : 'same');
+        transitionLine = `STAGE CHANGE: ${oldN} ${before} → ${newN} ${after} (${dir})`;
+      } else {
+        // off → on transition
+        recordStageChange('off', after);
+        transitionLine = `STAGE CHANGE: off → ${STAGE_NUMBER[after]} ${after} (activate)`;
+      }
+    }
+
     // Per-turn reinforcement: emit a compact reminder when dummies is active.
     // SessionStart injects the full SKILL.md once; this keeps dummies visible in
-    // the model's attention on every user message (other plugins may inject
-    // competing style hints mid-conversation).
+    // the model's attention on every user message. If a stage transition just
+    // happened, prepend a STAGE CHANGE line so commands/dummy.toml can render
+    // the Level-up! message.
     //
     // readFlag enforces symlink-safe read + size cap + VALID_MODES whitelist.
-    // If the flag is missing, corrupted, oversized, or a symlink pointing at
-    // something like ~/.ssh/id_rsa, readFlag returns null and we emit nothing.
-    const activeStage = readFlag(flagPath);
-    if (activeStage) {
+    if (after) {
+      const context = (transitionLine ? transitionLine + '\n' : '') +
+        "DUMMIES MODE ACTIVE (stage: " + after + "). " +
+        "Respond in plain language with analogies. Preserve code, commands, URLs, paths, env vars, CLI flags, error messages, warnings, version numbers verbatim. " +
+        "Culturally neutral analogies, consistent across the session. Append `ⓘ analogy ≈` after major analogies.";
+
       process.stdout.write(JSON.stringify({
         hookSpecificOutput: {
           hookEventName: "UserPromptSubmit",
-          additionalContext: "DUMMIES MODE ACTIVE (stage: " + activeStage + "). " +
-            "Respond in plain language with analogies. Preserve code, commands, URLs, paths, env vars, CLI flags, error messages, warnings, version numbers verbatim. " +
-            "Culturally neutral analogies, consistent across the session. Append `ⓘ analogy ≈` after major analogies."
+          additionalContext: context
+        }
+      }));
+    } else if (transitionLine) {
+      // Stage went to off — still useful for Claude to know (e.g. confirm "Dummies off").
+      process.stdout.write(JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: "UserPromptSubmit",
+          additionalContext: transitionLine
         }
       }));
     }

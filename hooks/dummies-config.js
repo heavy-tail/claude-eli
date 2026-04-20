@@ -152,4 +152,80 @@ function readFlag(flagPath) {
   }
 }
 
-module.exports = { getDefaultMode, getConfigDir, getConfigPath, VALID_MODES, safeWriteFlag, readFlag };
+// ---- Metadata (for /dummy-stats and Level-up events) ------------------------
+//
+// Stored at ~/.config/dummies/metadata.json (XDG respected, Windows %APPDATA%).
+// Tracks install date, session count, total prompts, and stage transition history.
+// Not security-sensitive, so we skip the symlink gauntlet — but still atomic write.
+
+const DEFAULT_METADATA = {
+  installedAt: null,
+  sessionCount: 0,
+  totalPrompts: 0,
+  lastSessionAt: null,
+  stageHistory: []
+};
+
+function getMetadataPath() {
+  return path.join(getConfigDir(), 'metadata.json');
+}
+
+function readMetadata() {
+  try {
+    const raw = fs.readFileSync(getMetadataPath(), 'utf8');
+    const parsed = JSON.parse(raw);
+    return { ...DEFAULT_METADATA, ...parsed };
+  } catch (e) {
+    return { ...DEFAULT_METADATA };
+  }
+}
+
+function writeMetadata(meta) {
+  try {
+    fs.mkdirSync(getConfigDir(), { recursive: true });
+    const tmp = getMetadataPath() + '.' + process.pid + '.' + Date.now();
+    fs.writeFileSync(tmp, JSON.stringify(meta, null, 2), { mode: 0o600 });
+    fs.renameSync(tmp, getMetadataPath());
+  } catch (e) {
+    // Silent fail — metadata is best-effort
+  }
+}
+
+function recordSession() {
+  const meta = readMetadata();
+  const now = new Date().toISOString();
+  if (!meta.installedAt) meta.installedAt = now;
+  meta.sessionCount = (meta.sessionCount || 0) + 1;
+  meta.lastSessionAt = now;
+  writeMetadata(meta);
+}
+
+function recordPrompt() {
+  const meta = readMetadata();
+  meta.totalPrompts = (meta.totalPrompts || 0) + 1;
+  writeMetadata(meta);
+}
+
+// Cap stage history at 100 entries to prevent unbounded growth.
+const MAX_STAGE_HISTORY = 100;
+
+function recordStageChange(fromStage, toStage) {
+  const meta = readMetadata();
+  if (!Array.isArray(meta.stageHistory)) meta.stageHistory = [];
+  meta.stageHistory.push({
+    from: fromStage,
+    to: toStage,
+    at: new Date().toISOString()
+  });
+  if (meta.stageHistory.length > MAX_STAGE_HISTORY) {
+    meta.stageHistory = meta.stageHistory.slice(-MAX_STAGE_HISTORY);
+  }
+  writeMetadata(meta);
+}
+
+module.exports = {
+  getDefaultMode, getConfigDir, getConfigPath, VALID_MODES,
+  safeWriteFlag, readFlag,
+  getMetadataPath, readMetadata, writeMetadata,
+  recordSession, recordPrompt, recordStageChange
+};
