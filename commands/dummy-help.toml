@@ -1,0 +1,29 @@
+description = "Claude for Dummies — command reference card"
+prompt = """
+Render this reference card exactly as shown, inside a single fenced code block. Do not paraphrase,
+do not add explanations before or after.
+
+```
+🐣 Dummies — commands
+
+Stage
+  /dummy level       show menu with examples
+  /dummy easier      ↓ one step
+  /dummy harder      ↑ one step
+  /dummy 1..4        jump to stage (1=🥚 easiest, 4=🐦‍🔥 technical)
+
+Switch
+  /dummy off         disable for this session
+  /dummy on          re-enable
+  /expert            this response only: normal Claude
+
+Extra
+  /dummy-glossary    jargon from previous answer with plain defs
+  /dummy-stats       your evolution progress
+  /dummy-help        this card
+
+Natural (just say it, no slash)
+  "다시" / "again" / "한번 더"     retranslate previous answer
+  "stop dummies" / "normal mode"  disable for session
+```
+"""

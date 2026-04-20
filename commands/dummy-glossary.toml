@@ -1,0 +1,15 @@
+description = "List jargon from the previous answer with plain definitions"
+prompt = """
+From the previous assistant answer in this conversation, extract every technical term, acronym,
+library/product name, CLI flag, env var, or other jargon that a beginner would not know.
+
+For each item, list:
+- The term verbatim as it appeared (use inline code formatting if it was code)
+- A plain-language definition in 1-2 sentences (culturally neutral — no regional idioms or sports references)
+- A brief note on how it was used in the context of that answer
+
+Format as a bulleted list ordered by appearance in the original answer. This is a reference card —
+NO analogies here (the main Dummies mode already provides those). Focus on clean, accurate definitions.
+
+If the previous answer had no jargon, respond: "No jargon to translate in the previous answer."
+"""

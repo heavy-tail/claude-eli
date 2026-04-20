@@ -1,0 +1,36 @@
+description = "Claude for Dummies — switch stage, show menu, or toggle on/off"
+argument-hint = "[level|easier|harder|1|2|3|4|on|off]"
+prompt = """
+User invoked /dummy with argument: {{args}}
+
+Look at the current Dummies stage from the SessionStart context (the "DUMMIES MODE ACTIVE — current stage: X" line).
+
+If the argument is empty or `level`: render the stage menu as a compact text block:
+
+```
+Current: [stage number + emoji + name] ← you are here
+
+Pick your stage:
+  1 🥚 Egg       Pure analogy, no jargon
+     e.g. "a kitchen shared by many cooks"
+  2 🐣 Chick     DEFAULT. Analogy + key term in parens
+     e.g. "a shared kitchen (fluid compute)"
+  3 🦅 Eagle     Term first, plain gloss in parens
+     e.g. "fluid compute (shared-server runtime)"
+  4 🐦‍🔥 Phoenix   Near-original technical prose
+
+Switch: /dummy 1|2|3|4   ·   Step: /dummy easier|harder   ·   Stop: /dummy off
+```
+
+If the argument is `1`, `2`, `3`, or `4`: the flag has already been updated by the hook. Confirm briefly:
+- Upgrade (new stage number > old): "🎉 Level up! You evolved to [new stage badge + name]. Share your level."
+- Downgrade: "Stage set to [new stage badge + name]."
+- Same stage: "Already at [stage]."
+
+If the argument is `easier` or `harder`: same Level-up / neutral confirm pattern.
+
+If the argument is `on`: "Dummies is on. Current stage: [stage]."
+If the argument is `off`: "Dummies is off. Say 'dummies mode' or /dummy on to re-enable."
+
+Match all messages to the current stage's format (analogy + term in Chick, etc.). Keep it to 1-2 lines.
+"""

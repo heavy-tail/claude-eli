@@ -1,0 +1,11 @@
+description = "This response only: normal Claude (full technical mode)"
+prompt = """
+For THIS RESPONSE ONLY, bypass Dummies — answer in standard technical mode. Do not apply analogies,
+do not rewrite explanations into plain language, do not add the `ⓘ analogy ≈` footnote.
+
+The Dummies stage remains set for the next response — /expert is a one-shot bypass, not a persistent toggle.
+
+Look at the user's actual request (the turn where they typed /expert). If they typed /expert alone,
+ask what they want in standard technical terms. If they typed /expert followed by a question, answer
+that question in normal mode.
+"""
