@@ -1,0 +1,15 @@
+How do I deploy this Next.js app to Vercel?
+Add authentication middleware to my API routes.
+What's the difference between SSR and SSG in Next.js?
+How do I set up environment variables in a React app?
+My component re-renders on every parent update — how do I fix it?
+What does this error mean: TypeError: Cannot read properties of undefined (reading 'map')?
+How do I use Tailwind CSS in a new Vite project?
+What's the right way to handle async errors in JavaScript?
+How does a database connection pool work?
+What are CORS errors and how do I fix them?
+Show me how to write a basic Express middleware.
+How do I revert the last git commit?
+Explain what `npm install --save-dev` does.
+What's the difference between `let`, `const`, and `var`?
+How do I create a Postgres index for fast lookups?
