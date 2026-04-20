@@ -1,35 +1,36 @@
 #!/usr/bin/env node
-// caveman — shared configuration resolver
+// Claude for Dummies — shared configuration resolver
 //
-// Resolution order for default mode:
-//   1. CAVEMAN_DEFAULT_MODE environment variable
-//   2. Config file defaultMode field:
-//      - $XDG_CONFIG_HOME/caveman/config.json (any platform, if set)
-//      - ~/.config/caveman/config.json (macOS / Linux fallback)
-//      - %APPDATA%\caveman\config.json (Windows fallback)
-//   3. 'full'
+// Resolution order for default stage:
+//   1. DUMMIES_DEFAULT_STAGE environment variable
+//   2. Config file defaultStage field:
+//      - $XDG_CONFIG_HOME/dummies/config.json (any platform, if set)
+//      - ~/.config/dummies/config.json (macOS / Linux fallback)
+//      - %APPDATA%\dummies\config.json (Windows fallback)
+//   3. 'chick'
+//
+// Based on the config pattern from caveman (JuliusBrussee/caveman, MIT).
 
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
 const VALID_MODES = [
-  'off', 'lite', 'full', 'ultra',
-  'wenyan-lite', 'wenyan', 'wenyan-full', 'wenyan-ultra',
-  'commit', 'review', 'compress'
+  'off',
+  'egg', 'chick', 'eagle', 'phoenix'
 ];
 
 function getConfigDir() {
   if (process.env.XDG_CONFIG_HOME) {
-    return path.join(process.env.XDG_CONFIG_HOME, 'caveman');
+    return path.join(process.env.XDG_CONFIG_HOME, 'dummies');
   }
   if (process.platform === 'win32') {
     return path.join(
       process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'),
-      'caveman'
+      'dummies'
     );
   }
-  return path.join(os.homedir(), '.config', 'caveman');
+  return path.join(os.homedir(), '.config', 'dummies');
 }
 
 function getConfigPath() {
@@ -38,7 +39,7 @@ function getConfigPath() {
 
 function getDefaultMode() {
   // 1. Environment variable (highest priority)
-  const envMode = process.env.CAVEMAN_DEFAULT_MODE;
+  const envMode = process.env.DUMMIES_DEFAULT_STAGE;
   if (envMode && VALID_MODES.includes(envMode.toLowerCase())) {
     return envMode.toLowerCase();
   }
@@ -47,22 +48,22 @@ function getDefaultMode() {
   try {
     const configPath = getConfigPath();
     const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    if (config.defaultMode && VALID_MODES.includes(config.defaultMode.toLowerCase())) {
-      return config.defaultMode.toLowerCase();
+    if (config.defaultStage && VALID_MODES.includes(config.defaultStage.toLowerCase())) {
+      return config.defaultStage.toLowerCase();
     }
   } catch (e) {
     // Config file doesn't exist or is invalid — fall through
   }
 
   // 3. Default
-  return 'full';
+  return 'chick';
 }
 
 // Symlink-safe flag file write.
 // Refuses symlinks at the target file and at the immediate parent directory,
 // uses O_NOFOLLOW where available, writes atomically via temp + rename with
 // 0600 permissions. Protects against local attackers replacing the predictable
-// flag path (~/.claude/.caveman-active) with a symlink to clobber other files.
+// flag path (~/.claude/.dummies-active) with a symlink to clobber other files.
 //
 // Does NOT walk the full ancestor chain — macOS has /tmp -> /private/tmp and
 // many legitimate setups route through symlinked home dirs, so a full walk
@@ -89,7 +90,7 @@ function safeWriteFlag(flagPath, content) {
       if (e.code !== 'ENOENT') return;
     }
 
-    const tempPath = path.join(flagDir, `.caveman-active.${process.pid}.${Date.now()}`);
+    const tempPath = path.join(flagDir, `.dummies-active.${process.pid}.${Date.now()}`);
     const O_NOFOLLOW = typeof fs.constants.O_NOFOLLOW === 'number' ? fs.constants.O_NOFOLLOW : 0;
     const flags = fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_EXCL | O_NOFOLLOW;
     let fd;
@@ -108,15 +109,15 @@ function safeWriteFlag(flagPath, content) {
 
 // Symlink-safe, size-capped, whitelist-validated flag file read.
 // Symmetric with safeWriteFlag: refuses symlinks at the target, caps the read,
-// and rejects anything that isn't a known mode. Returns null on any anomaly.
+// and rejects anything that isn't a known stage. Returns null on any anomaly.
 //
 // Without this, a local attacker with write access to ~/.claude/ could replace
 // the flag with a symlink to ~/.ssh/id_rsa (or any user-readable secret). Every
 // reader — statusline, per-turn reinforcement — would slurp that content and
 // either echo it to the terminal or inject it into model context.
 //
-// MAX_FLAG_BYTES is a hard cap. The longest legitimate value is "wenyan-ultra"
-// (12 bytes); 64 leaves slack without enabling exfil.
+// MAX_FLAG_BYTES is a hard cap. The longest legitimate value is "phoenix"
+// (7 bytes); 64 leaves slack without enabling exfil.
 const MAX_FLAG_BYTES = 64;
 
 function readFlag(flagPath) {

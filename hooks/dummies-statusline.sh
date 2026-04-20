@@ -1,14 +1,16 @@
 #!/bin/bash
-# caveman — statusline badge script for Claude Code
-# Reads the caveman mode flag file and outputs a colored badge.
+# Claude for Dummies — statusline badge script for Claude Code
+# Reads the dummies stage flag and outputs a colored badge with stage emoji.
 #
 # Usage in ~/.claude/settings.json:
-#   "statusLine": { "type": "command", "command": "bash /path/to/caveman-statusline.sh" }
+#   "statusLine": { "type": "command", "command": "bash /path/to/dummies-statusline.sh" }
 #
 # Plugin users: Claude will offer to set this up on first session.
 # Standalone users: install.sh wires this automatically.
+#
+# Based on the statusline pattern from caveman (JuliusBrussee/caveman, MIT).
 
-FLAG="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.caveman-active"
+FLAG="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.dummies-active"
 
 # Refuse symlinks — a local attacker could point the flag at ~/.ssh/id_rsa and
 # have the statusline render its bytes (including ANSI escape sequences) to
@@ -21,15 +23,15 @@ FLAG="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.caveman-active"
 MODE=$(head -c 64 "$FLAG" 2>/dev/null | tr -d '\n\r' | tr '[:upper:]' '[:lower:]')
 MODE=$(printf '%s' "$MODE" | tr -cd 'a-z0-9-')
 
-# Whitelist. Anything else → render nothing rather than echo attacker bytes.
+# Whitelist stage name → badge. Anything else → render nothing rather than echo
+# attacker bytes.
 case "$MODE" in
-  off|lite|full|ultra|wenyan-lite|wenyan|wenyan-full|wenyan-ultra|commit|review|compress) ;;
+  egg)     BADGE='🥚 dummies' ;;
+  chick)   BADGE='🐣 dummies' ;;
+  eagle)   BADGE='🦅 dummies' ;;
+  phoenix) BADGE='🐦‍🔥 dummies' ;;
   *) exit 0 ;;
 esac
 
-if [ -z "$MODE" ] || [ "$MODE" = "full" ]; then
-  printf '\033[38;5;172m[CAVEMAN]\033[0m'
-else
-  SUFFIX=$(printf '%s' "$MODE" | tr '[:lower:]' '[:upper:]')
-  printf '\033[38;5;172m[CAVEMAN:%s]\033[0m' "$SUFFIX"
-fi
+# Green = active. Bright enough to see without being loud.
+printf '\033[32m[%s]\033[0m' "$BADGE"

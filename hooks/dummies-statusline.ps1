@@ -1,11 +1,13 @@
+# Claude for Dummies — statusline badge script for Claude Code (Windows)
+# Reads the dummies stage flag and outputs a colored badge with stage emoji.
+#
+# Based on the statusline pattern from caveman (JuliusBrussee/caveman, MIT).
+
 $ClaudeDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME ".claude" }
-$Flag = Join-Path $ClaudeDir ".caveman-active"
+$Flag = Join-Path $ClaudeDir ".dummies-active"
 if (-not (Test-Path $Flag)) { exit 0 }
 
-# Refuse reparse points (symlinks / junctions) and oversized files. Without
-# this, a local attacker could point the flag at a secret file and have the
-# statusline render its bytes (including ANSI escape sequences) to the terminal
-# every keystroke.
+# Refuse reparse points (symlinks / junctions) and oversized files.
 try {
     $Item = Get-Item -LiteralPath $Flag -Force -ErrorAction Stop
     if ($Item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) { exit 0 }
@@ -27,13 +29,17 @@ try {
 $Mode = $Mode.ToLowerInvariant()
 $Mode = ($Mode -replace '[^a-z0-9-]', '')
 
-$Valid = @('off','lite','full','ultra','wenyan-lite','wenyan','wenyan-full','wenyan-ultra','commit','review','compress')
+$Valid = @('off', 'egg', 'chick', 'eagle', 'phoenix')
 if (-not ($Valid -contains $Mode)) { exit 0 }
 
-$Esc = [char]27
-if ([string]::IsNullOrEmpty($Mode) -or $Mode -eq "full") {
-    [Console]::Write("${Esc}[38;5;172m[CAVEMAN]${Esc}[0m")
-} else {
-    $Suffix = $Mode.ToUpperInvariant()
-    [Console]::Write("${Esc}[38;5;172m[CAVEMAN:$Suffix]${Esc}[0m")
+$Badge = switch ($Mode) {
+    'egg'     { "🥚 dummies" }
+    'chick'   { "🐣 dummies" }
+    'eagle'   { "🦅 dummies" }
+    'phoenix' { "🐦‍🔥 dummies" }
+    default   { exit 0 }
 }
+
+$Esc = [char]27
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::Write("${Esc}[32m[$Badge]${Esc}[0m")
