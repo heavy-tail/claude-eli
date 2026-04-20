@@ -26,10 +26,10 @@ MODE=$(printf '%s' "$MODE" | tr -cd 'a-z0-9-')
 # Whitelist stage name → badge. Anything else → render nothing rather than echo
 # attacker bytes.
 case "$MODE" in
-  egg)     BADGE='🥚 dummies' ;;
-  chick)   BADGE='🐣 dummies' ;;
-  eagle)   BADGE='🦅 dummies' ;;
-  phoenix) BADGE='🐦‍🔥 dummies' ;;
+  egg)     BADGE='1 🥚 dummies' ;;
+  chick)   BADGE='2 🐣 dummies' ;;
+  eagle)   BADGE='3 🦅 dummies' ;;
+  phoenix) BADGE='4 🐦‍🔥 dummies' ;;
   *) exit 0 ;;
 esac
 

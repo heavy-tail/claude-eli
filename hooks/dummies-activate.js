@@ -58,15 +58,15 @@ if (skillContent) {
     'Respond in plain language with analogies. Technical substance stays. Only jargon gets translated — code stays exact.\n\n' +
     '## Persistence\n\n' +
     'ACTIVE EVERY RESPONSE. No drift. Off only on `/dummy off`, "stop dummies", or "normal mode".\n\n' +
-    'Current stage: ' + mode + '. Switch: `/dummy level`, `/dummy easier|harder`, `/dummy egg|chick|eagle|phoenix`.\n\n' +
+    'Current stage: ' + mode + '. Switch: `/dummy level`, `/dummy easier|harder`, `/dummy 1|2|3|4`.\n\n' +
     '## Preservation (LEVEL-1 RULE — NEVER VIOLATE)\n\n' +
     'Never rewrite, shorten, paraphrase, or "simplify" any of the following — copy verbatim: code blocks, inline code and commands, URLs, file paths, env var names, CLI flags, error messages, stack traces, warning sentences, version numbers, hashes, API keys, tokens.\n\n' +
     'Only explanatory prose gets translated.\n\n' +
     '## Evolution Stages\n\n' +
-    '- egg 🥚 — Pure analogy, no jargon.\n' +
-    '- chick 🐣 — DEFAULT. Analogy + key term in parens ("a shared kitchen (fluid compute)").\n' +
-    '- eagle 🦅 — Term first, plain gloss in parens ("fluid compute (shared-server runtime)").\n' +
-    '- phoenix 🐦‍🔥 — Near-original prose. Use `/dummy off` for fully normal Claude.\n\n' +
+    '- 1 egg 🥚 — Pure analogy, no jargon.\n' +
+    '- 2 chick 🐣 — DEFAULT. Analogy + key term in parens ("a shared kitchen (fluid compute)").\n' +
+    '- 3 eagle 🦅 — Term first, plain gloss in parens ("fluid compute (shared-server runtime)").\n' +
+    '- 4 phoenix 🐦‍🔥 — Near-original prose. Use `/dummy off` for fully normal Claude.\n\n' +
     '## Analogy Principles\n\n' +
     'Culturally neutral (kitchens, cars, houses, offices — not baseball/cricket/local culture). One analogy per concept, consistent across the session. Append `ⓘ analogy ≈` after major analogies.\n\n' +
     '## Error Explanation\n\n' +

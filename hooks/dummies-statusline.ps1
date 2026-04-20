@@ -33,10 +33,10 @@ $Valid = @('off', 'egg', 'chick', 'eagle', 'phoenix')
 if (-not ($Valid -contains $Mode)) { exit 0 }
 
 $Badge = switch ($Mode) {
-    'egg'     { "🥚 dummies" }
-    'chick'   { "🐣 dummies" }
-    'eagle'   { "🦅 dummies" }
-    'phoenix' { "🐦‍🔥 dummies" }
+    'egg'     { "1 🥚 dummies" }
+    'chick'   { "2 🐣 dummies" }
+    'eagle'   { "3 🦅 dummies" }
+    'phoenix' { "4 🐦‍🔥 dummies" }
     default   { exit 0 }
 }
 

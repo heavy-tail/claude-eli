@@ -14,6 +14,10 @@ const flagPath = path.join(claudeDir, '.dummies-active');
 
 const STAGES = ['egg', 'chick', 'eagle', 'phoenix'];
 
+// User-facing command interface is numeric (/dummy 1|2|3|4). Internal storage
+// still uses stage names so hooks/statusline/SKILL.md share one vocabulary.
+const STAGES_BY_NUMBER = { '1': 'egg', '2': 'chick', '3': 'eagle', '4': 'phoenix' };
+
 function shiftStage(current, delta) {
   const i = STAGES.indexOf(current);
   if (i < 0) return getDefaultMode();
@@ -68,15 +72,16 @@ process.stdin.on('end', () => {
           unset = true;
         } else if (arg === 'on' || arg === '') {
           newStage = getDefaultMode();
-        } else if (STAGES.includes(arg)) {
-          newStage = arg;
+        } else if (STAGES_BY_NUMBER[arg]) {
+          newStage = STAGES_BY_NUMBER[arg];
         } else if (arg === 'easier') {
           newStage = shiftStage(readFlag(flagPath) || getDefaultMode(), -1);
         } else if (arg === 'harder') {
           newStage = shiftStage(readFlag(flagPath) || getDefaultMode(), +1);
         }
         // '/dummy level' and other args fall through — Claude + SKILL.md render menu,
-        // no flag change.
+        // no flag change. Stage names (egg/chick/eagle/phoenix) not accepted as args —
+        // numeric interface only for predictability.
       }
       // Sub-skills (/dummy-explain, /dummy-glossary, /dummy-analogy, /dummy-stats, /dummy-help)
       // don't change the active stage; Claude reads the prompt + sub-skill file and responds.

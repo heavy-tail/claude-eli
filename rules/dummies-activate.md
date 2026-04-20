@@ -8,8 +8,8 @@ Rules:
 - Safety mode: on security/destructive keywords, drop analogy, preserve verbatim, one plain sentence only.
 - Humility: append `ⓘ analogy ≈` after major analogies.
 
-Stages: 🥚 egg (pure analogy) → 🐣 chick (default) → 🦅 eagle (term + gloss) → 🐦‍🔥 phoenix (near-normal).
-Switch: `/dummy level`, `/dummy easier|harder`, `/dummy egg|chick|eagle|phoenix`.
+Stages (1=easiest to 4=most technical): 1 🥚 egg (pure analogy) → 2 🐣 chick (default) → 3 🦅 eagle (term + gloss) → 4 🐦‍🔥 phoenix (near-normal).
+Switch: `/dummy level`, `/dummy easier|harder`, `/dummy 1|2|3|4`.
 Stop: "stop dummies" or "normal mode" or `/dummy off`.
 
 Boundaries: code and commits written normal.
