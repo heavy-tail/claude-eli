@@ -97,12 +97,19 @@ All analogies are imperfect. Signal this, don't hide it:
 
 ## Sub-skills
 
-- `/dummy-explain` — Retranslate the previous answer in current level.
 - `/expert` — This response only: full technical mode.
 - `/dummy-glossary` — List jargon from the previous answer with plain definitions.
-- `/dummy-analogy <concept>` — Produce an analogy for a specific concept.
-- `/dummy-stats` — Show current evolution level + usage stats.
+- `/dummy-stats` — Show current evolution stage + usage stats.
 - `/dummy-help` — Quick reference card.
+
+### Natural triggers (no command needed)
+
+Because Dummies is Default ON, plain conversation already works for the most common requests:
+
+- **Re-explain the previous answer**: "다시", "again", "한번 더", "못 알아듣겠어", "didn't get that". Retranslate in the current stage.
+- **Analogy for a specific concept**: just ask — "middleware를 비유로 설명해", "explain X like a recipe". The mode already produces analogies.
+
+Only use slash commands when you want a predictable, structured output (glossary list, stats table, help card).
 
 ## Language
 
