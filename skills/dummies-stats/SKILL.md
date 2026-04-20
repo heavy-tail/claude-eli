@@ -1,0 +1,65 @@
+---
+name: dummies-stats
+description: >
+  Display the user's Dummies evolution progress card — current stage, install date,
+  session count, prompt count, and a stage-appropriate suggestion. Trigger: /dummy-stats,
+  "dummy stats", "내 진화", "what's my progress". One-shot; does NOT change the stage.
+---
+
+# Dummies Stats
+
+One-shot. Read metadata and render the progress card.
+
+## Data source
+
+Read `~/.config/dummies/metadata.json` (XDG respected; Windows: `%APPDATA%/dummies/metadata.json`).
+
+Shape:
+```json
+{
+  "installedAt": "2026-04-21T08:10:00Z",
+  "sessionCount": 42,
+  "totalPrompts": 420,
+  "lastSessionAt": "...",
+  "stageHistory": [{ "from": "chick", "to": "eagle", "at": "..." }]
+}
+```
+
+Current stage comes from the SessionStart context (the `DUMMIES MODE ACTIVE — current stage: X` line).
+
+## Format
+
+Render exactly this shape (adjust emoji + number to match current stage):
+
+```
+[badge] Dummies stats
+
+Current stage: [name] ([N]/4)
+Installed: [days since installedAt, or "today"]
+Sessions: [sessionCount]
+Prompts: [totalPrompts]
+
+Next stage: [stage+1 name + emoji, or "you're at Phoenix"]
+Suggested: [see rules below]
+```
+
+## Stage → suggestion
+
+| Current | Suggestion |
+|---------|-----------|
+| 1 🥚 Egg | "Still in Egg — plenty of time to explore. Try `/dummy harder` when you feel ready." |
+| 2 🐣 Chick | "Chick is the sweet spot. Stay as long as you like; `/dummy harder` when terms feel comfortable." |
+| 3 🦅 Eagle | "Eagle means you're learning the terms — keep going. `/dummy harder` to try Phoenix." |
+| 4 🐦‍🔥 Phoenix | "Phoenix reached. You're handling near-original prose. `/dummy off` for fully normal Claude." |
+
+## Edge cases
+
+- **First session / no data yet**: render a minimal card and add: "Installed today — more stats show once you've used it a while."
+- **sessionCount < 2**: omit the "Prompts" line (not informative yet).
+- **Current stage unknown** (shouldn't happen): say "Dummies is off. Run `/dummy on` to start."
+
+## Important
+
+- **Do NOT change the stage.** No flag writes.
+- Render in the current stage's style — if Chick, use analogy + term; if Phoenix, technical.
+- `ⓘ analogy ≈` footnote after any stats-related analogy (e.g. "like a pet game where your companion grows with you ⓘ analogy ≈").
