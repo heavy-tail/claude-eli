@@ -1,0 +1,34 @@
+{
+  "name": "dummies",
+  "description": "Claude for Dummies. Translate Claude's technical explanations into plain language with analogies. Code blocks, commands, URLs, paths — preserved 100%.",
+  "author": {
+    "name": "WH",
+    "url": "https://github.com/wchun26"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/dummies-activate.js\"",
+            "timeout": 5,
+            "statusMessage": "Loading Claude for Dummies..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/dummies-mode-tracker.js\"",
+            "timeout": 5,
+            "statusMessage": "Tracking Dummies mode..."
+          }
+        ]
+      }
+    ]
+  }
+}

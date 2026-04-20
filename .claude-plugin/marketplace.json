@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "dummies",
+  "description": "Claude for Dummies — Claude speaks plain language with analogies. Code stays exact.",
+  "owner": {
+    "name": "WH",
+    "url": "https://github.com/wchun26"
+  },
+  "plugins": [
+    {
+      "name": "dummies",
+      "description": "Default-on plain-English layer for Claude Code. Preserves code 100%, translates explanations into everyday metaphors.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
