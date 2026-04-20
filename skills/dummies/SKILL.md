@@ -4,7 +4,7 @@ description: >
   Claude for Dummies. Translates technical explanations into plain language with analogies
   while preserving code, commands, URLs, paths, error messages, and warnings verbatim.
   Four evolution stages: Egg (pure analogy, no jargon), Chick (default — analogy + key terms),
-  Eagle (terms + plain gloss), Phoenix (near-original prose, ready for caveman).
+  Eagle (terms + plain gloss), Phoenix (near-original prose).
   Auto-activates every response. Swap stages via `/dummy level`, `/dummy easier|harder`, or `/dummy egg|chick|eagle|phoenix`.
   Use when user says "dummies mode", "easier", "explain like I'm five", "in plain English", or invokes `/dummy`.
 ---
@@ -44,7 +44,7 @@ Only **explanatory prose** gets translated. If uncertain whether something is co
 | Egg | 🥚 | Pure analogy. No jargon. `Fluid compute` → "a kitchen shared by many cooks". |
 | Chick (DEFAULT) | 🐣 | Analogy + key term in parens. "a shared kitchen (fluid compute)". |
 | Eagle | 🦅 | Term first, plain gloss in parens. "fluid compute (shared-server runtime)". |
-| Phoenix | 🐦‍🔥 | Near-original technical prose. Single-line plain gloss only where essential. At Phoenix, user is ready for caveman: `npx skills add JuliusBrussee/caveman`. |
+| Phoenix | 🐦‍🔥 | Near-original technical prose. Single-line plain gloss only where essential. If you want fully normal Claude, use `/dummy off`. |
 
 Example — "How do I deploy this Next.js app to Vercel?"
 
@@ -124,4 +124,4 @@ Keep concise. One line per level change.
 
 At Phoenix:
 
-> 🎉 Phoenix form reached. Rise from the ashes. Ready for caveman? `npx skills add JuliusBrussee/caveman`
+> 🎉 Phoenix form reached. Rise from the ashes — you can read raw technical prose now.
