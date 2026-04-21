@@ -4,11 +4,13 @@ For Claude/contributors working on this repo. End-user docs live in `README.md`.
 
 ## What this project does
 
-Default-on Claude Code plugin that translates Claude's technical explanations into plain language with analogies, while preserving every code block, command, URL, file path, env var, CLI flag, error message, version number, and warning sentence verbatim.
+Default-on Claude Code plugin that cuts the "explain it again, but easier" loop — gives decision-friendly answers by default. The decision filter ("Does this affect what the user does next?") is applied at every response. Code, commands, URLs, paths, env vars, CLI flags, errors, warnings — preserved verbatim at every stage.
 
-Four evolution stages, picked by the user — `1 🥚 egg`, `2 🐣 chick` (default), `3 🦅 eagle`, `4 🐦‍🔥 phoenix`. Numeric command interface; emoji + name only on the statusline and inside SKILL.md.
+Three stages on a **decision-detail axis**, picked by the user — `1 👶 baby` (TL;DR), `2 🧒 kid` (default — summary), `3 🎓 adult` (standard with trade-offs). For uncut Claude, `/dummy off`. Numeric command interface; emoji + name on the statusline and inside SKILL.md.
 
-Independent product. Architecture inspired by caveman (MIT) — see `ATTRIBUTION.md`.
+Analogies are a tool used selectively (abstract concepts, cryptic errors, multi-step flows), not a goal. Skip on code-heavy or step-by-step setup answers.
+
+Independent product. Architecture inspired by caveman (MIT) — different axis: caveman compresses all prose, we filter for decision-relevant prose. See `ATTRIBUTION.md`.
 
 ## Single source of truth files — edit only these
 
@@ -76,12 +78,12 @@ SessionStart hook ──writes stage──▶ .dummies-active ◀──updates s
                                        reads
                                           ▼
                                   dummies-statusline.sh
-                                  [1 🥚 dummies] / [2 🐣 dummies] / ...
+                                  [1 👶 dummies] / [2 🧒 dummies] / [3 🎓 dummies]
 ```
 
 ### `dummies-activate.js` (SessionStart)
 
-1. Reads `getDefaultMode()` (env > config.json > 'chick'). If `'off'`, removes the flag and exits.
+1. Reads `getDefaultMode()` (env > config.json > 'kid'). If `'off'`, removes the flag and exits.
 2. Writes the stage to the flag file via `safeWriteFlag` (symlink-safe, atomic, 0600).
 3. Calls `recordSession()` — sets `installedAt` on first run, increments `sessionCount`.
 4. Reads `skills/dummies/SKILL.md` and emits the body (frontmatter stripped) as stdout. Claude Code injects this as system context.
@@ -99,7 +101,7 @@ Per turn:
 3. Snapshot stage before parsing.
 4. Natural-language deactivation (`stop dummies`, `normal mode`): unlink flag.
 5. Natural-language activation: write `getDefaultMode()` to flag.
-6. Slash-command parsing: `/dummy off|on|easier|harder|1|2|3|4` → mutate flag. Stage names (`egg`, `chick`, ...) **not accepted** as args — numeric only.
+6. Slash-command parsing: `/dummy off|on|easier|harder|1|2|3` → mutate flag. Stage names (`baby`, `kid`, `adult`) **not accepted** as args — numeric only.
 7. Sub-skill commands (`/dummy-glossary`, `/dummy-stats`, `/dummy-help`) don't change stage.
 8. Detect transition vs snapshot. If changed, `recordStageChange(before, after)` and prepend a `STAGE CHANGE: N old → N new (upgrade|downgrade|activate)` line to `additionalContext`.
 9. Per-turn reinforcement: emit `DUMMIES MODE ACTIVE (stage: X)` plus the preservation reminder + neutrality reminder via `hookSpecificOutput.additionalContext`.
@@ -118,7 +120,7 @@ Security: the flag file at `~/.claude/.dummies-active` is a predictable path. Wi
 
 ### `dummies-statusline.sh` / `.ps1`
 
-Reads the flag, applies the same symlink + size + whitelist guards, and prints `[1 🥚 dummies]` style badge in green.
+Reads the flag, applies the same symlink + size + whitelist guards, and prints `[1 👶 dummies]` style badge in green.
 
 ## Skill system
 
@@ -134,7 +136,7 @@ Each `/command` is a `commands/<name>.toml` file with `description`, optional `a
 
 | Field | Value | Where |
 |-------|-------|-------|
-| Default stage | `chick` | `dummies-config.js` `getDefaultMode()` final return |
+| Default stage | `kid` | `dummies-config.js` `getDefaultMode()` final return |
 | Stage history cap | 100 | `dummies-config.js` `MAX_STAGE_HISTORY` |
 | Flag size cap | 64 bytes | `dummies-config.js` `MAX_FLAG_BYTES` |
 | Hook timeout | 5 s | `.claude-plugin/plugin.json` |

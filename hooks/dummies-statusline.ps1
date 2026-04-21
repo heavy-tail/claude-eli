@@ -29,15 +29,14 @@ try {
 $Mode = $Mode.ToLowerInvariant()
 $Mode = ($Mode -replace '[^a-z0-9-]', '')
 
-$Valid = @('off', 'egg', 'chick', 'eagle', 'phoenix')
+$Valid = @('off', 'baby', 'kid', 'adult')
 if (-not ($Valid -contains $Mode)) { exit 0 }
 
 $Badge = switch ($Mode) {
-    'egg'     { "1 🥚 dummies" }
-    'chick'   { "2 🐣 dummies" }
-    'eagle'   { "3 🦅 dummies" }
-    'phoenix' { "4 🐦‍🔥 dummies" }
-    default   { exit 0 }
+    'baby'  { "1 👶 dummies" }
+    'kid'   { "2 🧒 dummies" }
+    'adult' { "3 🎓 dummies" }
+    default { exit 0 }
 }
 
 $Esc = [char]27

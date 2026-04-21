@@ -1,41 +1,70 @@
 # Claude for Dummies
 
-> Always on. One command away. No questions needed.
+> Stop asking "explain that easier." Get decision-friendly answers by default.
 
-Claude explains technical answers in plain language with analogies — while leaving every line of code, every command, every URL, every error message **exactly the way Claude wrote it**.
+Claude for Dummies cuts the **"explain it again, but easier"** loop. Instead of long technical answers you have to re-prompt down to a summary, you get the summary first — only the information that actually changes what you do next. Code, commands, URLs, paths, errors, warnings — preserved verbatim. Always on.
 
-If you're a vibecoder, a beginner, a PM who codes occasionally, or anyone who's tired of nodding along to "fluid compute" without really getting it — this is for you.
+For vibecoders, beginners, PMs who code, or anyone tired of re-prompting Claude for a TL;DR.
 
 ---
 
 ## Before / After
 
-**You ask:** *How do I deploy this Next.js app to Vercel?*
+**You ask:** *Why did only 58 of my 2,207 restaurants pass the price filter?*
 
 <table>
 <tr>
-<th>Default Claude</th>
-<th>Claude for Dummies</th>
+<th>Default Claude (full answer)</th>
+<th>Claude for Dummies — 🧒 Kid (default)</th>
 </tr>
 <tr>
 <td valign="top">
 
-> Run `vercel deploy` from your project root. This triggers a build using your `vercel.ts` config and deploys to Vercel's edge network. For production, use `vercel --prod`. Make sure your environment variables are configured in the Vercel dashboard or via `vercel env`.
+> Looking at your funnel, 2,207 restaurants entered the pipeline. 168 had no URL, leaving 2,039. Of those, 587 failed to fetch (anti-bot blocks, HTTP 404s, crawl4ai fallbacks all failing). 327 more failed at menu page parsing, leaving 1,125. Of those, 516 failed price extraction. 609 had prices extracted. Of those 609, only 58 had `all_prices ≤ $15` confirmed by the LLM, while 493 were marked `residual` (LLM confidence too low for "solo main ≤$15"). Borough breakdown: Manhattan 25, Queens 18, Brooklyn 11, Bronx 4, Staten Island 0. Anti-bot detection is dominant in fetch_failed. Stage 5→6 is the largest drop. Recommended levers: (1) loosen the LLM confidence threshold, (2) add anti-bot bypass via paid services, (3) Google Places URL recovery...
+
+(continues for ~600 more words with tables, options, trade-offs)
 
 </td>
 <td valign="top">
 
-> Run `vercel deploy` from your project root.
+> **2.6% (58/2,207). Too few to launch.**
 >
-> Think of it as putting your sign on a street corner — people can walk by and see your site. The build uses your `vercel.ts` config and uploads to Vercel's network. For the real version (not a test), use `vercel --prod`.
+> **Two real causes:**
+> 1. Sites have anti-bot blocks → ~half of fetches die.
+> 2. AI is too strict — 493 had prices extracted but were marked "not confident" and dumped.
 >
-> Keep secrets (passwords, API keys) out of your code — set them in the Vercel dashboard. Those are called environment variables. ⓘ analogy ≈
+> **Biggest finding:** those 493. Loosening the AI prompt could push pass count to 200-300.
+>
+> **Next:** spend a day testing prompt loosening on 20 of those 493 (free). If lift confirmed → re-run on full set.
+>
+> If that doesn't work, anti-bot bypass (paid, more time) is the next lever.
 
 </td>
 </tr>
 </table>
 
-**The code stays exactly the same. Only the explanation changes.**
+**Same data, same code preserved. Just only what you need to decide.**
+
+---
+
+## How it works
+
+Three stages on a **decision-detail axis**:
+
+| # | Badge | Stage | What you get |
+|---|-------|-------|--------------|
+| 1 | 👶 | **Baby** | TL;DR. Bottom line + 2-4 bullets max. |
+| 2 | 🧒 | **Kid** *(default)* | Summary. 5-10 bullets, key facts + main causes + next action. |
+| 3 | 🎓 | **Adult** | Standard. Full structure with options, trade-offs, edge cases. |
+
+Want fully uncut Claude? `/dummy off`.
+
+The decision filter applied at every stage:
+
+> **"Does this affect what the user does next?"**
+> If yes → include. If no → cut.
+
+Tables, numbers, code — all welcome **when they help you decide faster**, not when they look thorough.
 
 ---
 
@@ -48,45 +77,7 @@ claude plugin marketplace add wchun26/claude-for-dummies
 claude plugin install dummies@dummies
 ```
 
-Restart Claude Code. Done. Default ON — no further commands needed.
-
----
-
-## How it works
-
-Three layers, all automatic:
-
-1. **A SessionStart hook** loads the dummies ruleset on every Claude Code session.
-2. **A UserPromptSubmit hook** detects `/dummy` commands and quietly tracks your stage.
-3. **A statusline badge** shows your current stage at a glance: `[2 🐣 dummies]`.
-
-You don't have to think about any of it. Just talk to Claude like normal.
-
-When you want a one-off normal-Claude answer, type `/expert`. Stage stays put for the next response.
-
----
-
-## Evolution stages
-
-Pick how much you want translated. Default is **Chick** (analogy + key term).
-
-| # | Badge | Stage | What you see |
-|---|-------|-------|--------------|
-| 1 | 🥚 | **Egg** | Pure analogy, no jargon. *"a kitchen shared by many cooks"* |
-| 2 | 🐣 | **Chick** | Analogy + key term in parens. *"a shared kitchen (fluid compute)"* — **default** |
-| 3 | 🦅 | **Eagle** | Term first, plain gloss. *"fluid compute (shared-server runtime)"* |
-| 4 | 🐦‍🔥 | **Phoenix** | Near-original technical prose. |
-
-Switch any time:
-
-```
-/dummy 1        # jump to Egg
-/dummy easier   # one step easier
-/dummy harder   # one step technical
-/dummy level    # show the menu
-```
-
-When you level up, you'll see a one-time **🎉 Level up!** message. Share your stage if you want.
+Restart Claude Code. Default ON — no further commands needed.
 
 ---
 
@@ -94,15 +85,15 @@ When you level up, you'll see a one-time **🎉 Level up!** message. Share your 
 
 ```
 Stage
-  /dummy level       show menu with examples
-  /dummy easier      ↓ one step
-  /dummy harder      ↑ one step
-  /dummy 1..4        jump to stage (1=🥚 easiest, 4=🐦‍🔥 technical)
+  /dummy level       show menu
+  /dummy easier      ↓ one step (more dummy)
+  /dummy harder      ↑ one step (more detail)
+  /dummy 1..3        jump to stage (1=👶, 2=🧒 default, 3=🎓)
 
 Switch
-  /dummy off         disable for this session
+  /dummy off         disable for this session (= uncut Claude)
   /dummy on          re-enable
-  /expert            this response only: normal Claude
+  /expert            this response only: full technical mode
 
 Extra
   /dummy-glossary    jargon from previous answer with plain defs
@@ -114,34 +105,32 @@ Extra
 
 | You say | What happens |
 |---------|--------------|
-| `다시` / `again` / `한번 더` / `못 알아듣겠어` | Retranslate the previous answer in your current stage |
+| `다시` / `again` / `한번 더` / `못 알아듣겠어` | Re-translate previous answer in current stage |
 | `stop dummies` / `normal mode` | Disable for this session |
 | `dummies mode` / `talk like dummies` | Re-enable |
-
-These work because Dummies is Default ON — you can keep talking like a human, the plugin keeps the rules going.
 
 ---
 
 ## What we preserve, exactly
 
-**Code, commands, URLs, file paths, environment variables, CLI flags, error messages, version numbers, warning sentences — all kept verbatim.** Only explanatory prose gets the analogy treatment.
+**Code blocks, inline commands, URLs, file paths, env vars, CLI flags, error messages, version numbers, warning sentences — all verbatim. At every stage.** Only the explanatory prose around them gets filtered.
 
-We measure this with a regex-based extractor across every prompt in `evals/prompts/`. Synthetic-snapshot smoke test:
+We measure this with regex extraction across every prompt in `evals/prompts/`. Synthetic-snapshot smoke test:
 
 | Arm | code | inline | url | path | env_var | flag | version | error | Overall |
 |-----|------|--------|-----|------|---------|------|---------|-------|---------|
 | Plain "be terse" control | — | 50% | 0% | 25% | 0% | 100% | 0% | 0% | **25%** |
 | **Dummies** | — | **100%** | **100%** | **100%** | **100%** | **100%** | **100%** | **100%** | **100%** |
 
-Reproduce with `python evals/llm_run.py && python evals/measure.py` (needs `claude` CLI authenticated).
+Reproduce: `python evals/llm_run.py && python evals/measure.py` (needs `claude` CLI authenticated).
 
 ---
 
 ## Safety Clarity Mode
 
-When Claude is about to warn you about something dangerous — destructive commands (`rm -rf`, `DROP TABLE`, `force push`), security issues, production-critical actions — Dummies **drops the analogy** and keeps the warning verbatim. The statusline shows `[⚠ safety mode]` for that response.
+When Claude is about to warn you about something dangerous — destructive commands (`rm -rf`, `DROP TABLE`, `force push`), security issues, production-critical actions — Dummies **drops the analogy** and keeps the warning verbatim. Statusline shows `[⚠ safety mode]` for that response.
 
-You won't get cute metaphors when something can wipe your database. That's the rule.
+You won't get cute metaphors when something can wipe your database.
 
 ---
 
@@ -149,24 +138,29 @@ You won't get cute metaphors when something can wipe your database. That's the r
 
 > All analogies are imperfect. Use them as a first step, not the final map.
 
-Each analogy ends with a small `ⓘ analogy ≈` footnote so you know it's an approximation. If you spot a misleading one, please file an issue with the **bad-analogy** tag.
+When we use one (only when it actually helps), we end with a small `ⓘ analogy ≈` footnote. If you spot a misleading one, file an issue with the **bad-analogy** tag.
+
+Analogies are a **tool**, not a goal. We skip them when:
+- The answer is mostly code/commands (the code is the answer)
+- It's a step-by-step setup (numbered steps clearer than metaphor)
+- A precise number/threshold matters (just give the number)
 
 ---
 
 ## Configure default stage
 
-If Chick isn't your jam, set a different default.
+If Kid isn't your jam, set a different default.
 
 **Environment variable** (highest priority):
 
 ```bash
-export DUMMIES_DEFAULT_STAGE=eagle
+export DUMMIES_DEFAULT_STAGE=adult
 ```
 
 **Config file** (`~/.config/dummies/config.json`):
 
 ```json
-{ "defaultStage": "eagle" }
+{ "defaultStage": "adult" }
 ```
 
 Set `"off"` to disable auto-activation entirely (you can still turn it on per-session with `/dummy on`).
@@ -196,7 +190,7 @@ That's it.
 
 ## Inspiration
 
-Architecture inspired by [caveman](https://github.com/JuliusBrussee/caveman) (MIT) — same hook + skill plumbing pattern, opposite behavior. See [`ATTRIBUTION.md`](./ATTRIBUTION.md) for what we reused versus what's new.
+Architecture inspired by [caveman](https://github.com/JuliusBrussee/caveman) (MIT) — same hook + skill plumbing pattern, different axis. caveman compresses *all* prose tokens; Dummies filters for **decision-relevant prose** while expanding analogies where they help. See [`ATTRIBUTION.md`](./ATTRIBUTION.md) for what we reused.
 
 ## License
 

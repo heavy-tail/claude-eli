@@ -20,7 +20,7 @@ caveman's hook architecture, multi-agent install scripts, and eval harness were 
 
 - SKILL.md instruction content (plain-language translation rules)
 - Analogy library (concept → metaphor mapping)
-- Evolution levels (Egg Chick Eagle Phoenix)
+- Decision-detail stages (Baby / Kid / Adult) with the decision filter ("Does this affect what the user does next?")
 - Safety Clarity Mode (preserve verbatim on security warnings)
 - Code preservation measurement (AST diff + URL/path/flag/error checks)
 

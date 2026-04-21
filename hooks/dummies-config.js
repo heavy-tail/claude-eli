@@ -7,7 +7,7 @@
 //      - $XDG_CONFIG_HOME/dummies/config.json (any platform, if set)
 //      - ~/.config/dummies/config.json (macOS / Linux fallback)
 //      - %APPDATA%\dummies\config.json (Windows fallback)
-//   3. 'chick'
+//   3. 'kid'
 //
 // Based on the config pattern from caveman (JuliusBrussee/caveman, MIT).
 
@@ -17,7 +17,7 @@ const os = require('os');
 
 const VALID_MODES = [
   'off',
-  'egg', 'chick', 'eagle', 'phoenix'
+  'baby', 'kid', 'adult'
 ];
 
 function getConfigDir() {
@@ -56,7 +56,7 @@ function getDefaultMode() {
   }
 
   // 3. Default
-  return 'chick';
+  return 'kid';
 }
 
 // Symlink-safe flag file write.
@@ -116,8 +116,8 @@ function safeWriteFlag(flagPath, content) {
 // reader — statusline, per-turn reinforcement — would slurp that content and
 // either echo it to the terminal or inject it into model context.
 //
-// MAX_FLAG_BYTES is a hard cap. The longest legitimate value is "phoenix"
-// (7 bytes); 64 leaves slack without enabling exfil.
+// MAX_FLAG_BYTES is a hard cap. The longest legitimate value is "adult"
+// (5 bytes); 64 leaves slack without enabling exfil.
 const MAX_FLAG_BYTES = 64;
 
 function readFlag(flagPath) {

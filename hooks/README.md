@@ -24,7 +24,7 @@ If you installed Dummies standalone (without the plugin marketplace), use `bash 
 
 ### `dummies-config.js` — shared module (not a hook)
 
-- `getDefaultMode()` — resolves default stage from `DUMMIES_DEFAULT_STAGE` env var, then `~/.config/dummies/config.json`'s `defaultStage` field, then `'chick'`
+- `getDefaultMode()` — resolves default stage from `DUMMIES_DEFAULT_STAGE` env var, then `~/.config/dummies/config.json`'s `defaultStage` field, then `'kid'`
 - `safeWriteFlag(path, content)` — symlink-safe atomic write of the flag file (refuses symlinks, uses `O_NOFOLLOW`, writes `0600`)
 - `readFlag(path)` — symlink-safe size-capped whitelist-validated read
 - `recordSession() / recordPrompt() / recordStageChange()` — best-effort metadata writes
@@ -33,10 +33,9 @@ If you installed Dummies standalone (without the plugin marketplace), use `bash 
 
 Outputs a colored badge based on the flag value:
 
-- `egg` → `[1 🥚 dummies]` (green)
-- `chick` → `[2 🐣 dummies]` (green)
-- `eagle` → `[3 🦅 dummies]` (green)
-- `phoenix` → `[4 🐦‍🔥 dummies]` (green)
+- `baby` → `[1 👶 dummies]` (green)
+- `kid` → `[2 🧒 dummies]` (green)
+- `adult` → `[3 🎓 dummies]` (green)
 
 Refuses symlinks, caps reads at 64 bytes, and whitelists stage values to block terminal-escape injection through the flag file.
 
@@ -72,7 +71,7 @@ The installer writes this to your `settings.json` automatically. If you already 
 
 - `CLAUDE_CONFIG_DIR` — alternative location for `~/.claude` (respected by all scripts)
 - `XDG_CONFIG_HOME` — alternative location for `~/.config` (used for `~/.config/dummies/`)
-- `DUMMIES_DEFAULT_STAGE` — overrides the default stage (`egg|chick|eagle|phoenix|off`)
+- `DUMMIES_DEFAULT_STAGE` — overrides the default stage (`baby|kid|adult|off`)
 
 ## Inspiration
 

@@ -1,5 +1,5 @@
 description = "Claude for Dummies — switch stage, show menu, or toggle on/off"
-argument-hint = "[level|easier|harder|1|2|3|4|on|off]"
+argument-hint = "[level|easier|harder|1|2|3|on|off]"
 prompt = """
 User invoked /dummy with argument: {{args}}
 
@@ -11,20 +11,19 @@ If the argument is empty or `level`: render the stage menu as a compact text blo
 Current: [stage number + emoji + name] ← you are here
 
 Pick your stage:
-  1 🥚 Egg       Pure analogy, no jargon
-     e.g. "a kitchen shared by many cooks"
-  2 🐣 Chick     DEFAULT. Analogy + key term in parens
-     e.g. "a shared kitchen (fluid compute)"
-  3 🦅 Eagle     Term first, plain gloss in parens
-     e.g. "fluid compute (shared-server runtime)"
-  4 🐦‍🔥 Phoenix   Near-original technical prose
+  1 👶 Baby     TL;DR — bottom line + 2-4 bullets max
+                e.g. "Use vercel deploy. Don't forget --prod for live."
+  2 🧒 Kid      Summary — key facts + main causes + next action  ← default
+                e.g. analogy + brief steps + cost note
+  3 🎓 Adult    Standard — full options/trade-offs/edge cases
 
-Switch: /dummy 1|2|3|4   ·   Step: /dummy easier|harder   ·   Stop: /dummy off
+Switch: /dummy 1|2|3   ·   Step: /dummy easier|harder   ·   Stop: /dummy off
+For uncut Claude, use /dummy off.
 ```
 
-If the argument is `1`, `2`, `3`, or `4`: the flag has already been updated by the hook. Confirm briefly:
-- Upgrade (new stage number > old): "🎉 Level up! You evolved to [new stage badge + name]. Share your level."
-- Downgrade: "Stage set to [new stage badge + name]."
+If the argument is `1`, `2`, or `3`: the flag has already been updated by the hook. Confirm briefly:
+- Upgrade (new stage number > old): "🎉 Level up! You're now at [new badge + name] — [one-line what changes]. Share your stage."
+- Downgrade: "Stage set to [new badge + name] — [one-line what changes]."
 - Same stage: "Already at [stage]."
 
 If the argument is `easier` or `harder`: same Level-up / neutral confirm pattern.
@@ -32,5 +31,5 @@ If the argument is `easier` or `harder`: same Level-up / neutral confirm pattern
 If the argument is `on`: "Dummies is on. Current stage: [stage]."
 If the argument is `off`: "Dummies is off. Say 'dummies mode' or /dummy on to re-enable."
 
-Match all messages to the current stage's format (analogy + term in Chick, etc.). Keep it to 1-2 lines.
+Match all messages to the current stage's filter (Baby = TL;DR; Kid = summary; Adult = full). Keep confirms to 1-2 lines.
 """

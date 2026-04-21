@@ -21,7 +21,7 @@ Shape:
   "sessionCount": 42,
   "totalPrompts": 420,
   "lastSessionAt": "...",
-  "stageHistory": [{ "from": "chick", "to": "eagle", "at": "..." }]
+  "stageHistory": [{ "from": "kid", "to": "adult", "at": "..." }]
 }
 ```
 
@@ -34,7 +34,7 @@ Render exactly this shape (adjust emoji + number to match current stage):
 ```
 [badge] Dummies stats
 
-Current stage: [name] ([N]/4)
+Current stage: [name] ([N]/3)
 Installed: [days since installedAt, or "today"]
 Sessions: [sessionCount]
 Prompts: [totalPrompts]
@@ -47,10 +47,9 @@ Suggested: [see rules below]
 
 | Current | Suggestion |
 |---------|-----------|
-| 1 🥚 Egg | "Still in Egg — plenty of time to explore. Try `/dummy harder` when you feel ready." |
-| 2 🐣 Chick | "Chick is the sweet spot. Stay as long as you like; `/dummy harder` when terms feel comfortable." |
-| 3 🦅 Eagle | "Eagle means you're learning the terms — keep going. `/dummy harder` to try Phoenix." |
-| 4 🐦‍🔥 Phoenix | "Phoenix reached. You're handling near-original prose. `/dummy off` for fully normal Claude." |
+| 1 👶 Baby | "Baby — the tightest filter. TL;DR only. Try `/dummy harder` when you want main causes too." |
+| 2 🧒 Kid | "Kid is the sweet spot. Summary + key info. Stay as long as you like; `/dummy harder` for trade-offs." |
+| 3 🎓 Adult | "Adult — full structure with options and trade-offs. For uncut Claude, use `/dummy off`." |
 
 ## Edge cases
 

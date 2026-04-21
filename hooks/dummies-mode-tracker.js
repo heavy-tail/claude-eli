@@ -19,9 +19,9 @@ const {
 const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
 const flagPath = path.join(claudeDir, '.dummies-active');
 
-const STAGES = ['egg', 'chick', 'eagle', 'phoenix'];
-const STAGES_BY_NUMBER = { '1': 'egg', '2': 'chick', '3': 'eagle', '4': 'phoenix' };
-const STAGE_NUMBER = { egg: 1, chick: 2, eagle: 3, phoenix: 4 };
+const STAGES = ['baby', 'kid', 'adult'];
+const STAGES_BY_NUMBER = { '1': 'baby', '2': 'kid', '3': 'adult' };
+const STAGE_NUMBER = { baby: 1, kid: 2, adult: 3 };
 
 function shiftStage(current, delta) {
   const i = STAGES.indexOf(current);
@@ -130,8 +130,9 @@ process.stdin.on('end', () => {
     if (after) {
       const context = (transitionLine ? transitionLine + '\n' : '') +
         "DUMMIES MODE ACTIVE (stage: " + after + "). " +
-        "Respond in plain language with analogies. Preserve code, commands, URLs, paths, env vars, CLI flags, error messages, warnings, version numbers verbatim. " +
-        "Culturally neutral analogies, consistent across the session. Append `ⓘ analogy ≈` after major analogies.";
+        "Apply the decision filter: include only what affects what the user does next. " +
+        "Preserve code, commands, URLs, paths, env vars, CLI flags, error messages, warnings, version numbers verbatim. " +
+        "Use analogies as a tool (abstract concepts, cryptic errors) — not for code-heavy or step-by-step answers. Culturally neutral, consistent across the session. Append `ⓘ analogy ≈` after major analogies.";
 
       process.stdout.write(JSON.stringify({
         hookSpecificOutput: {

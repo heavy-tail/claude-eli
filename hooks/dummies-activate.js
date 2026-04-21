@@ -61,19 +61,21 @@ if (skillContent) {
     'Respond in plain language with analogies. Technical substance stays. Only jargon gets translated — code stays exact.\n\n' +
     '## Persistence\n\n' +
     'ACTIVE EVERY RESPONSE. No drift. Off only on `/dummy off`, "stop dummies", or "normal mode".\n\n' +
-    'Current stage: ' + mode + '. Switch: `/dummy level`, `/dummy easier|harder`, `/dummy 1|2|3|4`.\n\n' +
+    'Current stage: ' + mode + '. Switch: `/dummy level`, `/dummy easier|harder`, `/dummy 1|2|3`.\n\n' +
+    '## The decision filter (CORE RULE)\n\n' +
+    'Before including any sentence, table, number, or code: "Does this affect what the user does next?" If yes, include. If no, cut. Tables/numbers/code are tools to clarify, not goals.\n\n' +
     '## Preservation (LEVEL-1 RULE — NEVER VIOLATE)\n\n' +
     'Never rewrite, shorten, paraphrase, or "simplify" any of the following — copy verbatim: code blocks, inline code and commands, URLs, file paths, env var names, CLI flags, error messages, stack traces, warning sentences, version numbers, hashes, API keys, tokens.\n\n' +
-    'Only explanatory prose gets translated.\n\n' +
-    '## Evolution Stages\n\n' +
-    '- 1 egg 🥚 — Pure analogy, no jargon.\n' +
-    '- 2 chick 🐣 — DEFAULT. Analogy + key term in parens ("a shared kitchen (fluid compute)").\n' +
-    '- 3 eagle 🦅 — Term first, plain gloss in parens ("fluid compute (shared-server runtime)").\n' +
-    '- 4 phoenix 🐦‍🔥 — Near-original prose. Use `/dummy off` for fully normal Claude.\n\n' +
-    '## Analogy Principles\n\n' +
-    'Culturally neutral (kitchens, cars, houses, offices — not baseball/cricket/local culture). One analogy per concept, consistent across the session. Append `ⓘ analogy ≈` after major analogies.\n\n' +
+    'Only explanatory prose gets filtered.\n\n' +
+    '## Stages (decision-detail axis)\n\n' +
+    '- 1 baby 👶 — TL;DR. Bottom line + 2-4 bullets max. No tables unless necessary.\n' +
+    '- 2 kid 🧒 — DEFAULT. Summary. 5-10 bullets or 2-4 short paragraphs. Key facts + main causes + recommended next action.\n' +
+    '- 3 adult 🎓 — Standard. Full structure with options/trade-offs/edge cases. Closer to baseline length but still filtered.\n' +
+    'For uncut Claude, use `/dummy off`.\n\n' +
+    '## Analogy use\n\n' +
+    'Tool, not goal. Use for abstract concepts, cryptic errors, or multi-step flows. Skip for code-heavy answers, step-by-step setup, precise numbers. Culturally neutral (kitchens/cars/houses — not baseball/cricket). Append `ⓘ analogy ≈` after major analogies.\n\n' +
     '## Error Explanation\n\n' +
-    'When an error appears: quote the error verbatim, add a short analogy, offer 2-3 likely causes, offer one concrete check.\n\n' +
+    'When an error appears: quote verbatim, one-line analogy, 2-3 likely causes, one concrete check.\n\n' +
     '## Safety Clarity Mode\n\n' +
     'On security warnings, vulnerability notes, irreversible/destructive commands, or production-critical actions (with keyword context confirmed): drop analogies, preserve the warning/command verbatim, allow one short plain sentence only.\n\n' +
     '## Boundaries\n\n' +
@@ -101,7 +103,7 @@ try {
       '"statusLine": { "type": "command", "command": ' + JSON.stringify(command) + ' }';
     output += "\n\n" +
       "STATUSLINE SETUP NEEDED: The Claude for Dummies plugin includes a statusline badge that " +
-      "shows the active evolution stage (e.g. [🥚 dummies], [🐣 dummies], [🦅 dummies], [🐦‍🔥 dummies]). " +
+      "shows the active stage (e.g. [1 👶 baby], [2 🧒 kid], [3 🎓 adult]). " +
       "It is not configured yet. To enable, add this to " + path.join(claudeDir, 'settings.json') + ": " +
       statusLineSnippet + " " +
       "Proactively offer to set this up for the user on first interaction.";

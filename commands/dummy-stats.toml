@@ -3,24 +3,22 @@ prompt = """
 Show the user's Dummies progress card.
 
 Read the current stage from the SessionStart context (the "DUMMIES MODE ACTIVE — current stage: X" line).
-Read install date and session counts from $CLAUDE_CONFIG_DIR/.dummies-active metadata or from
-~/.config/dummies/config.json if they exist. If the user's data is limited (new install), note that.
+Read install date and session counts from ~/.config/dummies/metadata.json (XDG respected; Windows %APPDATA%/dummies/) if it exists. If the user's data is limited (new install), note that.
 
 Render like:
 
 ```
 [stage badge] Dummies stats
 
-Current stage: [stage name] ([N]/4)
+Current stage: [stage name] ([N]/3)
 Installed: [days since install, or "today"]
 Sessions so far: [approximate count, or "first session"]
 
-Next stage: [stage+1 name + emoji, or "you're at Phoenix"]
+Next stage: [stage+1 name + emoji, or "you're at Adult — try /dummy off for uncut Claude"]
 Suggested: [
-  stage 1: "Still in Egg — plenty of time to explore."
-  stage 2: "Chick is the sweet spot. Try /dummy harder when you feel ready."
-  stage 3: "Eagle means you're learning the terms — keep going."
-  stage 4: "Phoenix reached. Full technical prose."
+  stage 1: "Baby — tightest filter, TL;DR only. Try /dummy harder when you want main causes too."
+  stage 2: "Kid is the sweet spot. Try /dummy harder for trade-offs and options."
+  stage 3: "Adult — full structure. For uncut Claude, use /dummy off."
 ]
 ```
 
