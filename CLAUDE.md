@@ -4,19 +4,24 @@ For Claude/contributors working on this repo. End-user docs live in `README.md`.
 
 ## What this project does
 
-Default-on Claude Code plugin that cuts the "explain it again, but easier" loop — gives decision-friendly answers by default. The decision filter ("Does this affect what the user does next?") is applied at every response. Code, commands, URLs, paths, env vars, CLI flags, errors, warnings — preserved verbatim at every stage.
+Default-on Claude Code plugin that cuts the "explain it again, but easier" loop. **Mission: help the user understand** — every answer organized around what the user needs to decide. Six principles drive this: Completeness, MECE on decision axes, Clarity, Speed aids, Analogy when it beats prose, Diagrams when they clarify. Code, commands, URLs, paths, env vars, CLI flags, errors, warnings — preserved verbatim at every stage.
 
-Three stages on a **decision-detail axis**, picked by the user — `1 👶 baby` (TL;DR), `2 🧒 kid` (default — summary), `3 🎓 adult` (standard with trade-offs). For uncut Claude, `/dummy off`. Numeric command interface; emoji + name on the statusline and inside SKILL.md.
+Three stages differ in **depth only, not quality** — all three fully serve understanding:
+- `1 👶 baby` — bottom line + "한 줄 요약" (5-10 lines)
+- `2 🧒 kid` (default) — summary across 4-5 axes (15-25 lines)
+- `3 🎓 adult` — full, bookended with TL;DR + "한 줄 정리" + diagrams (30-60 lines)
 
-Analogies are a tool used selectively (abstract concepts, cryptic errors, multi-step flows), not a goal. Skip on code-heavy or step-by-step setup answers.
+For uncut Claude, `/dummy off`. Numeric command interface; emoji + name on the statusline and inside SKILL.md.
 
-Independent product. Architecture inspired by caveman (MIT) — different axis: caveman compresses all prose, we filter for decision-relevant prose. See `ATTRIBUTION.md`.
+Analogies are a tool used selectively (abstract concepts, cryptic errors, multi-step flows), not a goal. Skip on code-heavy or step-by-step setup answers. Diagrams expected in Adult.
+
+Independent product. Architecture inspired by caveman (MIT) — different axis: caveman compresses all prose, we organize prose for understanding. See `ATTRIBUTION.md`.
 
 ## Single source of truth files — edit only these
 
 | File | Controls |
 |------|----------|
-| `skills/dummies/SKILL.md` | Core dummies behavior — preservation rule, analogy principles, 4 stages, error explanation pattern, Safety Clarity Mode, language handling. The hook reads it at runtime. |
+| `skills/dummies/SKILL.md` | Core dummies behavior — North Star mission, 6 principles, preservation rule, 3 stages (depth-only axis), error pattern, Safety Clarity Mode, analogy + diagram rules, language handling. The hook reads it at runtime. |
 | `rules/dummies-activate.md` | Always-on rule body for non-Claude-Code agents in v2 (Cursor / Windsurf / Cline / Copilot via per-IDE rules dirs). Currently shipped but not auto-synced — v2 work. |
 | `skills/dummies-glossary/SKILL.md` | `/dummy-glossary` behavior. |
 | `skills/dummies-stats/SKILL.md` | `/dummy-stats` behavior. |
@@ -173,7 +178,7 @@ Dummies should hit ~100% on every preservation kind. terse should drop substanti
 - The `safeWriteFlag` / `readFlag` invariants (security).
 - The `package.json` `{"type": "commonjs"}` pin (interop).
 - The `STAGES_BY_NUMBER` mapping in `dummies-mode-tracker.js` — numeric command interface is a deliberate UX choice; do not accept stage names as args (revives 2-name confusion).
-- The Phoenix → no-caveman policy (we're an independent product, not a caveman funnel).
+- The independent-product stance — we're not a caveman funnel; no "graduate to caveman" copy anywhere.
 
 ## Inspiration
 

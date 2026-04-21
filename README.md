@@ -1,8 +1,8 @@
 # Claude for Dummies
 
-> Stop asking "explain that easier." Get decision-friendly answers by default.
+> Stop asking "explain that easier." Get answers you understand on the first pass.
 
-Claude for Dummies cuts the **"explain it again, but easier"** loop. Instead of long technical answers you have to re-prompt down to a summary, you get the summary first — only the information that actually changes what you do next. Code, commands, URLs, paths, errors, warnings — preserved verbatim. Always on.
+Claude for Dummies cuts the **"explain it again, but easier"** loop. The mission is simple: **help you understand** every answer the first time. Pick the depth you want — bottom line, summary, or full bookended — and Claude organizes the answer around what you actually need to decide. Code, commands, URLs, paths, errors, warnings — preserved verbatim at every stage. Always on.
 
 For vibecoders, beginners, PMs who code, or anyone tired of re-prompting Claude for a TL;DR.
 
@@ -49,22 +49,21 @@ For vibecoders, beginners, PMs who code, or anyone tired of re-prompting Claude 
 
 ## How it works
 
-Three stages on a **decision-detail axis**:
+Three stages differ in **depth only, not quality** — all three fully help you understand, just with different context depth.
 
 | # | Badge | Stage | What you get |
 |---|-------|-------|--------------|
-| 1 | 👶 | **Baby** | TL;DR. Bottom line + 2-4 bullets max. |
-| 2 | 🧒 | **Kid** *(default)* | Summary. 5-10 bullets, key facts + main causes + next action. |
-| 3 | 🎓 | **Adult** | Standard. Full structure with options, trade-offs, edge cases. |
+| 1 | 👶 | **Baby** | Bottom line. 3 axes max (result / cause / action), ends with "한 줄 요약". 5-10 lines. |
+| 2 | 🧒 | **Kid** *(default)* | Summary. 4-5 axes, 2-3 bullets each, ends with "한 줄 요약". 15-25 lines. |
+| 3 | 🎓 | **Adult** | Full, bookended. TL;DR at top + body with trade-offs + "한 줄 정리". Diagrams expected. 30-60 lines. |
 
 Want fully uncut Claude? `/dummy off`.
 
-The decision filter applied at every stage:
+What every stage does equally well — the **North Star**:
 
-> **"Does this affect what the user does next?"**
-> If yes → include. If no → cut.
+> **Help you understand.** Include the core + anything important for the decision (Completeness). Cover every axis you need to decide — result, cause, action, trade-off, check (MECE). Everyday words. One-line summary at the end. Analogies when they beat plain prose. Diagrams when they clarify.
 
-Tables, numbers, code — all welcome **when they help you decide faster**, not when they look thorough.
+Tables, arrows, funnels, analogies — all welcome **when they help you understand faster**, not when they look thorough.
 
 ---
 
@@ -190,7 +189,7 @@ That's it.
 
 ## Inspiration
 
-Architecture inspired by [caveman](https://github.com/JuliusBrussee/caveman) (MIT) — same hook + skill plumbing pattern, different axis. caveman compresses *all* prose tokens; Dummies filters for **decision-relevant prose** while expanding analogies where they help. See [`ATTRIBUTION.md`](./ATTRIBUTION.md) for what we reused.
+Architecture inspired by [caveman](https://github.com/JuliusBrussee/caveman) (MIT) — same hook + skill plumbing pattern, different goal. caveman compresses *all* prose tokens; Dummies **organizes prose around understanding** — around decision axes, with analogies and diagrams where they clarify. See [`ATTRIBUTION.md`](./ATTRIBUTION.md) for what we reused.
 
 ## License
 

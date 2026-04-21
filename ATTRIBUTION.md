@@ -2,7 +2,7 @@
 
 Claude for Dummies is based on the structure of [caveman](https://github.com/JuliusBrussee/caveman) by Julius Brussee, released under the MIT License.
 
-caveman's hook architecture, multi-agent install scripts, and eval harness were invaluable references. Our project mirrors the plumbing (scaffolding, hooks, installers, eval framework) but inverts the behavior: caveman makes Claude terse, Claude for Dummies makes Claude's explanations plain-language and analogical while preserving code verbatim.
+caveman's hook architecture, multi-agent install scripts, and eval harness were invaluable references. Our project mirrors the plumbing (scaffolding, hooks, installers, eval framework) but pursues a different goal: caveman makes Claude terse; Claude for Dummies organizes Claude's answers so the user understands them on the first pass — around decision axes, with analogies and diagrams where they clarify, and code preserved verbatim.
 
 ## What we reuse from caveman
 
@@ -18,9 +18,10 @@ caveman's hook architecture, multi-agent install scripts, and eval harness were 
 
 ## What is fully new
 
-- SKILL.md instruction content (plain-language translation rules)
-- Analogy library (concept → metaphor mapping)
-- Decision-detail stages (Baby / Kid / Adult) with the decision filter ("Does this affect what the user does next?")
+- SKILL.md instruction content (North Star mission + 6 understanding principles)
+- Analogy library (concept → metaphor mapping, culturally neutral)
+- Three understanding-depth stages (Baby / Kid / Adult) unified by the North Star: help the user understand
+- Question-form axis naming + diagram-first patterns (tables, funnels, cause trees)
 - Safety Clarity Mode (preserve verbatim on security warnings)
 - Code preservation measurement (AST diff + URL/path/flag/error checks)
 

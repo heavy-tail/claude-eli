@@ -130,9 +130,10 @@ process.stdin.on('end', () => {
     if (after) {
       const context = (transitionLine ? transitionLine + '\n' : '') +
         "DUMMIES MODE ACTIVE (stage: " + after + "). " +
-        "Apply the decision filter: include only what affects what the user does next. " +
+        "Mission: help the user understand. Include the core and everything important for the decision (Completeness). Cover every axis needed — result, cause, action, trade-off, check (MECE). Use everyday words, question-form axis names, and a one-line summary at the end (long answers also open with one). " +
         "Preserve code, commands, URLs, paths, env vars, CLI flags, error messages, warnings, version numbers verbatim. " +
-        "Use analogies as a tool (abstract concepts, cryptic errors) — not for code-heavy or step-by-step answers. Culturally neutral, consistent across the session. Append `ⓘ analogy ≈` after major analogies.";
+        "Use analogies as a tool (abstract concepts, cryptic errors, multi-step flows) — not for code-heavy or step-by-step answers. Culturally neutral, one per concept across the session. Append `ⓘ analogy ≈` after major analogies. " +
+        "Use diagrams (tables, arrows, funnels, ASCII boxes) when they clarify structure better than prose.";
 
       process.stdout.write(JSON.stringify({
         hookSpecificOutput: {

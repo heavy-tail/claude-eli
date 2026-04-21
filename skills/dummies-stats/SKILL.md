@@ -39,7 +39,7 @@ Installed: [days since installedAt, or "today"]
 Sessions: [sessionCount]
 Prompts: [totalPrompts]
 
-Next stage: [stage+1 name + emoji, or "you're at Phoenix"]
+Next stage: [stage+1 name + emoji, or "you're at Adult — try `/dummy off` for uncut Claude"]
 Suggested: [see rules below]
 ```
 
@@ -47,9 +47,9 @@ Suggested: [see rules below]
 
 | Current | Suggestion |
 |---------|-----------|
-| 1 👶 Baby | "Baby — the tightest filter. TL;DR only. Try `/dummy harder` when you want main causes too." |
-| 2 🧒 Kid | "Kid is the sweet spot. Summary + key info. Stay as long as you like; `/dummy harder` for trade-offs." |
-| 3 🎓 Adult | "Adult — full structure with options and trade-offs. For uncut Claude, use `/dummy off`." |
+| 1 👶 Baby | "Baby — bottom line + 한 줄 요약. Try `/dummy harder` when you want causes and options." |
+| 2 🧒 Kid | "Kid — summary across 4-5 axes (the sweet spot). Try `/dummy harder` for trade-offs and edge cases." |
+| 3 🎓 Adult | "Adult — full bookended answer with diagrams. For uncut Claude, use `/dummy off`." |
 
 ## Edge cases
 
@@ -60,5 +60,5 @@ Suggested: [see rules below]
 ## Important
 
 - **Do NOT change the stage.** No flag writes.
-- Render in the current stage's style — if Chick, use analogy + term; if Phoenix, technical.
+- Render in the current stage's style — Baby/Kid may include a brief analogy if natural; Adult stays clean with a TL;DR + body.
 - `ⓘ analogy ≈` footnote after any stats-related analogy (e.g. "like a pet game where your companion grows with you ⓘ analogy ≈").

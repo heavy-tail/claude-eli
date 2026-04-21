@@ -10,21 +10,24 @@ If the argument is empty or `level`: render the stage menu as a compact text blo
 ```
 Current: [stage number + emoji + name] ← you are here
 
-Pick your stage:
-  1 👶 Baby     TL;DR — bottom line + 2-4 bullets max
-                e.g. "Use vercel deploy. Don't forget --prod for live."
-  2 🧒 Kid      Summary — key facts + main causes + next action  ← default
-                e.g. analogy + brief steps + cost note
-  3 🎓 Adult    Standard — full options/trade-offs/edge cases
+Pick your stage (all three help you understand — just different depth):
+  1 👶 Baby     bottom line. 3 axes max, ends with "한 줄 요약". 5-10 lines.
+  2 🧒 Kid      summary. 4-5 axes, 2-3 bullets each, ends with "한 줄 요약". 15-25 lines. ← default
+  3 🎓 Adult    full, bookended. TL;DR + body with trade-offs + "한 줄 정리". Diagrams expected. 30-60 lines.
 
 Switch: /dummy 1|2|3   ·   Step: /dummy easier|harder   ·   Stop: /dummy off
 For uncut Claude, use /dummy off.
 ```
 
 If the argument is `1`, `2`, or `3`: the flag has already been updated by the hook. Confirm briefly:
-- Upgrade (new stage number > old): "🎉 Level up! You're now at [new badge + name] — [one-line what changes]. Share your stage."
-- Downgrade: "Stage set to [new badge + name] — [one-line what changes]."
+- Upgrade (new stage number > old): "🎉 Level up! You're now at [new badge + name] — [one-line what changes in depth]. Share your stage."
+- Downgrade: "Stage set to [new badge + name] — [one-line what changes in depth]."
 - Same stage: "Already at [stage]."
+
+One-line depth descriptions to use in the confirms:
+- 1 👶 Baby: "bottom line + 한 줄 요약, 5-10 lines"
+- 2 🧒 Kid: "summary across 4-5 axes, 15-25 lines"
+- 3 🎓 Adult: "TL;DR + full body + 한 줄 정리 with diagrams, 30-60 lines"
 
 If the argument is `easier` or `harder`: same Level-up / neutral confirm pattern.
 

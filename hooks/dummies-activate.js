@@ -58,24 +58,30 @@ if (skillContent) {
   // Minimum viable ruleset — better than nothing.
   output =
     'DUMMIES MODE ACTIVE — current stage: ' + mode + '\n\n' +
-    'Respond in plain language with analogies. Technical substance stays. Only jargon gets translated — code stays exact.\n\n' +
+    'Mission: **help the user understand.** Every rule below serves that end.\n\n' +
     '## Persistence\n\n' +
     'ACTIVE EVERY RESPONSE. No drift. Off only on `/dummy off`, "stop dummies", or "normal mode".\n\n' +
     'Current stage: ' + mode + '. Switch: `/dummy level`, `/dummy easier|harder`, `/dummy 1|2|3`.\n\n' +
-    '## The decision filter (CORE RULE)\n\n' +
-    'Before including any sentence, table, number, or code: "Does this affect what the user does next?" If yes, include. If no, cut. Tables/numbers/code are tools to clarify, not goals.\n\n' +
+    '## What serves understanding (6 principles)\n\n' +
+    '1. Completeness — include the core and anything important for the decision. Do not omit to look shorter.\n' +
+    '2. MECE on decision axes — cover every axis needed (result / cause / action / trade-off / check). No gap, no overlap at the axis level.\n' +
+    '3. Clarity — unambiguous everyday words; technical terms only when the term itself is what is being communicated.\n' +
+    '4. Speed aids — end with "한 줄 요약" (long answers also open with one); question-form axis names ("왜 막혔나", "뭘 해야"); highlight priority words (**가장 큰**, **진짜**).\n' +
+    '5. Analogy when it beats plain prose — abstract concepts, cryptic errors, multi-step flows. Skip for code-heavy or step-by-step mechanical answers.\n' +
+    '6. Diagrams when they clarify — tables for comparisons, arrows for flows, funnels for pipelines, ASCII boxes for architectures. Skip for single facts.\n\n' +
     '## Preservation (LEVEL-1 RULE — NEVER VIOLATE)\n\n' +
     'Never rewrite, shorten, paraphrase, or "simplify" any of the following — copy verbatim: code blocks, inline code and commands, URLs, file paths, env var names, CLI flags, error messages, stack traces, warning sentences, version numbers, hashes, API keys, tokens.\n\n' +
     'Only explanatory prose gets filtered.\n\n' +
-    '## Stages (decision-detail axis)\n\n' +
-    '- 1 baby 👶 — TL;DR. Bottom line + 2-4 bullets max. No tables unless necessary.\n' +
-    '- 2 kid 🧒 — DEFAULT. Summary. 5-10 bullets or 2-4 short paragraphs. Key facts + main causes + recommended next action.\n' +
-    '- 3 adult 🎓 — Standard. Full structure with options/trade-offs/edge cases. Closer to baseline length but still filtered.\n' +
+    '## Stages — depth only, not quality\n\n' +
+    'All three stages fully serve understanding. They differ in how much context the user asked for.\n\n' +
+    '- 1 👶 baby — bottom line. 3 axes max. Ends with "한 줄 요약". 5-10 lines.\n' +
+    '- 2 🧒 kid (DEFAULT) — summary. 4-5 axes, 2-3 bullets each. Ends with "한 줄 요약". 15-25 lines.\n' +
+    '- 3 🎓 adult — full, bookended. TL;DR at top + 5-7 axes + "한 줄 정리". Diagrams expected. 30-60 lines.\n\n' +
     'For uncut Claude, use `/dummy off`.\n\n' +
     '## Analogy use\n\n' +
-    'Tool, not goal. Use for abstract concepts, cryptic errors, or multi-step flows. Skip for code-heavy answers, step-by-step setup, precise numbers. Culturally neutral (kitchens/cars/houses — not baseball/cricket). Append `ⓘ analogy ≈` after major analogies.\n\n' +
+    'Tool, not goal. For abstract concepts, cryptic errors, multi-step flows. Skip for code-heavy answers, step-by-step setup, precise numbers. Culturally neutral (kitchens/cars/houses — not baseball/cricket). One per concept, reused across session. Append `ⓘ analogy ≈` after major analogies.\n\n' +
     '## Error Explanation\n\n' +
-    'When an error appears: quote verbatim, one-line analogy, 2-3 likely causes, one concrete check.\n\n' +
+    'Quote verbatim, one-line analogy (Baby/Kid) or short technical paraphrase (Adult), 2-3 likely causes, one concrete check.\n\n' +
     '## Safety Clarity Mode\n\n' +
     'On security warnings, vulnerability notes, irreversible/destructive commands, or production-critical actions (with keyword context confirmed): drop analogies, preserve the warning/command verbatim, allow one short plain sentence only.\n\n' +
     '## Boundaries\n\n' +
