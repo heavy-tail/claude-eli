@@ -20,7 +20,7 @@
 
 - [x] `bash hooks/install.sh` in clean `CLAUDE_CONFIG_DIR` — copies 5 files + wires settings.json + statusline
 - [x] `node hooks/eli-activate.js` — reads SKILL.md, strips frontmatter, emits ruleset, writes flag, records session
-- [x] `echo '{"prompt":"/eli 3"}' | node hooks/eli-mode-tracker.js` — updates flag to `adult`, emits `STAGE CHANGE` line, records stageHistory
+- [x] `echo '{"prompt":"/eli adult"}' | node hooks/eli-mode-tracker.js` — updates flag to `adult`, emits `STAGE CHANGE` line, records stageHistory
 - [x] `bash hooks/eli-statusline.sh` — emits `[3 🎓 eli]` (green)
 - [x] `echo '{"prompt":"/eli off"}' | node hooks/eli-mode-tracker.js` — deletes flag
 - [x] `bash hooks/uninstall.sh` — removes files, settings entries, statusline, .bak
@@ -46,7 +46,7 @@
 ## Post-publish (manual)
 
 - [ ] Real Claude API eval run: `python evals/llm_run.py && python evals/measure.py` and update README's preservation table with real numbers (currently shows synthetic-snapshot smoke test).
-- [ ] Test the marketplace install path on a fresh machine: `claude plugin marketplace add <user>/claude-eli && claude plugin install eli@eli` — confirm SessionStart hook fires and `/eli 3` updates statusline.
+- [ ] Test the marketplace install path on a fresh machine: `claude plugin marketplace add heavy-tail/claude-eli && claude plugin install eli@eli` — confirm SessionStart hook fires and `/eli adult` updates statusline.
 - [ ] Friend demo: ask 3-5 vibecoder/PM-coder friends to install and try `/eli level` + ask Claude a question. Capture quotes for README testimonials section (v0.2).
 
 ## Marketing / virality (separate workstream)

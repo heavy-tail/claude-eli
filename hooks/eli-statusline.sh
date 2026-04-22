@@ -23,14 +23,13 @@ FLAG="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.eli-active"
 MODE=$(head -c 64 "$FLAG" 2>/dev/null | tr -d '\n\r' | tr '[:upper:]' '[:lower:]')
 MODE=$(printf '%s' "$MODE" | tr -cd 'a-z0-9-')
 
-# Whitelist stage name → badge. Anything else → render nothing rather than echo
-# attacker bytes.
+# Whitelist stage name → badge + per-stage color. Anything else → render
+# nothing rather than echo attacker bytes.
 case "$MODE" in
-  baby)  BADGE='1 👶 eli' ;;
-  kid)   BADGE='2 🧒 eli' ;;
-  adult) BADGE='3 🎓 eli' ;;
+  baby)  BADGE='baby 👶 eli';  COLOR='\033[36m' ;;  # cyan — fresh, starting
+  kid)   BADGE='kid 🧒 eli';   COLOR='\033[32m' ;;  # green — default, steady
+  adult) BADGE='adult 🎓 eli'; COLOR='\033[33m' ;;  # yellow/gold — matured
   *) exit 0 ;;
 esac
 
-# Green = active. Bright enough to see without being loud.
-printf '\033[32m[%s]\033[0m' "$BADGE"
+printf '%b[%s]\033[0m' "$COLOR" "$BADGE"

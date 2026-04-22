@@ -7,9 +7,9 @@ For Claude/contributors working on this repo. End-user docs live in `README.md`.
 Default-on Claude Code plugin that cuts the "explain it again, but easier" loop. **Mission: help the user understand** — every answer organized around what the user needs to decide. Six principles drive this: Completeness, MECE on decision axes, Clarity, Speed aids, Analogy when it beats prose, Diagrams when they clarify. Code, commands, URLs, paths, env vars, CLI flags, errors, warnings — preserved verbatim at every stage.
 
 Three stages differ in **depth only, not quality** — all three fully serve understanding:
-- `1 👶 baby` — bottom line + "한 줄 요약" (5-10 lines)
-- `2 🧒 kid` (default) — summary across 4-5 axes (15-25 lines)
-- `3 🎓 adult` — full, bookended with TL;DR + "한 줄 정리" + diagrams (30-60 lines)
+- `👶 baby` — bottom line + "한 줄 요약" (5-10 lines)
+- `🧒 kid` (default) — summary across 4-5 axes (15-25 lines)
+- `🎓 adult` — full, bookended with TL;DR + "한 줄 정리" + diagrams (30-60 lines)
 
 For uncut Claude, `/eli off`. Numeric command interface; emoji + name on the statusline and inside SKILL.md.
 
@@ -83,7 +83,7 @@ SessionStart hook ──writes stage──▶ .eli-active ◀──updates stage
                                        reads
                                           ▼
                                   eli-statusline.sh
-                                  [1 👶 eli] / [2 🧒 eli] / [3 🎓 eli]
+                                  [baby 👶 eli] / [kid 🧒 eli] / [adult 🎓 eli]
 ```
 
 ### `eli-activate.js` (SessionStart)
@@ -106,7 +106,7 @@ Per turn:
 3. Snapshot stage before parsing.
 4. Natural-language deactivation (`stop eli`, `normal mode`): unlink flag.
 5. Natural-language activation: write `getDefaultMode()` to flag.
-6. Slash-command parsing: `/eli off|on|easier|harder|1|2|3` → mutate flag. Stage names (`baby`, `kid`, `adult`) **not accepted** as args — numeric only.
+6. Slash-command parsing: `/eli off|on|easier|harder|baby|kid|adult` → mutate flag. Numeric aliases (`/eli 1|2|3`) were removed in v0.5 in favor of stage-name-only args; with three consistently-named stages the numbers added no value.
 7. Sub-skill commands (`/eli-glossary`, `/eli-stats`, `/eli-help`) don't change stage.
 8. Detect transition vs snapshot. If changed, `recordStageChange(before, after)` and prepend a `STAGE CHANGE: N old → N new (upgrade|downgrade|activate)` line to `additionalContext`.
 9. Per-turn reinforcement: emit `ELI MODE ACTIVE (stage: X)` plus the preservation reminder + neutrality reminder via `hookSpecificOutput.additionalContext`.
@@ -125,7 +125,7 @@ Security: the flag file at `~/.claude/.eli-active` is a predictable path. Withou
 
 ### `eli-statusline.sh` / `.ps1`
 
-Reads the flag, applies the same symlink + size + whitelist guards, and prints `[1 👶 eli]` style badge in green.
+Reads the flag, applies the same symlink + size + whitelist guards, and prints `[baby 👶 eli]` (cyan) / `[kid 🧒 eli]` (green) / `[adult 🎓 eli]` (yellow/gold) style badges. Color varies per stage for quicker at-a-glance recognition.
 
 ## Skill system
 
@@ -177,7 +177,7 @@ ELI should hit ~100% on every preservation kind. terse should drop substantially
 
 - The `safeWriteFlag` / `readFlag` invariants (security).
 - The `package.json` `{"type": "commonjs"}` pin (interop).
-- The `STAGES_BY_NUMBER` mapping in `eli-mode-tracker.js` — numeric command interface is a deliberate UX choice; do not accept stage names as args (revives 2-name confusion).
+- The stage-name-only command interface (`/eli baby|kid|adult`) — v0.5 deliberately dropped numeric aliases (`/eli 1|2|3`) and stage-number traces because with three consistently-named stages there's no confusion, and two input formats add more UX drag than they save keystrokes. Don't re-add numbers as args unless stages change.
 - The independent-product stance — we're not a caveman funnel; no "graduate to caveman" copy anywhere.
 
 ## Inspiration

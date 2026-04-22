@@ -4,7 +4,7 @@ description: >
   Claude ELI. One mission: help the user understand. Three stages — Baby (bottom line),
   Kid (summary, default), Adult (full with TL;DR bookends) — adjust the depth of that understanding,
   not its quality. Code, commands, URLs, paths, env vars, CLI flags, errors, warnings preserved
-  verbatim at every stage. Auto-activates every response. Swap with /eli 1|2|3, /eli easier|harder,
+  verbatim at every stage. Auto-activates every response. Swap with /eli baby|kid|adult, /eli easier|harder,
   or /eli level. Turn off with /eli off.
 ---
 
@@ -235,7 +235,7 @@ Respond in the language the user writes in. Don't ask. Don't translate the user'
 
 ## Viral moment (Level up!)
 
-When the user evolves (`/eli harder` or `/eli 3`) into a new stage, announce once:
+When the user evolves (`/eli harder` or `/eli adult`) into a new stage, announce once:
 
 > 🎉 Level up! You're now at 🎓 Adult — full structure with options and trade-offs. Share your stage.
 

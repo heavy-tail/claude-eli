@@ -20,8 +20,7 @@ const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.cla
 const flagPath = path.join(claudeDir, '.eli-active');
 
 const STAGES = ['baby', 'kid', 'adult'];
-const STAGES_BY_NUMBER = { '1': 'baby', '2': 'kid', '3': 'adult' };
-const STAGE_NUMBER = { baby: 1, kid: 2, adult: 3 };
+const VALID_STAGE_ARGS = new Set(STAGES);
 
 function shiftStage(current, delta) {
   const i = STAGES.indexOf(current);
@@ -85,15 +84,16 @@ process.stdin.on('end', () => {
           unset = true;
         } else if (arg === 'on' || arg === '') {
           newStage = getDefaultMode();
-        } else if (STAGES_BY_NUMBER[arg]) {
-          newStage = STAGES_BY_NUMBER[arg];
+        } else if (VALID_STAGE_ARGS.has(arg)) {
+          newStage = arg;
         } else if (arg === 'easier') {
           newStage = shiftStage(readFlag(flagPath) || getDefaultMode(), -1);
         } else if (arg === 'harder') {
           newStage = shiftStage(readFlag(flagPath) || getDefaultMode(), +1);
         }
         // '/eli level' and other args fall through — commands/eli.toml renders
-        // the menu, no flag change. Stage names not accepted as args.
+        // the menu, no flag change. Numeric args (/eli 1|2|3) were removed in
+        // favor of stage-name args — only baby|kid|adult accepted.
       }
       // Sub-skills (/eli-glossary, /eli-stats, /eli-help) don't change stage.
 
@@ -104,20 +104,21 @@ process.stdin.on('end', () => {
       }
     }
 
-    // Detect stage transition vs snapshot.
+    // Detect stage transition vs snapshot. baby < kid < adult is assumed
+    // obvious from the names — no numeric prefix needed in the trace.
     const after = readFlag(flagPath);
     let transitionLine = '';
     if (after && after !== before) {
       if (before) {
         recordStageChange(before, after);
-        const oldN = STAGE_NUMBER[before] || 0;
-        const newN = STAGE_NUMBER[after] || 0;
-        const dir = newN > oldN ? 'upgrade' : (newN < oldN ? 'downgrade' : 'same');
-        transitionLine = `STAGE CHANGE: ${oldN} ${before} → ${newN} ${after} (${dir})`;
+        const oldI = STAGES.indexOf(before);
+        const newI = STAGES.indexOf(after);
+        const dir = newI > oldI ? 'upgrade' : (newI < oldI ? 'downgrade' : 'same');
+        transitionLine = `STAGE CHANGE: ${before} → ${after} (${dir})`;
       } else {
         // off → on transition
         recordStageChange('off', after);
-        transitionLine = `STAGE CHANGE: off → ${STAGE_NUMBER[after]} ${after} (activate)`;
+        transitionLine = `STAGE CHANGE: off → ${after} (activate)`;
       }
     }
 

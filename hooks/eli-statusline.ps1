@@ -32,13 +32,24 @@ $Mode = ($Mode -replace '[^a-z0-9-]', '')
 $Valid = @('off', 'baby', 'kid', 'adult')
 if (-not ($Valid -contains $Mode)) { exit 0 }
 
+# Per-stage badge + color:
+#   baby  → cyan (fresh, starting)
+#   kid   → green (default, steady)
+#   adult → yellow/gold (matured)
 $Badge = switch ($Mode) {
-    'baby'  { "1 👶 eli" }
-    'kid'   { "2 🧒 eli" }
-    'adult' { "3 🎓 eli" }
+    'baby'  { "baby 👶 eli" }
+    'kid'   { "kid 🧒 eli" }
+    'adult' { "adult 🎓 eli" }
     default { exit 0 }
+}
+
+$Color = switch ($Mode) {
+    'baby'  { "36" }
+    'kid'   { "32" }
+    'adult' { "33" }
+    default { "32" }
 }
 
 $Esc = [char]27
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-[Console]::Write("${Esc}[32m[$Badge]${Esc}[0m")
+[Console]::Write("${Esc}[${Color}m[$Badge]${Esc}[0m")

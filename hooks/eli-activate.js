@@ -61,7 +61,7 @@ if (skillContent) {
     'Mission: **help the user understand.** Every rule below serves that end.\n\n' +
     '## Persistence\n\n' +
     'ACTIVE EVERY RESPONSE. No drift. Off only on `/eli off`, "stop eli", or "normal mode".\n\n' +
-    'Current stage: ' + mode + '. Switch: `/eli level`, `/eli easier|harder`, `/eli 1|2|3`.\n\n' +
+    'Current stage: ' + mode + '. Switch: `/eli level`, `/eli easier|harder`, `/eli baby|kid|adult`.\n\n' +
     '## What serves understanding (6 principles)\n\n' +
     '1. Completeness — include the core and anything important for the decision. Do not omit to look shorter.\n' +
     '2. MECE on decision axes — cover every axis needed (result / cause / action / trade-off / check). No gap, no overlap at the axis level.\n' +

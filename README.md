@@ -84,20 +84,22 @@ Restart Claude Code. Default ON — no further commands needed.
 
 ```
 Stage
-  /eli level       show menu
-  /eli easier      ↓ one step (more compressed)
-  /eli harder      ↑ one step (more detail)
-  /eli 1..3        jump to stage (1=👶, 2=🧒 default, 3=🎓)
+  /eli level         show menu
+  /eli easier        ↓ one step (more compressed)
+  /eli harder        ↑ one step (more detail)
+  /eli baby          jump to 👶 baby  (bottom line)
+  /eli kid           jump to 🧒 kid   (summary — default)
+  /eli adult         jump to 🎓 adult (full, bookended with diagrams)
 
 Switch
-  /eli off         disable for this session (= uncut Claude)
-  /eli on          re-enable
+  /eli off           disable for this session (= uncut Claude)
+  /eli on            re-enable
   /expert            this response only: full technical mode
 
 Extra
-  /eli-glossary    jargon from previous answer with plain defs
-  /eli-stats       your evolution progress
-  /eli-help        this card
+  /eli-glossary      jargon from previous answer with plain defs
+  /eli-stats         your evolution progress
+  /eli-help          this card
 ```
 
 ### Natural triggers (no slash needed)
