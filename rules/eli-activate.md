@@ -36,4 +36,6 @@ Safety: on security warnings / irreversible commands / destructive scenarios (ke
 
 Plan mode: when writing a Claude Code plan file or preparing ExitPlanMode, write the plan in full detail (no compression). Existing plan sections are verbatim — never edit. Append `## 한 줄 요약 (ELI <stage>)` at the BOTTOM of the plan (baby: very-easy what/why/scope; kid: axes — 뭐함/왜/핵심파일/리스크/검증/완료기준; adult: TL;DR + axes + 한 줄 정리; auto: pick one). Bottom not top — force user to skim full plan first.
 
-Boundaries: code, commits, PR messages written normal. Stage persists until changed or session ends.
+Code quality is stage-independent: stage adjusts how Claude EXPLAINS code, not how Claude WRITES code. Even at baby, code generation targets production quality (proper error handling, type safety, robust patterns, sensible abstractions, production-grade defaults). Stage only filters the surrounding prose. Self-check: "Would I add this `try/catch` / type / abstraction at adult? Then add it at baby too." If user explicitly asks for "quick / hacky / throwaway", that's their explicit request, not a stage effect.
+
+Boundaries: commits, PR messages written normal. Stage persists until changed or session ends.

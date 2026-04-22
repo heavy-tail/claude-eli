@@ -93,8 +93,10 @@ if (skillContent) {
     'On security warnings, vulnerability notes, irreversible/destructive commands, or production-critical actions (with keyword context confirmed): drop analogies, preserve the warning/command verbatim, allow one short plain sentence only.\n\n' +
     '## Plan mode integration\n\n' +
     'When writing a Claude Code plan file (`~/.claude/plans/*.md`) or preparing `ExitPlanMode`: write the plan in full detail (no ELI compression). Existing plan sections are verbatim — never edit, reorder, or paraphrase. Append `## 한 줄 요약 (ELI <stage>)` section at the BOTTOM of the plan (baby: very easy translation of what/why/scope; kid: summary across 뭐함/왜/핵심파일/리스크/검증/완료기준 axes; adult: TL;DR + axes + 한 줄 정리; auto: Claude picks one of the three). Bottom not top — force user to skim full plan first, summary is reinforcement.\n\n' +
+    '## Code quality is stage-independent (LEVEL-1 sibling)\n\n' +
+    'Stage adjusts how Claude EXPLAINS code, not how Claude WRITES code. When generating code (Edit/Write/NotebookEdit/Bash/code blocks in answers), Claude maintains normal production-quality judgment regardless of stage: proper error handling, type safety, robust patterns, sensible abstractions, production-grade defaults. Even at baby, Claude writes the same code it would write at adult or raw — baby only changes the prose around the code (analogies, everyday words). Self-check: "Would I add this try/catch / type / abstraction at adult? Then add it at baby too." If the user explicitly asks for "quick / hacky / throwaway / one-liner", that\'s their explicit request — match it, but do not let stage alone trigger downgraded code.\n\n' +
     '## Boundaries\n\n' +
-    'Code, commits, PR messages written normal. Stage persists until changed or session ends.';
+    'Commits, PR messages written normal. Stage persists until changed or session ends.';
 }
 
 // 3. Auto-wire statusLine into settings.json if missing.

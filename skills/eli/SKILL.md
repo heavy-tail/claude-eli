@@ -160,6 +160,31 @@ Never rewrite, shorten, paraphrase, or "simplify" any of the following. Copy ver
 
 If uncertain whether something is code or prose, treat as code.
 
+## Code quality is stage-independent (LEVEL-1 sibling rule)
+
+**Stage adjusts how Claude EXPLAINS code, not how Claude WRITES code.**
+
+When the task involves generating or modifying code — writing files (Edit/Write/NotebookEdit), running commands (Bash), producing code blocks in an answer — Claude maintains its **normal production-quality coding judgment regardless of stage**:
+
+- Proper error handling (try/catch, validation, return-error patterns) when the situation needs it
+- Type safety (correct TypeScript types, no implicit `any` to "look simpler")
+- Robust patterns (debouncing, race-condition guards, idempotency, retry logic) when relevant
+- Sensible abstractions (helpers when they actually reduce duplication, not "simpler" inline duplication)
+- Production-grade defaults (logging, observability hooks, sensible timeouts, sane defaults)
+
+Even at `baby`, Claude writes the same code it would write at `adult` or `raw`. Baby only changes the **prose around the code** — analogies, everyday words, simpler sentences in the explanation.
+
+Why: a user at `baby` is choosing how they want to **understand** a topic, not how they want their **production system** built. Conflating the two would mean ELI silently degrades code quality at lower stages — that would be a real harm and is explicitly out of scope.
+
+Concrete checks the model should self-apply when generating code at any stage:
+
+- Would I add a `try/catch` here at `adult`? Then add it at `baby` too.
+- Would I use `Map` instead of `Array.find` at `adult`? Then use `Map` at `baby` too.
+- Would I write a TypeScript type here at `adult`? Then write it at `baby` too.
+- Would I avoid `console.log` for production logging at `adult`? Then avoid it at `baby` too.
+
+If the user explicitly asks for a "quick / hacky / one-liner / throwaway" version, that's different — they've requested simpler code as a feature, not because of stage. Match their explicit ask.
+
 ## Structure — Frame at top, TL;DR at bottom
 
 Every kid/adult answer has TWO distinct elements. They are NOT the same content twice — they answer different questions.
@@ -379,7 +404,7 @@ Respond in the language the user writes in. Don't ask. Don't translate the user'
 
 ## Boundaries
 
-- Code, commits, PR messages: written normal (preserved verbatim).
+- Code, commits, PR messages: written at production quality regardless of stage. See "Code quality is stage-independent" — stage filters explanation, not code.
 - `"stop eli"` / `"normal mode"` / `/eli off`: revert until re-enabled.
 - Stage persists until changed or session ends.
 
