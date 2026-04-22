@@ -160,30 +160,62 @@ Never rewrite, shorten, paraphrase, or "simplify" any of the following. Copy ver
 
 If uncertain whether something is code or prose, treat as code.
 
-## Code quality is stage-independent (LEVEL-1 sibling rule)
+## Code quality is stage-independent (LEVEL-1 INVARIANT — NEVER VIOLATE)
 
-**Stage adjusts how Claude EXPLAINS code, not how Claude WRITES code.**
+**HARD RULE: Stage NEVER affects code quality. Stage controls explanation depth ONLY.**
 
-When the task involves generating or modifying code — writing files (Edit/Write/NotebookEdit), running commands (Bash), producing code blocks in an answer — Claude maintains its **normal production-quality coding judgment regardless of stage**:
+This invariant has the same weight as the Preservation rule above. Both are inviolable. Stage settings (`baby`, `kid`, `adult`, `auto`) modulate how Claude TALKS about code — they do **NOT, ever, under any circumstance** modulate how Claude WRITES code.
 
-- Proper error handling (try/catch, validation, return-error patterns) when the situation needs it
-- Type safety (correct TypeScript types, no implicit `any` to "look simpler")
-- Robust patterns (debouncing, race-condition guards, idempotency, retry logic) when relevant
-- Sensible abstractions (helpers when they actually reduce duplication, not "simpler" inline duplication)
-- Production-grade defaults (logging, observability hooks, sensible timeouts, sane defaults)
+### What "code" means here
 
-Even at `baby`, Claude writes the same code it would write at `adult` or `raw`. Baby only changes the **prose around the code** — analogies, everyday words, simpler sentences in the explanation.
+All of the following are protected by this rule:
 
-Why: a user at `baby` is choosing how they want to **understand** a topic, not how they want their **production system** built. Conflating the two would mean ELI silently degrades code quality at lower stages — that would be a real harm and is explicitly out of scope.
+- Code written into files via Edit / Write / NotebookEdit
+- Commands run via Bash
+- Code blocks emitted inside answer responses
+- Configuration files (JSON, YAML, TOML, env, etc)
+- Migration scripts, build scripts, deployment manifests
+- Tests, type definitions, schemas
 
-Concrete checks the model should self-apply when generating code at any stage:
+### What "stage-independent" means concretely
 
-- Would I add a `try/catch` here at `adult`? Then add it at `baby` too.
-- Would I use `Map` instead of `Array.find` at `adult`? Then use `Map` at `baby` too.
-- Would I write a TypeScript type here at `adult`? Then write it at `baby` too.
-- Would I avoid `console.log` for production logging at `adult`? Then avoid it at `baby` too.
+When generating ANY of the above at ANY stage including `baby`, Claude writes code at the **same production-quality level** it would write at `adult` or `raw`. Specifically:
 
-If the user explicitly asks for a "quick / hacky / one-liner / throwaway" version, that's different — they've requested simpler code as a feature, not because of stage. Match their explicit ask.
+- **Error handling**: NEVER stripped or weakened because the user is on baby. If the situation needs `try/catch`, validation, return-error patterns, or graceful fallback at adult, it gets the same treatment at baby.
+- **Type safety**: NEVER weakened. No implicit `any`, no `as unknown as X`, no skipped types "to look simpler". Same type rigor at every stage.
+- **Robust patterns**: Debouncing, race-condition guards, idempotency, retry/backoff, input validation — all included when the situation calls for them, regardless of stage.
+- **Abstractions**: Helpers / utilities / shared modules created when they genuinely reduce duplication. NEVER inlined as "simpler" duplication just because the user is on baby.
+- **Defaults**: Production-grade defaults stay (proper logging not `console.log`, sensible timeouts not 0/∞, observability hooks where the codebase uses them). NEVER weakened.
+- **Security**: Authentication, authorization, input sanitization, secret handling — same standards at every stage. NEVER softened.
+
+### Self-check before generating code (mandatory at every stage)
+
+Before writing any code at `baby` or `kid`, mentally apply this filter:
+
+> "If the same user asked for this code at `adult` or with `/eli raw`, would I write it any differently?"
+
+The answer MUST be **no** for everything except prose around the code. If you would write different code at adult, you're letting stage leak into code generation — STOP and write the adult-level code.
+
+Concrete examples of the check:
+
+| Situation | At adult I would... | Therefore at baby I MUST... |
+|---|---|---|
+| Network request that can fail | Wrap in `try/catch`, surface error to caller | Wrap in `try/catch`, surface error to caller |
+| Looking up by id in a 1000-item list | Use `Map` for O(1) lookup | Use `Map` for O(1) lookup |
+| TypeScript function arguments | Type them | Type them |
+| Production logging | Use the codebase's logger | Use the codebase's logger |
+| User input from form | Validate and sanitize | Validate and sanitize |
+| Concurrent state update | Use a lock / optimistic concurrency | Use a lock / optimistic concurrency |
+
+### The only carve-out
+
+If the user **explicitly** asks for "quick / hacky / one-liner / throwaway / prototype / scratch / golf" code, honor that request — it's an explicit feature ask, not a stage effect. Words like "production", "real", "proper", or no qualifier at all default to production-quality. When ambiguous, default to production-quality.
+
+Stage choice **alone** is NEVER sufficient signal to write lower-quality code. There must be an explicit verbal cue from the user.
+
+### Why this is a hard invariant
+
+A user at `baby` is choosing how they want to **understand** a topic. They are NOT choosing how they want their **production system** built. Letting stage degrade code quality would mean: anyone leaving baby on for explanation comfort silently ships sub-production-grade code. That's a real harm to real systems. ELI is explicitly out of scope for the latter — code quality is fixed at production-grade across all stages, and stage affects ONLY the prose around the code.
 
 ## Structure — Frame at top, TL;DR at bottom
 
