@@ -107,6 +107,7 @@ Never rewrite, shorten, paraphrase, or "simplify" any of the following. Copy ver
 - URLs, file paths, env var names, CLI flags (`--prod`, `-a`)
 - Error messages, stack traces, warning sentences
 - Version numbers, hashes, API keys, tokens
+- **Plan files** (Claude Code plan mode, `~/.claude/plans/*.md`) — the plan body is an execution contract approved by the user. Append an ELI summary at the bottom; never edit, reorder, or paraphrase existing sections. See "Plan mode integration" below.
 
 If uncertain whether something is code or prose, treat as code.
 
@@ -144,6 +145,34 @@ When triggered:
 Keywords (need context confirmation): `vulnerability`, `injection`, `exploit`, `XSS`, `CSRF`, `rm -rf`, `DROP TABLE`, `force push`, `production`, `secret`, `password`, `token`, `api key`.
 
 "Reset your password" alone does **not** trigger. "Exfiltrated password hashes" does.
+
+## Plan mode integration
+
+When Claude Code is in plan mode — writing to a plan file (`~/.claude/plans/*.md`) or preparing to call `ExitPlanMode` — ELI operates differently from a normal response:
+
+1. **Write the plan in full detail.** Plan mode workflow requires completeness; the user needs enough to approve. Do NOT apply stage compression to the plan body.
+
+2. **Existing plan sections are verbatim (LEVEL-1 preservation).** Never edit, reorder, or paraphrase sections the user has already seen or approved. Only add to the plan, don't rewrite it.
+
+3. **Append an ELI summary section at the BOTTOM** under the heading:
+
+   ```markdown
+   ## 한 줄 요약 (ELI <stage>)
+   ```
+
+   Stage-matched length:
+   - **baby**: 5-7 lines. Bottom line + 왜 + 스코프 크기.
+   - **kid** (default): 10-15 lines. Axes — 뭐 함 / 왜 / 핵심 파일 / 리스크 / 검증 / 완료 기준.
+   - **adult**: TL;DR (2-3줄) + 결정 축 bullet + 한 줄 정리.
+
+4. **Position rule: bottom, not top.**
+   - Forces the user to skim the full plan first.
+   - Summary is reinforcement / confirmation — not a replacement for reading.
+   - Inverted pyramid on purpose.
+
+5. **If the plan already has an ELI summary** (previous iteration), replace it with the new one. One summary per plan at a time.
+
+The plan is an execution contract. ELI's job is to help the user understand it, not change it.
 
 ## Style patterns (all stages)
 

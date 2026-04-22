@@ -178,6 +178,7 @@ ELI should hit ~100% on every preservation kind. terse should drop substantially
 - The `safeWriteFlag` / `readFlag` invariants (security).
 - The `package.json` `{"type": "commonjs"}` pin (interop).
 - The stage-name-only command interface (`/eli baby|kid|adult`) — v0.5 deliberately dropped numeric aliases (`/eli 1|2|3`) and stage-number traces because with three consistently-named stages there's no confusion, and two input formats add more UX drag than they save keystrokes. Don't re-add numbers as args unless stages change.
+- The plan-summary-at-bottom rule — v0.6 puts the ELI summary for plan mode at the bottom of the plan file, not the top. This is inverted pyramid on purpose: the user should skim the plan in full first and use the summary as reinforcement, not use the summary to skip reading. Don't "helpfully" move it to the top.
 - The independent-product stance — we're not a caveman funnel; no "graduate to caveman" copy anywhere.
 
 ## Inspiration

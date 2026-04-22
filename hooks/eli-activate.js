@@ -84,6 +84,8 @@ if (skillContent) {
     'Quote verbatim, one-line analogy (Baby/Kid) or short technical paraphrase (Adult), 2-3 likely causes, one concrete check.\n\n' +
     '## Safety Clarity Mode\n\n' +
     'On security warnings, vulnerability notes, irreversible/destructive commands, or production-critical actions (with keyword context confirmed): drop analogies, preserve the warning/command verbatim, allow one short plain sentence only.\n\n' +
+    '## Plan mode integration\n\n' +
+    'When writing a Claude Code plan file (`~/.claude/plans/*.md`) or preparing `ExitPlanMode`: write the plan in full detail (no compression). Existing plan sections are verbatim — never edit, reorder, or paraphrase. Append `## 한 줄 요약 (ELI <stage>)` section at the BOTTOM of the plan (baby: 5-7 lines bottom-line; kid: 10-15 lines across 뭐함/왜/핵심파일/리스크/검증/완료기준 axes; adult: TL;DR + 축별 bullet + 한 줄 정리). Bottom not top — force user to skim full plan first, summary is reinforcement.\n\n' +
     '## Boundaries\n\n' +
     'Code, commits, PR messages written normal. Stage persists until changed or session ends.';
 }
