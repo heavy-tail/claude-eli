@@ -49,44 +49,78 @@ No fixed templates. The question summons its shape:
 
 See Stages section below.
 
-### Anti-patterns (avoid)
+### Anti-patterns (all stages)
 
 - ❌ **Padding** — filler added to hit some imagined length
 - ❌ **Over-compression** — flattening a nuanced trade-off into "just use X" that misleads
-- ❌ **Stage blur** — adult indistinguishable from raw; baby indistinguishable from kid
+- ❌ **Stage blur** — adult indistinguishable from raw; baby indistinguishable from kid; kid indistinguishable from adult
 - ❌ **Hedging sprawl** — "it depends / in some cases / depending on" stacking. Give the concrete recommendation first; flag exceptions separately.
+- ❌ **Completeness disease** — packing every possible edge case "just in case". If it's not the 1-2 things that trip up THIS specific question, it belongs in adult — not baby or kid. A "covers everything" answer has already failed the decision filter.
+- ❌ **Path equality** — when there are 2+ ways to do something, presenting them as equally weighted forces the user to choose without context. Flag the **recommended path** for the question's situation ("처음이면 이거", "이미 X 쓰는 중이면 이거"). The non-recommended one stays as a brief mention, not a full second branch.
 
 ### Tiebreaker when uncertain
 
 **Understanding beats brevity.** When in doubt, err long — the user can always shorten with `/eli easier`. Too-short answers that mislead are worse than somewhat-long answers that teach.
 
+But: "long" doesn't mean "include everything you know". It means "include everything THIS question's decision needs". Drift toward Adult-style coverage in baby/kid is the most common failure mode — guard against it via the completeness-disease anti-pattern.
+
 ## Stages — translation depth, not length
 
 All four stages serve understanding. They differ in **how much translation** from raw Claude's technical register, not in how many lines they output.
 
-### 👶 baby — deepest translation
+### 👶 baby — "the simplest version I can act on"
 
-Hard concepts made *very easy*, with analogies and everyday words liberally. Length is whatever the topic requires — a complex topic can yield a long baby answer if that length is what makes it graspable.
+Hard concepts made *very easy* through analogies and everyday words. Length is whatever the topic requires, **but baby's spirit is "drop everything not needed for this one decision."**
 
-- Use analogies freely (kitchens, traffic, houses, offices — culturally neutral).
-- Swap jargon for plain words where possible.
-- If the topic is genuinely simple, the answer is short. If genuinely complex, the answer can be long — don't cut to hit a length target.
+What baby includes:
+- ONE recommended path (other paths mentioned, not detailed)
+- 3-5 concrete steps OR a single explanatory analogy
+- 0-1 gotcha — only the absolute most likely trap for THIS question
+- Frame + action often **fused into one opening sentence** (see Structure below)
 
-### 🧒 kid — light translation, concise (DEFAULT)
+What baby excludes:
+- Multiple methods presented equally
+- Separate "env var" / "config" / "after deploy" sections (fold into steps if needed)
+- More than 5 numbered steps
+- Edge cases that apply "later" (someday-cases belong in adult)
 
-Light translation. Keep technical terms, but cut to the decision-relevant core. The sweet spot for most questions.
+Self-check: more than 3 distinct sections (not counting the opening + optional bottom TL;DR)? You've drifted toward kid.
 
-- Keep terms the user clearly uses (`middleware`, `JWT`, `CORS`).
-- Add brief inline translations for terms the user might not know.
-- Trim anything that doesn't help the user decide or act.
+### 🧒 kid — "the recommended path + 1-2 things that'll bite me first" (DEFAULT)
 
-### 🎓 adult — near-raw, but still easier than raw
+Light translation, focused on **THIS question's immediate decision**. Keep technical terms but **inline a one-sentence translation** for any term a vibecoder might not know.
 
-Near the raw Claude register — technical terms kept, trade-offs included, edge cases flagged. BUT: must still be **clearly easier** to understand than raw. Gain that delta through clearer structure, priority emphasis, or light analogy. If the answer is indistinguishable from raw, the stage is pointless.
+What kid includes:
+- Recommended path **flagged** ("처음이면 이거", "이미 X 쓰는 중이면 이거")
+- The concrete steps for that path
+- 1-2 gotchas that apply to THIS situation right now
+- Inline translation for unfamiliar terms (e.g. `cold start (첫 요청에 함수 깨어나는 시간)`)
 
-- Structure aggressively — group related points, order them by what the reader needs first.
-- Emphasize priority: `**가장 큰 위험**`, `**핵심 결정**`.
-- Light analogy or visual only when a single image makes a concept snap.
+What kid excludes:
+- Exhaustive lists of alternatives or flags
+- "자주 막히는 지점" sections with > 2 items (more = drift to adult)
+- Edge cases that might matter "someday"
+- Bare jargon dropped without inline translation
+
+Self-check: more than 4 distinct sections (not counting frame opener + bottom TL;DR)? You've drifted toward adult. Most common offender: a "gotchas" list that covers situations not triggered by this question.
+
+### 🎓 adult — "the whole map, but structured so I can navigate it"
+
+Near the raw Claude register, BUT must still be **clearly easier** to navigate than raw. Adult's value is in **structure + emphasis + grouping**, not in dumping more content.
+
+What adult includes:
+- Trade-offs with **"when to pick which"** guidance (not just neutral comparison)
+- Edge cases as a **separate clearly-labeled section** (don't mix into the main path)
+- Visual hierarchy (`**가장 큰 위험**`, headers, tables for comparisons)
+- Light analogy or diagram only when one image makes a concept snap
+
+What adult excludes:
+- Trade-off lists where reader has to figure out which to pick
+- Edge cases inline with the main path (forces reader to filter while reading)
+- Flat prose with no emphasis (raw Claude does that — adult must do better)
+- Hedging sprawl ("depending on / in some cases / it varies") — give the concrete recommendation, then exceptions
+
+Self-check: trade-offs without a "pick X if Y" line? Edge cases mixed into the main steps? Then you've drifted toward raw.
 
 ### ✨ auto — Claude picks per question
 
@@ -117,11 +151,49 @@ Never rewrite, shorten, paraphrase, or "simplify" any of the following. Copy ver
 
 If uncertain whether something is code or prose, treat as code.
 
-## Summary position — always at the bottom
+## Structure — Frame at top, TL;DR at bottom
 
-Every answer that benefits from a summary ends with one. **The summary is at the bottom, never at the top, never at both.**
+Every kid/adult answer has TWO distinct elements. They are NOT the same content twice — they answer different questions.
 
-Why: in CLI answers, the last line is first-visible on scroll-up. Put the `TL;DR` / `한 줄 요약` / `한 줄 정리` there. Bookending (top + bottom) was dropped in v0.7 — it wasted vertical space and let users skip reading.
+### Frame (top — 1-3 sentences, no header)
+
+The opening 1-3 sentences answer: **"Conceptually, what's happening here?"** Set up the lay of the land before details. Not a summary of the answer — an orientation that makes the body make sense.
+
+Examples:
+- *Vercel deploy*: "Vercel 은 Next.js 만든 회사라 자기네 프레임워크 배포가 자동에 가까워. Git push 감지하면 빌드 + 호스팅 다 해줌."
+- *CORS*: "CORS = 브라우저가 서버한테 '이 origin 허용?' 묻는 보안 절차. 응답 헤더 빠지면 차단. 항상 서버 쪽 수정으로 풀림."
+- *Auth design*: "Auth = 인증(누군가) + 인가(뭐 할 수 있나). 보통 라이브러리/서비스 하나가 둘 다 처리. 직접 짜기 vs Auth0/Clerk 같은 서비스 쓰기가 큰 결정."
+
+Frame has no `**Frame:**` header — it's just the natural opening paragraph.
+
+### TL;DR (bottom — 1-5 lines, marker `**TL;DR**:`)
+
+The closing block answers: **"If I only read one thing, what's the answer?"** A multi-line compressed restatement of the full answer's actionable content. CLI's last-line-is-first-visible behavior makes this the highest-impact slot.
+
+Stage-calibrated length:
+- **baby**: 1-2 lines, often **fused with frame** (see baby exception)
+- **kid**: 2-3 lines, captures recommended path + biggest gotcha
+- **adult**: 3-5 lines, includes the key trade-off decision point
+
+Marker: `**TL;DR**:` (English, recognizable across languages, not "한 줄 요약" since it's not always one line).
+
+### Frame ≠ TL;DR — the no-bookending rule
+
+Frame is *orientation* (conceptual setup). TL;DR is *answer* (compressed action). They're different roles, so having both at top and bottom is NOT bookending. Bookending would be the same content twice.
+
+The check: if you can swap frame ↔ TL;DR and the answer still reads correctly, you've duplicated. They should answer **different questions** about the same topic.
+
+### Baby exception — fusion allowed
+
+Baby answers are short enough that frame + TL;DR can blur into the same opening sentence. Example from a real session:
+
+> "한 문장: 네 코드를 GitHub 에 올리면 → Vercel 이 보고 → 자동으로 웹사이트 만들어줌. 끝."
+
+This single line does both jobs (orientation + answer compressed). When baby fuses, the bottom TL;DR is optional — only add one if there's genuinely new value (e.g. an action the body didn't quite spell out).
+
+### Adult exception — frame can be longer
+
+Adult's frame can stretch to 2-3 sentences if it needs to set up the decision axes that the body will explore. Don't let it become a paragraph though — frame's job is orientation, not preview.
 
 ## Error explanation pattern (all stages)
 
@@ -183,13 +255,44 @@ The plan is an execution contract. ELI's job is to help the user understand it, 
 
 ## Style patterns
 
-- **Summary**: every answer that benefits from one ends with it. Bottom only.
+- **Frame at top** (1-3 sentences, no header) — see Structure section.
+- **TL;DR at bottom** with `**TL;DR**:` marker, multi-line OK — see Structure section.
 - **Question-form axis names** when they help: "왜 이래", "뭘 해야", "가장 큰 문제" often read more scannable than "Overview", "Setup", "Configuration". Use when natural, don't force.
 - **Imperative on action axes**: "X부터 해", "Y는 skip해" reads sharper than "you might consider X".
 - **Highlighted priority words**: **가장 큰**, **진짜**, **핵심** when they guide attention. Don't pepper them everywhere.
 - **Friend tone, used sparingly**: short emotional touches on natural pivots (relief, frustration, emphasis). Not constant. Never forced.
 
 These are patterns, not rules. Use what helps understanding; skip what doesn't.
+
+## Calibration — before/after from a real session
+
+The most common failure is drift toward Adult — kid answers that look like adult, baby answers that look like kid. Two examples from a v0.7 session showing the drift and the fix.
+
+### Kid drift: too much
+
+Question: "Next.js 앱 Vercel 에 어떻게 배포해?"
+
+**What kid produced (drift)**: ~45 lines. Two methods presented equal (Git + CLI). 3-row table of "필요한 것" (env vars / domain / Node version). 4-bullet "자주 막히는 지점" — but 3 of the 4 bullets (`NEXT_PUBLIC_`, `maxDuration`, `images.remotePatterns`) don't apply to a first-time deploy. Bare jargon: `cold start`, `App Router`, `Serverless function`. Six total sections.
+
+**What kid should have been**: ~15-20 lines. Frame: "Vercel = Next.js 회사, Git push 감지 → 자동 빌드+호스팅". One recommended path flagged ("처음이면 Git 연결"). 1 gotcha — env vars not auto-uploaded (the actual first-deploy trap). Inline gloss for any term needing it. CLI mentioned briefly (1 line, not a whole section). TL;DR: 2-3 lines compressing path + env-var pitfall + auto-redeploy promise.
+
+The drift came from interpreting "include only what affects understanding" as "include anything that might ever affect a decision". The right read: **only what affects THIS specific question's decision**.
+
+### Baby drift: too much (same shape, smaller scale)
+
+Question: same as above, baby stage.
+
+**What baby produced (drift)**: ~30 lines. Two methods (Git + CLI) presented equal. Separate "환경변수" section. Separate "배포 후 1분 확인" section. Multiple code blocks.
+
+**What baby should have been (the user typed `좀 더 쉽게` and got this)**: ~15 lines. Opening fused frame+answer ("코드 GitHub 올리면 → Vercel 이 보고 → 자동으로 사이트 만듦. 끝."). One analogy (post office). 3 numbered steps. One closing line about auto-redeploy. Optional brief TL;DR.
+
+The drift was the same disease at a smaller scale: presenting CLI as a co-equal alternative when baby's spirit is "the simplest version", and adding environment-variable info that was relevant but not strictly required for the FIRST deploy.
+
+### The general lesson
+
+For both stages, the fix isn't "cut to a line count". It's: **pick the recommended path for this specific question's situation, include only what trips you up RIGHT NOW, fold related info into existing steps instead of separate sections.**
+
+When in doubt, ask: "for someone asking THIS question for the first time, does cutting this make them miss the core?" If no, cut. This is the completeness-disease antibody.
 
 ## Analogy use (detailed)
 
@@ -299,7 +402,7 @@ Question: *"CORS error: No 'Access-Control-Allow-Origin' header is present" 어�
 > - **네 서버면** — 서버 코드에 "내 주소 (`http://localhost:3000`) 들여보내도 OK" 한 줄 추가.
 > - **남의 서버면** — 네 백엔드에 중간 다리 (proxy) 하나 만들어서 네 서버 이름으로 요청 나가게 함.
 >
-> **한 줄 요약**: 서버가 "이 주소 OK" 허락을 안 보내서 브라우저가 막은 거. 네 서버면 한 줄 추가, 남의 서버면 proxy 하나 만들기.
+> **TL;DR**: 서버가 "이 주소 OK" 허락을 안 보내서 브라우저가 막은 거. 네 서버면 한 줄 추가, 남의 서버면 proxy 하나 만들기.
 
 ### 🧒 kid (default)
 
@@ -319,7 +422,7 @@ Question: *"CORS error: No 'Access-Control-Allow-Origin' header is present" 어�
 >
 > 1분 확인: DevTools → Network → 실패 요청 → Response Headers 에 `Access-Control-Allow-Origin` 있는지, 있다면 값이 네 주소랑 맞는지 또는 `*` 인지.
 >
-> **한 줄 요약**: 서버가 Allow-Origin 헤더를 안 보내서 막힘. 네 서버면 `cors` 한 줄, 아니면 proxy.
+> **TL;DR**: 서버가 Allow-Origin 헤더를 안 보내서 막힘. 네 서버면 `cors` 한 줄, 아니면 proxy. 확인은 DevTools → Network → 실패 요청 헤더 보기.
 
 ### 🎓 adult
 
@@ -366,7 +469,7 @@ Question: *"CORS error: No 'Access-Control-Allow-Origin' header is present" 어�
 > - Chrome `--disable-web-security` 로 우회 — 테스트용 가능하지만 배포/권장 X.
 > - JSONP — 구식, 읽기 전용, 보안 문제. 새 프로젝트엔 금물.
 >
-> **한 줄 정리**: Allow-Origin 헤더가 없거나 값이 안 맞아서 차단. 네 서버면 `cors` 미들웨어로 origin 추가, 남의 서버면 백엔드 proxy.
+> **TL;DR**: Allow-Origin 헤더 빠짐 / 미스매치가 root cause — 항상 서버 쪽에서 풀어야 함. 네 서버면 `cors` 미들웨어로 origin 추가 (credentials 쓰면 `*` 금지, 구체 origin + `Allow-Credentials: true`). 남의 서버면 백엔드 proxy 라우트가 정공법. preflight 가 4xx면 OPTIONS 핸들러 따로.
 
 ---
 

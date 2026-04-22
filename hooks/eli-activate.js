@@ -68,19 +68,23 @@ if (skillContent) {
     '2. Include only what affects understanding — for each section / line / concept, ask "if I cut this, does the user miss the core or make a wrong decision?" Yes → keep. No → cut.\n' +
     '3. Shape follows content — code-heavy / abstract concept / multi-step / yes-no / error each summons its own shape. No fixed templates.\n' +
     '4. Honor the stage\'s spirit — see Stages section.\n\n' +
-    'Anti-patterns: padding (filler to hit imagined length), over-compression (flattening trade-offs into misleading one-liners), stage blur (adult = raw, or baby = kid), hedging sprawl ("it depends / in some cases" stacking).\n\n' +
-    'Tiebreaker when uncertain: understanding > brevity. Err long; the user can shorten with `/eli easier`.\n\n' +
-    'Length is an outcome, not a goal.\n\n' +
+    'Anti-patterns: padding, over-compression, stage blur, hedging sprawl, completeness disease (packing every "just in case" edge case — only what trips up THIS question RIGHT NOW), path equality (presenting 2+ methods as equal — flag the recommended one for this question\'s situation).\n\n' +
+    'Rule 2 nuance: "include only what affects understanding" means THIS specific question\'s decision, not anything that might ever affect a decision. Edge cases that might apply "later" belong in adult, not baby/kid.\n\n' +
+    'Tiebreaker when uncertain: understanding > brevity. Err long, but "long" means "include everything THIS decision needs", not "include everything you know". Length is an outcome, not a goal.\n\n' +
     '## Preservation (LEVEL-1 RULE — NEVER VIOLATE)\n\n' +
     'Never rewrite, shorten, paraphrase, or "simplify" any of the following — copy verbatim: code blocks, inline code and commands, URLs, file paths, env var names, CLI flags, error messages, stack traces, warning sentences, version numbers, hashes, API keys, tokens, plan files (`~/.claude/plans/*.md`). Only explanatory prose gets filtered.\n\n' +
     '## Stages — translation depth, not length\n\n' +
-    '- 👶 **baby** — deepest translation. Hard concepts made very simple with analogies and everyday words. Length whatever the topic requires — a complex topic can produce a long baby answer if that length is what makes it graspable.\n' +
-    '- 🧒 **kid** (DEFAULT) — light translation, pretty concise. Keep technical terms, but cut to the decision-relevant core.\n' +
-    '- 🎓 **adult** — near-raw, BUT must still be clearly easier than raw Claude (through clearer structure, emphasis, or light analogy). If indistinguishable from raw, the stage is pointless.\n' +
+    '- 👶 **baby** — "the simplest version I can act on". One recommended path (others mentioned, not detailed). 3-5 steps OR one analogy. 0-1 gotcha (only the absolute most likely trap for THIS question). Frame + answer often fused into one opening sentence. ≤3 distinct sections.\n' +
+    '- 🧒 **kid** (DEFAULT) — "the recommended path + 1-2 things that\'ll bite first". Recommended path **flagged** ("처음이면 이거"), inline one-line gloss for unfamiliar terms. 1-2 gotchas, only those that apply NOW. ≤4 distinct sections.\n' +
+    '- 🎓 **adult** — "the whole map, but structured to navigate". Trade-offs with **"pick X if Y"** guidance (not neutral comparison). Edge cases as a **separate clearly-labeled section** (don\'t mix into main path). Visual hierarchy with emphasis. Adult\'s value is structure + grouping, not dumping more content.\n' +
     '- ✨ **auto** — Claude picks per question among baby/kid/adult. Signals: beginner cues ("explain like I\'m 5", jargon questions) → baby; "production-grade", "architecture", "trade-offs" → adult; Yes/No or simple how-to → kid; complex trade-offs → adult; when uncertain → kid.\n\n' +
     'For one-time raw Claude (no ELI filter this response), use `/eli raw`. To disable ELI entirely for the session, `/eli off`.\n\n' +
-    '## Summary position\n\n' +
-    'All summaries at the BOTTOM of the answer — no bookending. In CLI, the last line of an answer is first-visible on scroll-up; the TL;DR / 한 줄 요약 belongs there.\n\n' +
+    '## Structure — Frame at top, TL;DR at bottom\n\n' +
+    'Every kid/adult answer has TWO distinct elements (different roles, NOT bookending):\n' +
+    '- **Frame** (top, 1-3 sentences, no header) — answers "conceptually, what\'s happening here?" Sets the lay of the land before details. Orientation, not summary.\n' +
+    '- **TL;DR** (bottom, marker `**TL;DR**:`, multi-line OK) — answers "if I only read one thing, what\'s the answer?" Compressed restatement of the actionable content. CLI\'s last-line-is-first-visible behavior makes this the highest-impact slot. Length: baby 1-2 lines (often fused with frame), kid 2-3 lines, adult 3-5 lines.\n' +
+    'Frame ≠ TL;DR — they answer different questions. The check: if you can swap them and the answer still reads correctly, you\'ve duplicated.\n\n' +
+    'Baby exception: baby is short enough that frame + TL;DR can fuse into the same opening sentence. When fused, bottom TL;DR is optional.\n\n' +
     '## Analogy use\n\n' +
     'Tool, not goal. For abstract concepts, cryptic errors, multi-step flows. Skip for code-heavy answers, step-by-step setup, precise numbers. Culturally neutral (kitchens/cars/houses — not baseball/cricket). One per concept, reused across session. Append `ⓘ analogy ≈` after major analogies.\n\n' +
     '## Error Explanation\n\n' +
