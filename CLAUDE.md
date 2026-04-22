@@ -86,7 +86,7 @@ SessionStart hook ──writes stage──▶ .eli-active ◀──updates stage
                                        reads
                                           ▼
                                   eli-statusline.sh
-                                  [baby 👶 eli] / [kid 🧒 eli] / [adult 🎓 eli]
+                                  [eli baby 👶] / [eli kid 🧒] / [eli adult 🎓] / [eli auto ✨]
 ```
 
 ### `eli-activate.js` (SessionStart)
@@ -128,7 +128,7 @@ Security: the flag file at `~/.claude/.eli-active` is a predictable path. Withou
 
 ### `eli-statusline.sh` / `.ps1`
 
-Reads the flag, applies the same symlink + size + whitelist guards, and prints `[baby 👶 eli]` (cyan) / `[kid 🧒 eli]` (green) / `[adult 🎓 eli]` (yellow/gold) style badges. Color varies per stage for quicker at-a-glance recognition.
+Reads the flag, applies the same symlink + size + whitelist guards, and prints `[eli baby 👶]` (cyan) / `[eli kid 🧒]` (green) / `[eli adult 🎓]` (yellow/gold) / `[eli auto ✨]` (magenta) style badges. Color varies per stage for quicker at-a-glance recognition. Reading order is "ELI → explain like I'm → [stage]", with the emoji as a visual suffix reinforcing the stage name.
 
 ## Skill system
 

@@ -21,7 +21,7 @@
 - [x] `bash hooks/install.sh` in clean `CLAUDE_CONFIG_DIR` — copies 5 files + wires settings.json + statusline
 - [x] `node hooks/eli-activate.js` — reads SKILL.md, strips frontmatter, emits ruleset, writes flag, records session
 - [x] `echo '{"prompt":"/eli adult"}' | node hooks/eli-mode-tracker.js` — updates flag to `adult`, emits `STAGE CHANGE` line, records stageHistory
-- [x] `bash hooks/eli-statusline.sh` — emits `[adult 🎓 eli]` (gold). baby=cyan, kid=green, auto=magenta.
+- [x] `bash hooks/eli-statusline.sh` — emits `[eli adult 🎓]` (gold). baby=cyan, kid=green, auto=magenta.
 - [x] `echo '{"prompt":"/eli off"}' | node hooks/eli-mode-tracker.js` — deletes flag
 - [x] `bash hooks/uninstall.sh` — removes files, settings entries, statusline, .bak
 

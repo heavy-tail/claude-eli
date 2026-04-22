@@ -33,10 +33,10 @@ If you installed ELI standalone (without the plugin marketplace), use `bash hook
 
 Outputs a colored badge based on the flag value, with per-stage color for at-a-glance recognition:
 
-- `baby` → `[baby 👶 eli]` (cyan — fresh)
-- `kid` → `[kid 🧒 eli]` (green — default, steady)
-- `adult` → `[adult 🎓 eli]` (yellow/gold — matured)
-- `auto` → `[auto ✨ eli]` (magenta — adaptive, Claude picks per question)
+- `baby` → `[eli baby 👶]` (cyan — fresh)
+- `kid` → `[eli kid 🧒]` (green — default, steady)
+- `adult` → `[eli adult 🎓]` (yellow/gold — matured)
+- `auto` → `[eli auto ✨]` (magenta — adaptive, Claude picks per question)
 
 Refuses symlinks, caps reads at 64 bytes, and whitelists stage values to block terminal-escape injection through the flag file.
 

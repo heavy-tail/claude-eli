@@ -38,10 +38,10 @@ if (-not ($Valid -contains $Mode)) { exit 0 }
 #   adult → yellow/gold (matured)
 #   auto  → magenta (adaptive — Claude picks per question)
 $Badge = switch ($Mode) {
-    'baby'  { "baby 👶 eli" }
-    'kid'   { "kid 🧒 eli" }
-    'adult' { "adult 🎓 eli" }
-    'auto'  { "auto ✨ eli" }
+    'baby'  { "eli baby 👶" }
+    'kid'   { "eli kid 🧒" }
+    'adult' { "eli adult 🎓" }
+    'auto'  { "eli auto ✨" }
     default { exit 0 }
 }
 
