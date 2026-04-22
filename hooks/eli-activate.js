@@ -88,34 +88,49 @@ if (skillContent) {
     'Code, commits, PR messages written normal. Stage persists until changed or session ends.';
 }
 
-// 3. Detect missing statusline config — nudge Claude to help set it up on first interaction
+// 3. Auto-wire statusLine into settings.json if missing.
+//
+// Plugin marketplace install wires hooks (via plugin.json) but NOT statusLine
+// — the plugin manifest schema doesn't support a top-level statusLine field.
+// So we programmatically wire it from the SessionStart hook. This is the
+// canonical Claude Code pattern for plugin-shipped statuslines.
+//
+// Idempotent: we only write when the user has no statusLine OR their existing
+// statusLine points to a stale plugin cache path (commit SHA changes across
+// plugin updates). Never overwrite a user's custom statusLine.
 try {
-  let hasStatusline = false;
+  const isWindows = process.platform === 'win32';
+  const scriptName = isWindows ? 'eli-statusline.ps1' : 'eli-statusline.sh';
+  const scriptPath = path.join(__dirname, scriptName);
+  const command = isWindows
+    ? `powershell -ExecutionPolicy Bypass -File "${scriptPath}"`
+    : `bash "${scriptPath}"`;
+
+  let settings = {};
   if (fs.existsSync(settingsPath)) {
-    const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-    if (settings.statusLine) {
-      hasStatusline = true;
-    }
+    settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
   }
 
-  if (!hasStatusline) {
-    const isWindows = process.platform === 'win32';
-    const scriptName = isWindows ? 'eli-statusline.ps1' : 'eli-statusline.sh';
-    const scriptPath = path.join(__dirname, scriptName);
-    const command = isWindows
-      ? `powershell -ExecutionPolicy Bypass -File "${scriptPath}"`
-      : `bash "${scriptPath}"`;
-    const statusLineSnippet =
-      '"statusLine": { "type": "command", "command": ' + JSON.stringify(command) + ' }';
-    output += "\n\n" +
-      "STATUSLINE SETUP NEEDED: The Claude ELI plugin includes a statusline badge that " +
-      "shows the active stage (e.g. [1 👶 baby], [2 🧒 kid], [3 🎓 adult]). " +
-      "It is not configured yet. To enable, add this to " + path.join(claudeDir, 'settings.json') + ": " +
-      statusLineSnippet + " " +
-      "Proactively offer to set this up for the user on first interaction.";
+  const existing = settings.statusLine;
+  const existingCmd = existing
+    ? (typeof existing === 'string' ? existing : (existing.command || ''))
+    : '';
+
+  // Write if: (a) no statusLine at all, OR (b) existing statusLine is an
+  // eli-statusline.sh from a stale plugin cache path (different scriptPath).
+  // Never touch a user's custom non-eli statusline.
+  const isEliStatusline = /eli-statusline\.(sh|ps1)/.test(existingCmd);
+  const isStalePath = isEliStatusline && !existingCmd.includes(scriptPath);
+  const shouldWrite = !existing || isStalePath;
+
+  if (shouldWrite) {
+    settings.statusLine = { type: 'command', command: command };
+    fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n');
+    output += '\n\nSTATUSLINE AUTO-WIRED: ELI statusline badge configured in ' +
+      settingsPath + '. Restart Claude Code to see it.';
   }
 } catch (e) {
-  // Silent fail — don't block session start over statusline detection
+  // Silent fail — don't block session start over statusline setup.
 }
 
 process.stdout.write(output);
