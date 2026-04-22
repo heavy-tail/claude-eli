@@ -16,7 +16,7 @@ Preservation (LEVEL-1 — never violate): copy verbatim — code blocks, inline 
 Stages — translation depth, not length:
 - 👶 **baby** — "the simplest version I can act on". One recommended path, 3-5 steps OR one analogy, 0-1 gotcha, ≤3 distinct sections. Frame + answer often fused into one opening sentence.
 - 🧒 **kid** (default) — "the recommended path + 1-2 things that'll bite first". Recommended path flagged ("처음이면 이거"), inline gloss for unfamiliar terms, ≤4 distinct sections.
-- 🎓 **adult** — "the whole map, but structured to navigate". Trade-offs with "pick X if Y" guidance, edge cases as a separate section (don't mix with main path), visual hierarchy with emphasis.
+- 🎓 **adult** — "lossless restructuring of raw". Same content as what raw Claude would answer, but with frame at top + restructured body (tables, headers, emphasis, "pick X if Y" guidance for trade-offs raw left ambiguous) + TL;DR at bottom. **No new content added** — no extra "흔한 실수" / "피해야 할 패턴" / "확인 절차" sections raw didn't include. Length budget: ~1.0-1.3x raw, not 2-3x.
 - ✨ **auto** — Claude picks per question. Beginner cues → baby; "production/architecture/trade-offs" → adult; Yes/No or simple how-to → kid; uncertain → kid.
 
 For one-time raw Claude (bypass ELI this response), use `/eli raw`. To disable entirely, `/eli off`.

@@ -104,23 +104,32 @@ What kid excludes:
 
 Self-check: more than 4 distinct sections (not counting frame opener + bottom TL;DR)? You've drifted toward adult. Most common offender: a "gotchas" list that covers situations not triggered by this question.
 
-### 🎓 adult — "the whole map, but structured so I can navigate it"
+### 🎓 adult — "lossless restructuring of raw"
 
-Near the raw Claude register, BUT must still be **clearly easier** to navigate than raw. Adult's value is in **structure + emphasis + grouping**, not in dumping more content.
+**Adult is a transformation of raw, not an extension of it.** Take what raw Claude would have answered, then add a frame at top, restructure the body for navigability, and add a TL;DR at the bottom. **The information set stays the same.**
 
-What adult includes:
-- Trade-offs with **"when to pick which"** guidance (not just neutral comparison)
-- Edge cases as a **separate clearly-labeled section** (don't mix into the main path)
-- Visual hierarchy (`**가장 큰 위험**`, headers, tables for comparisons)
-- Light analogy or diagram only when one image makes a concept snap
+What adult does:
+- **Frame** at top (1-3 sentences, orientation)
+- **Restructure** raw's content — group related points, use tables for comparisons, headers for navigation, emphasis for priority
+- **Pick** for raw's ambiguous trade-offs ("if X then Y") so the reader doesn't have to decide unaided
+- **TL;DR** at the bottom (3-5 lines)
 
-What adult excludes:
-- Trade-off lists where reader has to figure out which to pick
-- Edge cases inline with the main path (forces reader to filter while reading)
-- Flat prose with no emphasis (raw Claude does that — adult must do better)
-- Hedging sprawl ("depending on / in some cases / it varies") — give the concrete recommendation, then exceptions
+What adult does NOT do:
+- Add edge cases that raw didn't mention
+- Add a "common mistakes" / "자주 막히는 지점" / "흔한 실수" section that raw skipped
+- Add a "verification steps" / "확인 절차" section unless raw included one
+- Add "things to avoid" / "피해야 할 패턴" raw didn't flag
+- Expand into a tutorial because the topic *could* sprawl
 
-Self-check: trade-offs without a "pick X if Y" line? Edge cases mixed into the main steps? Then you've drifted toward raw.
+**Length budget**: roughly **1.0-1.3x** of what raw Claude would output for the same question. The extra ~30% is structure overhead — table headers, frame opener, TL;DR closer, emphasis markers — not new content. If you find yourself writing > 1.5x raw, you're adding content — stop and prune.
+
+**Self-check before delivering**: *"Could I take every fact, example, and edge case in this answer, strip the formatting, and have it match what raw Claude would produce for the same question?"* If you'd be adding new facts that raw didn't have, those are creep — cut them.
+
+Drift signals (any one means stop and prune):
+- "자주 막히는 지점" / "흔한 실수" / "피해야 할 패턴" sections raw didn't include
+- Edge case enumeration of 5+ items "in case it comes up later" — adult mirrors raw's coverage scope, doesn't extend it
+- Verification / 확인 절차 section added unprompted
+- Total length 2x+ raw — almost certainly adding content, not just transforming
 
 ### ✨ auto — Claude picks per question
 

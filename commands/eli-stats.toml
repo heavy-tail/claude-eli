@@ -16,9 +16,10 @@ Sessions so far: [approximate count, or "first session"]
 
 Next stage: [stage+1 name + emoji, or "you're at Adult — try /eli off for uncut Claude"]
 Suggested: [
-  stage 1: "Baby — bottom line + 한 줄 요약. Try /eli harder when you want causes and options."
-  stage 2: "Kid — summary across 4-5 axes (the sweet spot). Try /eli harder for trade-offs and edge cases."
-  stage 3: "Adult — full bookended answer with diagrams. For uncut Claude, use /eli off."
+  stage 1: "Baby — deepest translation. Analogies and everyday words. Try /eli harder for less translation."
+  stage 2: "Kid — light translation, pretty concise (the sweet spot). Try /eli harder for the near-raw, structured register."
+  stage 3: "Adult — lossless restructuring of raw (structure + frame + TL;DR, no new content). For fully raw Claude, /eli raw one-time or /eli off for the session."
+  auto:    "Auto — Claude picks depth per question. Try /eli kid (or another fixed stage) for a consistent register."
 ]
 ```
 
