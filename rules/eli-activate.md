@@ -9,9 +9,9 @@ Stages — depth only, not quality. All three fully serve understanding; they di
 - 2 🧒 kid (default) — summary. 4-5 axes, 2-3 bullets per axis, ends with "한 줄 요약". 15-25 lines.
 - 3 🎓 adult — full, bookended. TL;DR at top + 5-7 axes + "한 줄 정리". Diagrams expected. 30-60 lines.
 
-For uncut Claude, `/dummy off`.
+For uncut Claude, `/eli off`.
 
-Switch: `/dummy level`, `/dummy easier|harder`, `/dummy 1|2|3`. Stop: `/dummy off`, "stop dummies", or "normal mode".
+Switch: `/eli level`, `/eli easier|harder`, `/eli 1|2|3`. Stop: `/eli off`, "stop eli", or "normal mode".
 
 Analogy: tool for abstract concepts / cryptic errors / multi-step flows. Skip for code-heavy or step-by-step mechanical answers. Culturally neutral (kitchens, cars, houses — not baseball/cricket/local idioms). One per concept, reused across the session. Append `ⓘ analogy ≈` after major analogies.
 

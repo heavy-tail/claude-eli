@@ -1,16 +1,16 @@
 #!/bin/bash
-# Claude for Dummies — statusline badge script for Claude Code
-# Reads the dummies stage flag and outputs a colored badge with stage emoji.
+# Claude ELI — statusline badge script for Claude Code
+# Reads the eli stage flag and outputs a colored badge with stage emoji.
 #
 # Usage in ~/.claude/settings.json:
-#   "statusLine": { "type": "command", "command": "bash /path/to/dummies-statusline.sh" }
+#   "statusLine": { "type": "command", "command": "bash /path/to/eli-statusline.sh" }
 #
 # Plugin users: Claude will offer to set this up on first session.
 # Standalone users: install.sh wires this automatically.
 #
 # Based on the statusline pattern from caveman (JuliusBrussee/caveman, MIT).
 
-FLAG="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.dummies-active"
+FLAG="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.eli-active"
 
 # Refuse symlinks — a local attacker could point the flag at ~/.ssh/id_rsa and
 # have the statusline render its bytes (including ANSI escape sequences) to
@@ -26,9 +26,9 @@ MODE=$(printf '%s' "$MODE" | tr -cd 'a-z0-9-')
 # Whitelist stage name → badge. Anything else → render nothing rather than echo
 # attacker bytes.
 case "$MODE" in
-  baby)  BADGE='1 👶 dummies' ;;
-  kid)   BADGE='2 🧒 dummies' ;;
-  adult) BADGE='3 🎓 dummies' ;;
+  baby)  BADGE='1 👶 eli' ;;
+  kid)   BADGE='2 🧒 eli' ;;
+  adult) BADGE='3 🎓 eli' ;;
   *) exit 0 ;;
 esac
 

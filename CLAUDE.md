@@ -1,4 +1,4 @@
-# CLAUDE.md — Claude for Dummies (internal dev guide)
+# CLAUDE.md — Claude ELI (internal dev guide)
 
 For Claude/contributors working on this repo. End-user docs live in `README.md`.
 
@@ -11,7 +11,7 @@ Three stages differ in **depth only, not quality** — all three fully serve und
 - `2 🧒 kid` (default) — summary across 4-5 axes (15-25 lines)
 - `3 🎓 adult` — full, bookended with TL;DR + "한 줄 정리" + diagrams (30-60 lines)
 
-For uncut Claude, `/dummy off`. Numeric command interface; emoji + name on the statusline and inside SKILL.md.
+For uncut Claude, `/eli off`. Numeric command interface; emoji + name on the statusline and inside SKILL.md.
 
 Analogies are a tool used selectively (abstract concepts, cryptic errors, multi-step flows), not a goal. Skip on code-heavy or step-by-step setup answers. Diagrams expected in Adult.
 
@@ -21,11 +21,11 @@ Independent product. Architecture inspired by caveman (MIT) — different axis: 
 
 | File | Controls |
 |------|----------|
-| `skills/dummies/SKILL.md` | Core dummies behavior — North Star mission, 6 principles, preservation rule, 3 stages (depth-only axis), error pattern, Safety Clarity Mode, analogy + diagram rules, language handling. The hook reads it at runtime. |
-| `rules/dummies-activate.md` | Always-on rule body for non-Claude-Code agents in v2 (Cursor / Windsurf / Cline / Copilot via per-IDE rules dirs). Currently shipped but not auto-synced — v2 work. |
-| `skills/dummies-glossary/SKILL.md` | `/dummy-glossary` behavior. |
-| `skills/dummies-stats/SKILL.md` | `/dummy-stats` behavior. |
-| `skills/dummies-help/SKILL.md` | `/dummy-help` reference card. |
+| `skills/eli/SKILL.md` | Core eli behavior — North Star mission, 6 principles, preservation rule, 3 stages (depth-only axis), error pattern, Safety Clarity Mode, analogy + diagram rules, language handling. The hook reads it at runtime. |
+| `rules/eli-activate.md` | Always-on rule body for non-Claude-Code agents in v2 (Cursor / Windsurf / Cline / Copilot via per-IDE rules dirs). Currently shipped but not auto-synced — v2 work. |
+| `skills/eli-glossary/SKILL.md` | `/eli-glossary` behavior. |
+| `skills/eli-stats/SKILL.md` | `/eli-stats` behavior. |
+| `skills/eli-help/SKILL.md` | `/eli-help` reference card. |
 
 ## File structure
 
@@ -44,10 +44,10 @@ Independent product. Architecture inspired by caveman (MIT) — different axis: 
 ├── README.md                # user-facing
 ├── benchmarks/              # caveman's harness, structure preserved (v2 work)
 ├── commands/
-│   ├── dummy.toml           # /dummy <arg>
-│   ├── dummy-glossary.toml
-│   ├── dummy-help.toml
-│   ├── dummy-stats.toml
+│   ├── eli.toml           # /eli <arg>
+│   ├── eli-glossary.toml
+│   ├── eli-help.toml
+│   ├── eli-stats.toml
 │   └── expert.toml
 ├── evals/
 │   ├── prompts/en.txt       # 15 vibecoder pain prompts
@@ -56,62 +56,62 @@ Independent product. Architecture inspired by caveman (MIT) — different axis: 
 │   ├── plot.py              # caveman's plotter, kept for parity
 │   └── snapshots/           # results.json — committed when regenerated
 ├── hooks/
-│   ├── dummies-activate.js
-│   ├── dummies-mode-tracker.js
-│   ├── dummies-config.js    # shared module
-│   ├── dummies-statusline.sh / .ps1
+│   ├── eli-activate.js
+│   ├── eli-mode-tracker.js
+│   ├── eli-config.js    # shared module
+│   ├── eli-statusline.sh / .ps1
 │   ├── install.sh / .ps1    # standalone installer
 │   ├── uninstall.sh / .ps1
 │   ├── package.json         # CJS pin
 │   └── README.md            # hooks-specific docs
 ├── rules/
-│   └── dummies-activate.md  # v2 always-on rule (not yet wired into per-IDE dirs)
+│   └── eli-activate.md  # v2 always-on rule (not yet wired into per-IDE dirs)
 └── skills/
-    ├── dummies/             # main skill
-    ├── dummies-glossary/    # sub-skill
-    ├── dummies-stats/       # sub-skill
-    └── dummies-help/        # sub-skill
+    ├── eli/             # main skill
+    ├── eli-glossary/    # sub-skill
+    ├── eli-stats/       # sub-skill
+    └── eli-help/        # sub-skill
 ```
 
 ## Hook system (Claude Code)
 
-Two hooks plus one shared module and a CJS pin. Communicate via flag file at `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.dummies-active`.
+Two hooks plus one shared module and a CJS pin. Communicate via flag file at `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.eli-active`.
 
 ```
-SessionStart hook ──writes stage──▶ .dummies-active ◀──updates stage── UserPromptSubmit hook
+SessionStart hook ──writes stage──▶ .eli-active ◀──updates stage── UserPromptSubmit hook
                                           │
                                        reads
                                           ▼
-                                  dummies-statusline.sh
-                                  [1 👶 dummies] / [2 🧒 dummies] / [3 🎓 dummies]
+                                  eli-statusline.sh
+                                  [1 👶 eli] / [2 🧒 eli] / [3 🎓 eli]
 ```
 
-### `dummies-activate.js` (SessionStart)
+### `eli-activate.js` (SessionStart)
 
 1. Reads `getDefaultMode()` (env > config.json > 'kid'). If `'off'`, removes the flag and exits.
 2. Writes the stage to the flag file via `safeWriteFlag` (symlink-safe, atomic, 0600).
 3. Calls `recordSession()` — sets `installedAt` on first run, increments `sessionCount`.
-4. Reads `skills/dummies/SKILL.md` and emits the body (frontmatter stripped) as stdout. Claude Code injects this as system context.
+4. Reads `skills/eli/SKILL.md` and emits the body (frontmatter stripped) as stdout. Claude Code injects this as system context.
 5. If no SKILL.md is found (standalone install without `skills/`), falls back to a hardcoded minimum ruleset embedded in the file.
 6. Detects missing `statusLine` config and appends a setup nudge.
 
 Silent-fails on filesystem errors. Never blocks session start.
 
-### `dummies-mode-tracker.js` (UserPromptSubmit)
+### `eli-mode-tracker.js` (UserPromptSubmit)
 
 Per turn:
 
-1. `recordPrompt()` (cheap; writes `~/.config/dummies/metadata.json`).
+1. `recordPrompt()` (cheap; writes `~/.config/eli/metadata.json`).
 2. If prompt starts with `/expert`: skip reinforcement, return (SKILL.md handles `/expert`).
 3. Snapshot stage before parsing.
-4. Natural-language deactivation (`stop dummies`, `normal mode`): unlink flag.
+4. Natural-language deactivation (`stop eli`, `normal mode`): unlink flag.
 5. Natural-language activation: write `getDefaultMode()` to flag.
-6. Slash-command parsing: `/dummy off|on|easier|harder|1|2|3` → mutate flag. Stage names (`baby`, `kid`, `adult`) **not accepted** as args — numeric only.
-7. Sub-skill commands (`/dummy-glossary`, `/dummy-stats`, `/dummy-help`) don't change stage.
+6. Slash-command parsing: `/eli off|on|easier|harder|1|2|3` → mutate flag. Stage names (`baby`, `kid`, `adult`) **not accepted** as args — numeric only.
+7. Sub-skill commands (`/eli-glossary`, `/eli-stats`, `/eli-help`) don't change stage.
 8. Detect transition vs snapshot. If changed, `recordStageChange(before, after)` and prepend a `STAGE CHANGE: N old → N new (upgrade|downgrade|activate)` line to `additionalContext`.
-9. Per-turn reinforcement: emit `DUMMIES MODE ACTIVE (stage: X)` plus the preservation reminder + neutrality reminder via `hookSpecificOutput.additionalContext`.
+9. Per-turn reinforcement: emit `ELI MODE ACTIVE (stage: X)` plus the preservation reminder + neutrality reminder via `hookSpecificOutput.additionalContext`.
 
-### `dummies-config.js`
+### `eli-config.js`
 
 Shared module exporting:
 
@@ -121,17 +121,17 @@ Shared module exporting:
 - `getMetadataPath`, `readMetadata`, `writeMetadata`
 - `recordSession`, `recordPrompt`, `recordStageChange` — best-effort metadata.
 
-Security: the flag file at `~/.claude/.dummies-active` is a predictable path. Without symlink guards, a local attacker with write access could replace it with a symlink to `~/.ssh/id_rsa` (or any user-readable secret) and have every reader (statusline, mode-tracker reinforcement) slurp those bytes into the terminal or model context. `safeWriteFlag` and `readFlag` enforce the gauntlet — symlink refusal at target and immediate parent, `O_NOFOLLOW`, atomic temp+rename, size cap, value whitelist. Don't bypass these for any new flag-style file.
+Security: the flag file at `~/.claude/.eli-active` is a predictable path. Without symlink guards, a local attacker with write access could replace it with a symlink to `~/.ssh/id_rsa` (or any user-readable secret) and have every reader (statusline, mode-tracker reinforcement) slurp those bytes into the terminal or model context. `safeWriteFlag` and `readFlag` enforce the gauntlet — symlink refusal at target and immediate parent, `O_NOFOLLOW`, atomic temp+rename, size cap, value whitelist. Don't bypass these for any new flag-style file.
 
-### `dummies-statusline.sh` / `.ps1`
+### `eli-statusline.sh` / `.ps1`
 
-Reads the flag, applies the same symlink + size + whitelist guards, and prints `[1 👶 dummies]` style badge in green.
+Reads the flag, applies the same symlink + size + whitelist guards, and prints `[1 👶 eli]` style badge in green.
 
 ## Skill system
 
 Skills are Markdown files with YAML frontmatter consumed by Claude Code's skill/plugin system. The `name` and `description` fields drive discovery; the body is the instruction the model loads when the skill is active.
 
-Stages are **not** independent skills — they're intensity levels of one skill. `dummies-glossary`, `dummies-stats`, `dummies-help` are independent skills (one-shot; don't change the stage).
+Stages are **not** independent skills — they're intensity levels of one skill. `eli-glossary`, `eli-stats`, `eli-help` are independent skills (one-shot; don't change the stage).
 
 ## Slash commands (TOML)
 
@@ -141,9 +141,9 @@ Each `/command` is a `commands/<name>.toml` file with `description`, optional `a
 
 | Field | Value | Where |
 |-------|-------|-------|
-| Default stage | `kid` | `dummies-config.js` `getDefaultMode()` final return |
-| Stage history cap | 100 | `dummies-config.js` `MAX_STAGE_HISTORY` |
-| Flag size cap | 64 bytes | `dummies-config.js` `MAX_FLAG_BYTES` |
+| Default stage | `kid` | `eli-config.js` `getDefaultMode()` final return |
+| Stage history cap | 100 | `eli-config.js` `MAX_STAGE_HISTORY` |
+| Flag size cap | 64 bytes | `eli-config.js` `MAX_FLAG_BYTES` |
 | Hook timeout | 5 s | `.claude-plugin/plugin.json` |
 
 ## Evals
@@ -152,17 +152,17 @@ Each `/command` is a `commands/<name>.toml` file with `description`, optional `a
 
 `evals/measure.py` reads the snapshot and reports:
 
-1. **Output length delta vs baseline** per arm (Dummies should be longer; terse shorter).
+1. **Output length delta vs baseline** per arm (ELI should be longer; terse shorter).
 2. **Preservation rate** per arm per artifact kind: `code_block`, `inline_code`, `url`, `path`, `env_var`, `flag`, `version`, `error`. The artifact set is extracted from the baseline answer (the natural full-technical answer); preservation = fraction that appears verbatim as substrings in the arm's answer.
 
-Dummies should hit ~100% on every preservation kind. terse should drop substantially. The synthetic-snapshot smoke test in commit `1c1fac8` confirms the math.
+ELI should hit ~100% on every preservation kind. terse should drop substantially. The synthetic-snapshot smoke test in commit `1c1fac8` confirms the math.
 
 ## Honesty rules
 
 - **Preservation must stay near 100%.** If you change SKILL.md and the eval drops below ~95% on any kind, that's a regression — fix the rule before merging.
 - **Analogy humility footnote (`ⓘ analogy ≈`) stays.** It signals that analogies are approximations and is part of the product's trust posture.
 - **Safety Clarity Mode keywords need context confirmation.** Single keywords like `password`, `production`, `token` show up in normal questions all the time. The rule is "drop analogies + preserve verbatim **only when the surrounding context confirms a destructive or security-sensitive scenario**."
-- **No telemetry.** Metadata stays local at `~/.config/dummies/`. Don't add any phone-home.
+- **No telemetry.** Metadata stays local at `~/.config/eli/`. Don't add any phone-home.
 
 ## Release process
 
@@ -171,13 +171,13 @@ Dummies should hit ~100% on every preservation kind. terse should drop substanti
 3. Update README's preservation table with the latest numbers if material.
 4. Run install→commands→uninstall smoke test in a clean `CLAUDE_CONFIG_DIR`.
 5. Commit, tag, push.
-6. `claude plugin marketplace add <user>/claude-for-dummies` works against the `main` branch.
+6. `claude plugin marketplace add <user>/claude-eli` works against the `main` branch.
 
 ## Things to leave alone (without thought)
 
 - The `safeWriteFlag` / `readFlag` invariants (security).
 - The `package.json` `{"type": "commonjs"}` pin (interop).
-- The `STAGES_BY_NUMBER` mapping in `dummies-mode-tracker.js` — numeric command interface is a deliberate UX choice; do not accept stage names as args (revives 2-name confusion).
+- The `STAGES_BY_NUMBER` mapping in `eli-mode-tracker.js` — numeric command interface is a deliberate UX choice; do not accept stage names as args (revives 2-name confusion).
 - The independent-product stance — we're not a caveman funnel; no "graduate to caveman" copy anywhere.
 
 ## Inspiration

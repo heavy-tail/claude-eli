@@ -1,8 +1,8 @@
 #!/bin/bash
-# Claude for Dummies — uninstaller for the SessionStart + UserPromptSubmit hooks
+# Claude ELI — uninstaller for the SessionStart + UserPromptSubmit hooks
 # Removes: hook files in ~/.claude/hooks, settings.json entries, and the flag file
 # Usage: bash hooks/uninstall.sh
-#   or:  bash <(curl -s https://raw.githubusercontent.com/wchun26/claude-for-dummies/main/hooks/uninstall.sh)
+#   or:  bash <(curl -s https://raw.githubusercontent.com/heavy-tail/claude-eli/main/hooks/uninstall.sh)
 #
 # Based on the uninstaller pattern from caveman (JuliusBrussee/caveman, MIT).
 set -e
@@ -10,30 +10,30 @@ set -e
 CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 HOOKS_DIR="$CLAUDE_DIR/hooks"
 SETTINGS="$CLAUDE_DIR/settings.json"
-FLAG_FILE="$CLAUDE_DIR/.dummies-active"
+FLAG_FILE="$CLAUDE_DIR/.eli-active"
 
-HOOK_FILES=("package.json" "dummies-config.js" "dummies-activate.js" "dummies-mode-tracker.js" "dummies-statusline.sh")
+HOOK_FILES=("package.json" "eli-config.js" "eli-activate.js" "eli-mode-tracker.js" "eli-statusline.sh")
 
-# Detect if Dummies is installed as a plugin (check plugin cache)
+# Detect if ELI is installed as a plugin (check plugin cache)
 PLUGIN_INSTALLED=0
 if [ -d "$CLAUDE_DIR/plugins" ]; then
-  if find "$CLAUDE_DIR/plugins" -path "*/dummies*" -name "plugin.json" -print -quit 2>/dev/null | grep -q .; then
+  if find "$CLAUDE_DIR/plugins" -path "*/eli*" -name "plugin.json" -print -quit 2>/dev/null | grep -q .; then
     PLUGIN_INSTALLED=1
   fi
 fi
 
 if [ "$PLUGIN_INSTALLED" -eq 1 ]; then
-  echo "Claude for Dummies appears to be installed as a Claude Code plugin."
+  echo "Claude ELI appears to be installed as a Claude Code plugin."
   echo "To uninstall the plugin, run:"
   echo ""
-  echo "  claude plugin disable dummies"
+  echo "  claude plugin disable eli"
   echo ""
   echo "This script removes standalone hooks (installed via install.sh)."
   echo "Continuing with standalone hook removal..."
   echo ""
 fi
 
-echo "Uninstalling Claude for Dummies hooks..."
+echo "Uninstalling Claude ELI hooks..."
 
 # 1. Remove hook files
 REMOVED_FILES=0
@@ -49,28 +49,28 @@ if [ "$REMOVED_FILES" -eq 0 ]; then
   echo "  No hook files found in $HOOKS_DIR"
 fi
 
-# 2. Remove dummies entries from settings.json (idempotent)
+# 2. Remove eli entries from settings.json (idempotent)
 if [ -f "$SETTINGS" ]; then
   # Require node for the same reason install.sh does — safe JSON editing
   if ! command -v node >/dev/null 2>&1; then
     echo "WARNING: 'node' not found — cannot safely edit settings.json."
-    echo "         Remove the dummies SessionStart and UserPromptSubmit"
+    echo "         Remove the eli SessionStart and UserPromptSubmit"
     echo "         entries from $SETTINGS manually."
   else
     # Back up before editing, same policy as install.sh
     cp "$SETTINGS" "$SETTINGS.bak"
 
     # Pass paths via env vars — avoids shell injection if $HOME contains single quotes
-    DUMMIES_SETTINGS="$SETTINGS" DUMMIES_HOOKS_DIR="$HOOKS_DIR" node -e "
+    ELI_SETTINGS="$SETTINGS" ELI_HOOKS_DIR="$HOOKS_DIR" node -e "
       const fs = require('fs');
-      const settingsPath = process.env.DUMMIES_SETTINGS;
-      const hooksDir = process.env.DUMMIES_HOOKS_DIR;
-      const managedStatusLinePath = hooksDir + '/dummies-statusline.sh';
+      const settingsPath = process.env.ELI_SETTINGS;
+      const hooksDir = process.env.ELI_HOOKS_DIR;
+      const managedStatusLinePath = hooksDir + '/eli-statusline.sh';
       const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
 
-      const isDummiesEntry = (entry) =>
+      const isELIEntry = (entry) =>
         entry && entry.hooks && entry.hooks.some(h =>
-          h.command && h.command.includes('dummies')
+          h.command && h.command.includes('eli')
         );
 
       let removed = 0;
@@ -78,7 +78,7 @@ if [ -f "$SETTINGS" ]; then
         for (const event of ['SessionStart', 'UserPromptSubmit']) {
           if (Array.isArray(settings.hooks[event])) {
             const before = settings.hooks[event].length;
-            settings.hooks[event] = settings.hooks[event].filter(e => !isDummiesEntry(e));
+            settings.hooks[event] = settings.hooks[event].filter(e => !isELIEntry(e));
             removed += before - settings.hooks[event].length;
             // Drop the event key if it's now empty (keeps settings.json tidy)
             if (settings.hooks[event].length === 0) {
@@ -92,19 +92,19 @@ if [ -f "$SETTINGS" ]; then
         }
       }
 
-      // Remove statusLine if it references dummies
+      // Remove statusLine if it references eli
       if (settings.statusLine) {
         const cmd = typeof settings.statusLine === 'string'
           ? settings.statusLine
           : (settings.statusLine.command || '');
         if (cmd.includes(managedStatusLinePath)) {
           delete settings.statusLine;
-          console.log('  Removed dummies statusLine from settings.json');
+          console.log('  Removed eli statusLine from settings.json');
         }
       }
 
       fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n');
-      console.log('  Removed ' + removed + ' dummies hook entries from settings.json');
+      console.log('  Removed ' + removed + ' eli hook entries from settings.json');
     "
   fi
 fi
@@ -127,5 +127,5 @@ echo "Done! Restart Claude Code to complete the uninstall."
 # Guidance for other agents
 echo ""
 echo "Other install paths (if you used them):"
-echo "  claude plugin disable dummies     # Claude Code plugin"
-echo "  rm -rf ~/.config/dummies/         # Local metadata (optional)"
+echo "  claude plugin disable eli     # Claude Code plugin"
+echo "  rm -rf ~/.config/eli/         # Local metadata (optional)"

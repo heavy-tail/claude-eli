@@ -1,8 +1,8 @@
 # Attribution
 
-Claude for Dummies is based on the structure of [caveman](https://github.com/JuliusBrussee/caveman) by Julius Brussee, released under the MIT License.
+Claude ELI is based on the structure of [caveman](https://github.com/JuliusBrussee/caveman) by Julius Brussee, released under the MIT License.
 
-caveman's hook architecture, multi-agent install scripts, and eval harness were invaluable references. Our project mirrors the plumbing (scaffolding, hooks, installers, eval framework) but pursues a different goal: caveman makes Claude terse; Claude for Dummies organizes Claude's answers so the user understands them on the first pass — around decision axes, with analogies and diagrams where they clarify, and code preserved verbatim.
+caveman's hook architecture, multi-agent install scripts, and eval harness were invaluable references. Our project mirrors the plumbing (scaffolding, hooks, installers, eval framework) but pursues a different goal: caveman makes Claude terse; Claude ELI organizes Claude's answers so the user understands them on the first pass — around decision axes, with analogies and diagrams where they clarify, and code preserved verbatim.
 
 ## What we reuse from caveman
 

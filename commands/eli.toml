@@ -1,9 +1,9 @@
-description = "Claude for Dummies — switch stage, show menu, or toggle on/off"
+description = "Claude ELI — switch stage, show menu, or toggle on/off"
 argument-hint = "[level|easier|harder|1|2|3|on|off]"
 prompt = """
-User invoked /dummy with argument: {{args}}
+User invoked /eli with argument: {{args}}
 
-Look at the current Dummies stage from the SessionStart context (the "DUMMIES MODE ACTIVE — current stage: X" line).
+Look at the current ELI stage from the SessionStart context (the "ELI MODE ACTIVE — current stage: X" line).
 
 If the argument is empty or `level`: render the stage menu as a compact text block:
 
@@ -15,8 +15,8 @@ Pick your stage (all three help you understand — just different depth):
   2 🧒 Kid      summary. 4-5 axes, 2-3 bullets each, ends with "한 줄 요약". 15-25 lines. ← default
   3 🎓 Adult    full, bookended. TL;DR + body with trade-offs + "한 줄 정리". Diagrams expected. 30-60 lines.
 
-Switch: /dummy 1|2|3   ·   Step: /dummy easier|harder   ·   Stop: /dummy off
-For uncut Claude, use /dummy off.
+Switch: /eli 1|2|3   ·   Step: /eli easier|harder   ·   Stop: /eli off
+For uncut Claude, use /eli off.
 ```
 
 If the argument is `1`, `2`, or `3`: the flag has already been updated by the hook. Confirm briefly:
@@ -31,8 +31,8 @@ One-line depth descriptions to use in the confirms:
 
 If the argument is `easier` or `harder`: same Level-up / neutral confirm pattern.
 
-If the argument is `on`: "Dummies is on. Current stage: [stage]."
-If the argument is `off`: "Dummies is off. Say 'dummies mode' or /dummy on to re-enable."
+If the argument is `on`: "ELI is on. Current stage: [stage]."
+If the argument is `off`: "ELI is off. Say 'eli mode' or /eli on to re-enable."
 
 Match all messages to the current stage's filter (Baby = TL;DR; Kid = summary; Adult = full). Keep confirms to 1-2 lines.
 """

@@ -1,9 +1,9 @@
-# Claude for Dummies — one-command hook installer for Claude Code (Windows PowerShell)
+# Claude ELI — one-command hook installer for Claude Code (Windows PowerShell)
 # Installs: SessionStart hook (auto-load rules) + UserPromptSubmit hook (stage tracking)
 # Usage: powershell -ExecutionPolicy Bypass -File hooks\install.ps1
 #   or:  powershell -ExecutionPolicy Bypass -File hooks\install.ps1 -Force
 #   or (remote, no -Force support via pipe):
-#        irm https://raw.githubusercontent.com/wchun26/claude-for-dummies/main/hooks/install.ps1 | iex
+#        irm https://raw.githubusercontent.com/heavy-tail/claude-eli/main/hooks/install.ps1 | iex
 #   Note: irm ... | iex cannot pass -Force. For force reinstall, save the file and run with -File.
 #
 # Based on the installer pattern from caveman (JuliusBrussee/caveman, MIT).
@@ -15,7 +15,7 @@ $ErrorActionPreference = "Stop"
 
 # Require node
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-    Write-Host "ERROR: 'node' is required to install the Claude for Dummies hooks (used to merge" -ForegroundColor Red
+    Write-Host "ERROR: 'node' is required to install the Claude ELI hooks (used to merge" -ForegroundColor Red
     Write-Host "       the hook config into settings.json safely)." -ForegroundColor Red
     Write-Host "       Install Node.js from https://nodejs.org and re-run this script." -ForegroundColor Red
     exit 1
@@ -24,9 +24,9 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
 $ClaudeDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $env:USERPROFILE ".claude" }
 $HooksDir = Join-Path $ClaudeDir "hooks"
 $Settings = Join-Path $ClaudeDir "settings.json"
-$RepoUrl = "https://raw.githubusercontent.com/wchun26/claude-for-dummies/main/hooks"
+$RepoUrl = "https://raw.githubusercontent.com/heavy-tail/claude-eli/main/hooks"
 
-$HookFiles = @("package.json", "dummies-config.js", "dummies-activate.js", "dummies-mode-tracker.js", "dummies-statusline.sh", "dummies-statusline.ps1")
+$HookFiles = @("package.json", "eli-config.js", "eli-activate.js", "eli-mode-tracker.js", "eli-statusline.sh", "eli-statusline.ps1")
 
 # Resolve source — works from repo clone or remote
 $ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { $null }
@@ -46,7 +46,7 @@ if (-not $Force) {
     if ($AllFilesPresent -and (Test-Path $Settings)) {
         try {
             $settingsObj = Get-Content $Settings -Raw | ConvertFrom-Json
-            $hasDummiesHook = {
+            $hasELIHook = {
                 param([string]$eventName)
                 if (-not $settingsObj.hooks) { return $false }
                 $entries = $settingsObj.hooks.$eventName
@@ -54,7 +54,7 @@ if (-not $Force) {
                 foreach ($entry in $entries) {
                     if ($entry.hooks) {
                         foreach ($hookDef in $entry.hooks) {
-                            if ($hookDef.command -and $hookDef.command.Contains("dummies")) {
+                            if ($hookDef.command -and $hookDef.command.Contains("eli")) {
                                 return $true
                             }
                         }
@@ -62,7 +62,7 @@ if (-not $Force) {
                 }
                 return $false
             }
-            $HooksWired = (& $hasDummiesHook "SessionStart") -and (& $hasDummiesHook "UserPromptSubmit")
+            $HooksWired = (& $hasELIHook "SessionStart") -and (& $hasELIHook "UserPromptSubmit")
             $HasStatusLine = $null -ne $settingsObj.statusLine
         } catch {
             $HooksWired = $false
@@ -71,7 +71,7 @@ if (-not $Force) {
     }
 
     if ($AllFilesPresent -and $HooksWired -and $HasStatusLine) {
-        Write-Host "Claude for Dummies hooks already installed in $HooksDir"
+        Write-Host "Claude ELI hooks already installed in $HooksDir"
         Write-Host "  Re-run with -Force to overwrite: powershell -File hooks\install.ps1 -Force"
         Write-Host ""
         Write-Host "Nothing to do. Hooks are already in place."
@@ -79,10 +79,10 @@ if (-not $Force) {
     }
 }
 
-if ($Force -and (Test-Path (Join-Path $HooksDir "dummies-activate.js"))) {
-    Write-Host "Reinstalling Claude for Dummies hooks (-Force)..."
+if ($Force -and (Test-Path (Join-Path $HooksDir "eli-activate.js"))) {
+    Write-Host "Reinstalling Claude ELI hooks (-Force)..."
 } else {
-    Write-Host "Installing Claude for Dummies hooks..."
+    Write-Host "Installing Claude ELI hooks..."
 }
 
 # 1. Ensure hooks dir exists
@@ -113,29 +113,29 @@ Copy-Item $Settings "$Settings.bak" -Force
 
 # Use node for safe JSON merging — pass paths via env vars to avoid injection
 # if the username contains a single quote (e.g., O'Brien).
-$env:DUMMIES_SETTINGS = $Settings -replace '\\', '/'
-$env:DUMMIES_HOOKS_DIR = $HooksDir -replace '\\', '/'
+$env:ELI_SETTINGS = $Settings -replace '\\', '/'
+$env:ELI_HOOKS_DIR = $HooksDir -replace '\\', '/'
 
 $nodeScript = @'
 const fs = require('fs');
-const settingsPath = process.env.DUMMIES_SETTINGS;
-const hooksDir = process.env.DUMMIES_HOOKS_DIR;
-const managedStatusLinePath = hooksDir + '/dummies-statusline.ps1';
+const settingsPath = process.env.ELI_SETTINGS;
+const hooksDir = process.env.ELI_HOOKS_DIR;
+const managedStatusLinePath = hooksDir + '/eli-statusline.ps1';
 const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
 if (!settings.hooks) settings.hooks = {};
 
 // SessionStart
 if (!settings.hooks.SessionStart) settings.hooks.SessionStart = [];
 const hasStart = settings.hooks.SessionStart.some(e =>
-  e.hooks && e.hooks.some(h => h.command && h.command.includes('dummies'))
+  e.hooks && e.hooks.some(h => h.command && h.command.includes('eli'))
 );
 if (!hasStart) {
   settings.hooks.SessionStart.push({
     hooks: [{
       type: 'command',
-      command: 'node "' + hooksDir + '/dummies-activate.js"',
+      command: 'node "' + hooksDir + '/eli-activate.js"',
       timeout: 5,
-      statusMessage: 'Loading Claude for Dummies...'
+      statusMessage: 'Loading Claude ELI...'
     }]
   });
 }
@@ -143,15 +143,15 @@ if (!hasStart) {
 // UserPromptSubmit
 if (!settings.hooks.UserPromptSubmit) settings.hooks.UserPromptSubmit = [];
 const hasPrompt = settings.hooks.UserPromptSubmit.some(e =>
-  e.hooks && e.hooks.some(h => h.command && h.command.includes('dummies'))
+  e.hooks && e.hooks.some(h => h.command && h.command.includes('eli'))
 );
 if (!hasPrompt) {
   settings.hooks.UserPromptSubmit.push({
     hooks: [{
       type: 'command',
-      command: 'node "' + hooksDir + '/dummies-mode-tracker.js"',
+      command: 'node "' + hooksDir + '/eli-mode-tracker.js"',
       timeout: 5,
-      statusMessage: 'Tracking Dummies stage...'
+      statusMessage: 'Tracking ELI stage...'
     }]
   });
 }
@@ -170,7 +170,7 @@ if (!settings.statusLine) {
   if (cmd.includes(managedStatusLinePath)) {
     console.log('  Statusline badge already configured.');
   } else {
-    console.log('  NOTE: Existing statusline detected - Dummies badge NOT added.');
+    console.log('  NOTE: Existing statusline detected - ELI badge NOT added.');
     console.log('        See hooks/README.md to add the badge to your existing statusline.');
   }
 }
@@ -185,7 +185,7 @@ Write-Host ""
 Write-Host "Done! Restart Claude Code to activate." -ForegroundColor Green
 Write-Host ""
 Write-Host "What's installed:"
-Write-Host "  - SessionStart hook: auto-loads Dummies rules every session"
+Write-Host "  - SessionStart hook: auto-loads ELI rules every session"
 Write-Host "  - Stage tracker hook: updates statusline badge when you change stage"
-Write-Host "    (/dummy 1, /dummy 2, /dummy harder, /dummy off, etc.)"
-Write-Host "  - Statusline badge: shows [1 👶 dummies] / [2 🧒 dummies] / [3 🎓 dummies]"
+Write-Host "    (/eli 1, /eli 2, /eli harder, /eli off, etc.)"
+Write-Host "  - Statusline badge: shows [1 👶 eli] / [2 🧒 eli] / [3 🎓 eli]"

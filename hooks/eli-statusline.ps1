@@ -1,10 +1,10 @@
-# Claude for Dummies — statusline badge script for Claude Code (Windows)
-# Reads the dummies stage flag and outputs a colored badge with stage emoji.
+# Claude ELI — statusline badge script for Claude Code (Windows)
+# Reads the eli stage flag and outputs a colored badge with stage emoji.
 #
 # Based on the statusline pattern from caveman (JuliusBrussee/caveman, MIT).
 
 $ClaudeDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME ".claude" }
-$Flag = Join-Path $ClaudeDir ".dummies-active"
+$Flag = Join-Path $ClaudeDir ".eli-active"
 if (-not (Test-Path $Flag)) { exit 0 }
 
 # Refuse reparse points (symlinks / junctions) and oversized files.
@@ -33,9 +33,9 @@ $Valid = @('off', 'baby', 'kid', 'adult')
 if (-not ($Valid -contains $Mode)) { exit 0 }
 
 $Badge = switch ($Mode) {
-    'baby'  { "1 👶 dummies" }
-    'kid'   { "2 🧒 dummies" }
-    'adult' { "3 🎓 dummies" }
+    'baby'  { "1 👶 eli" }
+    'kid'   { "2 🧒 eli" }
+    'adult' { "3 🎓 eli" }
     default { exit 0 }
 }
 

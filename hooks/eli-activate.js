@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// Claude for Dummies — Claude Code SessionStart activation hook
+// Claude ELI — Claude Code SessionStart activation hook
 //
 // Runs once per session start:
-//   1. Writes flag file at $CLAUDE_CONFIG_DIR/.dummies-active (statusline reads this)
-//   2. Emits dummies ruleset as hidden SessionStart context (Claude Code injects it as system context)
+//   1. Writes flag file at $CLAUDE_CONFIG_DIR/.eli-active (statusline reads this)
+//   2. Emits eli ruleset as hidden SessionStart context (Claude Code injects it as system context)
 //   3. Detects missing statusline config and emits a setup nudge
 //
 // Based on the hook pattern from caveman (JuliusBrussee/caveman, MIT).
@@ -11,10 +11,10 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { getDefaultMode, safeWriteFlag, recordSession } = require('./dummies-config');
+const { getDefaultMode, safeWriteFlag, recordSession } = require('./eli-config');
 
 const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
-const flagPath = path.join(claudeDir, '.dummies-active');
+const flagPath = path.join(claudeDir, '.eli-active');
 const settingsPath = path.join(claudeDir, 'settings.json');
 
 const mode = getDefaultMode();
@@ -36,14 +36,14 @@ recordSession();
 //    Reads SKILL.md at runtime so edits to the source of truth propagate automatically — no
 //    hardcoded duplication to go stale.
 //
-//    Plugin installs: __dirname = <plugin_root>/hooks/, SKILL.md at <plugin_root>/skills/dummies/SKILL.md
+//    Plugin installs: __dirname = <plugin_root>/hooks/, SKILL.md at <plugin_root>/skills/eli/SKILL.md
 //    Standalone installs: __dirname = $CLAUDE_CONFIG_DIR/hooks/, SKILL.md won't exist — falls back
 //    to the hardcoded minimum ruleset below.
 
 let skillContent = '';
 try {
   skillContent = fs.readFileSync(
-    path.join(__dirname, '..', 'skills', 'dummies', 'SKILL.md'), 'utf8'
+    path.join(__dirname, '..', 'skills', 'eli', 'SKILL.md'), 'utf8'
   );
 } catch (e) { /* standalone install — use fallback below */ }
 
@@ -52,16 +52,16 @@ let output;
 if (skillContent) {
   // Strip YAML frontmatter
   const body = skillContent.replace(/^---[\s\S]*?---\s*/, '');
-  output = 'DUMMIES MODE ACTIVE — current stage: ' + mode + '\n\n' + body;
+  output = 'ELI MODE ACTIVE — current stage: ' + mode + '\n\n' + body;
 } else {
   // Fallback when SKILL.md is not found (standalone hook install without skills dir).
   // Minimum viable ruleset — better than nothing.
   output =
-    'DUMMIES MODE ACTIVE — current stage: ' + mode + '\n\n' +
+    'ELI MODE ACTIVE — current stage: ' + mode + '\n\n' +
     'Mission: **help the user understand.** Every rule below serves that end.\n\n' +
     '## Persistence\n\n' +
-    'ACTIVE EVERY RESPONSE. No drift. Off only on `/dummy off`, "stop dummies", or "normal mode".\n\n' +
-    'Current stage: ' + mode + '. Switch: `/dummy level`, `/dummy easier|harder`, `/dummy 1|2|3`.\n\n' +
+    'ACTIVE EVERY RESPONSE. No drift. Off only on `/eli off`, "stop eli", or "normal mode".\n\n' +
+    'Current stage: ' + mode + '. Switch: `/eli level`, `/eli easier|harder`, `/eli 1|2|3`.\n\n' +
     '## What serves understanding (6 principles)\n\n' +
     '1. Completeness — include the core and anything important for the decision. Do not omit to look shorter.\n' +
     '2. MECE on decision axes — cover every axis needed (result / cause / action / trade-off / check). No gap, no overlap at the axis level.\n' +
@@ -77,7 +77,7 @@ if (skillContent) {
     '- 1 👶 baby — bottom line. 3 axes max. Ends with "한 줄 요약". 5-10 lines.\n' +
     '- 2 🧒 kid (DEFAULT) — summary. 4-5 axes, 2-3 bullets each. Ends with "한 줄 요약". 15-25 lines.\n' +
     '- 3 🎓 adult — full, bookended. TL;DR at top + 5-7 axes + "한 줄 정리". Diagrams expected. 30-60 lines.\n\n' +
-    'For uncut Claude, use `/dummy off`.\n\n' +
+    'For uncut Claude, use `/eli off`.\n\n' +
     '## Analogy use\n\n' +
     'Tool, not goal. For abstract concepts, cryptic errors, multi-step flows. Skip for code-heavy answers, step-by-step setup, precise numbers. Culturally neutral (kitchens/cars/houses — not baseball/cricket). One per concept, reused across session. Append `ⓘ analogy ≈` after major analogies.\n\n' +
     '## Error Explanation\n\n' +
@@ -100,7 +100,7 @@ try {
 
   if (!hasStatusline) {
     const isWindows = process.platform === 'win32';
-    const scriptName = isWindows ? 'dummies-statusline.ps1' : 'dummies-statusline.sh';
+    const scriptName = isWindows ? 'eli-statusline.ps1' : 'eli-statusline.sh';
     const scriptPath = path.join(__dirname, scriptName);
     const command = isWindows
       ? `powershell -ExecutionPolicy Bypass -File "${scriptPath}"`
@@ -108,7 +108,7 @@ try {
     const statusLineSnippet =
       '"statusLine": { "type": "command", "command": ' + JSON.stringify(command) + ' }';
     output += "\n\n" +
-      "STATUSLINE SETUP NEEDED: The Claude for Dummies plugin includes a statusline badge that " +
+      "STATUSLINE SETUP NEEDED: The Claude ELI plugin includes a statusline badge that " +
       "shows the active stage (e.g. [1 👶 baby], [2 🧒 kid], [3 🎓 adult]). " +
       "It is not configured yet. To enable, add this to " + path.join(claudeDir, 'settings.json') + ": " +
       statusLineSnippet + " " +

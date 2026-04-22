@@ -1,13 +1,13 @@
 ---
-name: dummies-glossary
+name: eli-glossary
 description: >
   Extract every technical term, acronym, library/product name, CLI flag, env var,
   or other jargon from the previous assistant answer and produce a plain-language
-  definition reference card. Trigger: /dummy-glossary, "glossary", "용어 정리해줘".
-  One-shot — does NOT change the active Dummies stage.
+  definition reference card. Trigger: /eli-glossary, "glossary", "용어 정리해줘".
+  One-shot — does NOT change the active ELI stage.
 ---
 
-# Dummies Glossary
+# ELI Glossary
 
 One-shot. Extract jargon from the previous assistant answer and output a reference card.
 
@@ -35,7 +35,7 @@ Order by appearance in the original answer. Use a bulleted list.
 
 ## Important
 
-- **No analogies.** Glossary is a reference card — the main Dummies mode already provides analogies. Keep definitions clean and direct.
+- **No analogies.** Glossary is a reference card — the main ELI mode already provides analogies. Keep definitions clean and direct.
 - **Do not change the stage.** This is a one-shot display. No flag writes.
 - **Preserve verbatim** all code-looking items (commands, flags, paths, etc.).
 

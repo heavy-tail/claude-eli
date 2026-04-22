@@ -7,14 +7,14 @@ answer.
 
 Why baseline as reference: baseline (no system prompt) is the natural
 "full technical" answer with all artifacts intact. Each arm (terse,
-dummies, etc.) reduces or rephrases — preservation answers "did the arm
+eli, etc.) reduces or rephrases — preservation answers "did the arm
 keep the technical specifics intact while changing the prose around them?"
 
-For Dummies, target preservation = ~100% on every category.
+For ELI, target preservation = ~100% on every category.
 The whole product claim is "we change what Claude *says*, not what Claude
 *writes* in code-shaped artifacts."
 
-Also reports output length delta per arm (Dummies should be longer than
+Also reports output length delta per arm (ELI should be longer than
 baseline, since plain-language explanations cost prose; we surface this
 honestly).
 
@@ -58,7 +58,7 @@ FLAG = re.compile(r"(?<![a-zA-Z0-9_-])(--?[a-zA-Z][a-zA-Z0-9-]*)")
 VERSION = re.compile(r"\bv?\d+\.\d+(?:\.\d+)?\b")
 # Standard JS / Python / generic error patterns. Stop at the first comma so
 # we don't accidentally pull in surrounding prose that legitimately differs
-# between arms (e.g. baseline appends "check your .env.local" while dummies
+# between arms (e.g. baseline appends "check your .env.local" while eli
 # appends "it's like opening an empty drawer"). The error itself — the
 # preserved part — ends before the next comma.
 ERROR = re.compile(
@@ -168,7 +168,7 @@ def main() -> None:
         delta = (total - base_total) / base_total if base_total else 0.0
         print(f"| **{arm}** | {total} | {fmt_delta_pct(delta)} |")
     print()
-    print("_Dummies should run longer than baseline (analogies cost prose); terse should run shorter._")
+    print("_ELI should run longer than baseline (analogies cost prose); terse should run shorter._")
     print()
 
     # ---- Preservation rate per artifact kind ----------
@@ -176,7 +176,7 @@ def main() -> None:
     print()
     print("For each prompt, we extract artifacts (code, URLs, env vars, CLI flags, etc.) from the")
     print("BASELINE answer, then check what fraction appears verbatim in the arm's answer.")
-    print("Higher = better. **Dummies target = ~100% on every category.**")
+    print("Higher = better. **ELI target = ~100% on every category.**")
     print()
     header = "| Arm | " + " | ".join(KINDS) + " | Overall |"
     sep = "|-----|" + "|".join("---" for _ in KINDS) + "|---------|"

@@ -1,0 +1,29 @@
+description = "Claude ELI — command reference card"
+prompt = """
+Render this reference card exactly as shown, inside a single fenced code block. Do not paraphrase,
+do not add explanations before or after.
+
+```
+🧒 ELI — commands
+
+Stage
+  /eli level       show menu with examples
+  /eli easier      ↓ one step (more eli)
+  /eli harder      ↑ one step (more detail)
+  /eli 1..3        jump to stage (1=👶 baby, 2=🧒 kid default, 3=🎓 adult)
+
+Switch
+  /eli off         disable for this session (= uncut Claude)
+  /eli on          re-enable
+  /expert            this response only: full technical mode
+
+Extra
+  /eli-glossary    jargon from previous answer with plain defs
+  /eli-stats       your evolution progress
+  /eli-help        this card
+
+Natural (just say it, no slash)
+  "다시" / "again" / "한번 더"     re-translate previous answer
+  "stop eli" / "normal mode"  disable for session
+```
+"""

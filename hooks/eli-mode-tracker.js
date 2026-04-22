@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Claude for Dummies — UserPromptSubmit hook to track active evolution stage
-// Inspects user input for /dummy commands and writes stage to flag file.
+// Claude ELI — UserPromptSubmit hook to track active evolution stage
+// Inspects user input for /eli commands and writes stage to flag file.
 //
-// Also records prompt count + stage transitions for /dummy-stats, and emits
+// Also records prompt count + stage transitions for /eli-stats, and emits
 // a STAGE CHANGE line when an upgrade/downgrade happens so that Level-up!
-// messages can be rendered by commands/dummy.toml.
+// messages can be rendered by commands/eli.toml.
 //
 // Based on the hook pattern from caveman (JuliusBrussee/caveman, MIT).
 
@@ -14,10 +14,10 @@ const os = require('os');
 const {
   getDefaultMode, safeWriteFlag, readFlag,
   recordPrompt, recordStageChange
-} = require('./dummies-config');
+} = require('./eli-config');
 
 const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
-const flagPath = path.join(claudeDir, '.dummies-active');
+const flagPath = path.join(claudeDir, '.eli-active');
 
 const STAGES = ['baby', 'kid', 'adult'];
 const STAGES_BY_NUMBER = { '1': 'baby', '2': 'kid', '3': 'adult' };
@@ -38,11 +38,11 @@ process.stdin.on('end', () => {
     const prompt = (data.prompt || '').trim();
     const lower = prompt.toLowerCase();
 
-    // Record every prompt for /dummy-stats (cheap, best-effort).
+    // Record every prompt for /eli-stats (cheap, best-effort).
     recordPrompt();
 
     // /expert — this response only, normal Claude. SKILL.md handles the behavior.
-    // Skip per-turn reinforcement so the "DUMMIES ACTIVE" line doesn't fight
+    // Skip per-turn reinforcement so the "ELI ACTIVE" line doesn't fight
     // the "/expert = normal" rule.
     if (/^\/expert\b/.test(lower)) {
       return;
@@ -52,34 +52,35 @@ process.stdin.on('end', () => {
     const before = readFlag(flagPath);
 
     // Natural-language deactivation first — takes priority over everything else.
-    if (/\b(stop|disable|deactivate|turn off)\b.*\bdummies?\b/i.test(prompt) ||
-        /\bdummies?\b.*\b(stop|disable|deactivate|turn off)\b/i.test(prompt) ||
+    // Match "eli" as a whole word (not "el", "else", "elite", etc).
+    if (/\b(stop|disable|deactivate|turn off)\b.*\beli\b/i.test(prompt) ||
+        /\beli\b.*\b(stop|disable|deactivate|turn off)\b/i.test(prompt) ||
         /\bnormal mode\b/i.test(prompt)) {
       try { fs.unlinkSync(flagPath); } catch (e) {}
       if (before) recordStageChange(before, 'off');
       return;
     }
 
-    // Natural-language activation ("activate dummies", "dummies mode", "talk like dummies").
-    if (/\b(activate|enable|turn on|start)\b.*\bdummies?\b/i.test(prompt) ||
-        /\bdummies?\b.*\b(mode|activate|enable|turn on|start)\b/i.test(prompt) ||
-        /\btalk like dummies?\b/i.test(prompt)) {
+    // Natural-language activation ("activate eli", "eli mode", "talk like eli").
+    if (/\b(activate|enable|turn on|start)\b.*\beli\b/i.test(prompt) ||
+        /\beli\b.*\b(mode|activate|enable|turn on|start)\b/i.test(prompt) ||
+        /\btalk like eli\b/i.test(prompt)) {
       const mode = getDefaultMode();
       if (mode !== 'off') {
         safeWriteFlag(flagPath, mode);
       }
     }
 
-    // Slash commands — /dummy <arg>
-    if (lower.startsWith('/dummy')) {
+    // Slash commands — /eli <arg>
+    if (lower.startsWith('/eli')) {
       const parts = lower.split(/\s+/);
-      const cmd = parts[0]; // /dummy, /dummy-explain, /dummy-glossary, etc.
+      const cmd = parts[0]; // /eli, /eli-explain, /eli-glossary, etc.
       const arg = parts[1] || '';
 
       let newStage = null;
       let unset = false;
 
-      if (cmd === '/dummy' || cmd === '/dummy:dummies') {
+      if (cmd === '/eli' || cmd === '/eli:eli') {
         if (arg === 'off') {
           unset = true;
         } else if (arg === 'on' || arg === '') {
@@ -91,10 +92,10 @@ process.stdin.on('end', () => {
         } else if (arg === 'harder') {
           newStage = shiftStage(readFlag(flagPath) || getDefaultMode(), +1);
         }
-        // '/dummy level' and other args fall through — commands/dummy.toml renders
+        // '/eli level' and other args fall through — commands/eli.toml renders
         // the menu, no flag change. Stage names not accepted as args.
       }
-      // Sub-skills (/dummy-glossary, /dummy-stats, /dummy-help) don't change stage.
+      // Sub-skills (/eli-glossary, /eli-stats, /eli-help) don't change stage.
 
       if (unset) {
         try { fs.unlinkSync(flagPath); } catch (e) {}
@@ -120,16 +121,16 @@ process.stdin.on('end', () => {
       }
     }
 
-    // Per-turn reinforcement: emit a compact reminder when dummies is active.
-    // SessionStart injects the full SKILL.md once; this keeps dummies visible in
+    // Per-turn reinforcement: emit a compact reminder when eli is active.
+    // SessionStart injects the full SKILL.md once; this keeps eli visible in
     // the model's attention on every user message. If a stage transition just
-    // happened, prepend a STAGE CHANGE line so commands/dummy.toml can render
+    // happened, prepend a STAGE CHANGE line so commands/eli.toml can render
     // the Level-up! message.
     //
     // readFlag enforces symlink-safe read + size cap + VALID_MODES whitelist.
     if (after) {
       const context = (transitionLine ? transitionLine + '\n' : '') +
-        "DUMMIES MODE ACTIVE (stage: " + after + "). " +
+        "ELI MODE ACTIVE (stage: " + after + "). " +
         "Mission: help the user understand. Include the core and everything important for the decision (Completeness). Cover every axis needed — result, cause, action, trade-off, check (MECE). Use everyday words, question-form axis names, and a one-line summary at the end (long answers also open with one). " +
         "Preserve code, commands, URLs, paths, env vars, CLI flags, error messages, warnings, version numbers verbatim. " +
         "Use analogies as a tool (abstract concepts, cryptic errors, multi-step flows) — not for code-heavy or step-by-step answers. Culturally neutral, one per concept across the session. Append `ⓘ analogy ≈` after major analogies. " +
@@ -142,7 +143,7 @@ process.stdin.on('end', () => {
         }
       }));
     } else if (transitionLine) {
-      // Stage went to off — still useful for Claude to know (e.g. confirm "Dummies off").
+      // Stage went to off — still useful for Claude to know (e.g. confirm "ELI off").
       process.stdout.write(JSON.stringify({
         hookSpecificOutput: {
           hookEventName: "UserPromptSubmit",

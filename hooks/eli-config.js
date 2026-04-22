@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// Claude for Dummies — shared configuration resolver
+// Claude ELI — shared configuration resolver
 //
 // Resolution order for default stage:
-//   1. DUMMIES_DEFAULT_STAGE environment variable
+//   1. ELI_DEFAULT_STAGE environment variable
 //   2. Config file defaultStage field:
-//      - $XDG_CONFIG_HOME/dummies/config.json (any platform, if set)
-//      - ~/.config/dummies/config.json (macOS / Linux fallback)
-//      - %APPDATA%\dummies\config.json (Windows fallback)
+//      - $XDG_CONFIG_HOME/eli/config.json (any platform, if set)
+//      - ~/.config/eli/config.json (macOS / Linux fallback)
+//      - %APPDATA%\eli\config.json (Windows fallback)
 //   3. 'kid'
 //
 // Based on the config pattern from caveman (JuliusBrussee/caveman, MIT).
@@ -22,15 +22,15 @@ const VALID_MODES = [
 
 function getConfigDir() {
   if (process.env.XDG_CONFIG_HOME) {
-    return path.join(process.env.XDG_CONFIG_HOME, 'dummies');
+    return path.join(process.env.XDG_CONFIG_HOME, 'eli');
   }
   if (process.platform === 'win32') {
     return path.join(
       process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'),
-      'dummies'
+      'eli'
     );
   }
-  return path.join(os.homedir(), '.config', 'dummies');
+  return path.join(os.homedir(), '.config', 'eli');
 }
 
 function getConfigPath() {
@@ -39,7 +39,7 @@ function getConfigPath() {
 
 function getDefaultMode() {
   // 1. Environment variable (highest priority)
-  const envMode = process.env.DUMMIES_DEFAULT_STAGE;
+  const envMode = process.env.ELI_DEFAULT_STAGE;
   if (envMode && VALID_MODES.includes(envMode.toLowerCase())) {
     return envMode.toLowerCase();
   }
@@ -63,7 +63,7 @@ function getDefaultMode() {
 // Refuses symlinks at the target file and at the immediate parent directory,
 // uses O_NOFOLLOW where available, writes atomically via temp + rename with
 // 0600 permissions. Protects against local attackers replacing the predictable
-// flag path (~/.claude/.dummies-active) with a symlink to clobber other files.
+// flag path (~/.claude/.eli-active) with a symlink to clobber other files.
 //
 // Does NOT walk the full ancestor chain — macOS has /tmp -> /private/tmp and
 // many legitimate setups route through symlinked home dirs, so a full walk
@@ -90,7 +90,7 @@ function safeWriteFlag(flagPath, content) {
       if (e.code !== 'ENOENT') return;
     }
 
-    const tempPath = path.join(flagDir, `.dummies-active.${process.pid}.${Date.now()}`);
+    const tempPath = path.join(flagDir, `.eli-active.${process.pid}.${Date.now()}`);
     const O_NOFOLLOW = typeof fs.constants.O_NOFOLLOW === 'number' ? fs.constants.O_NOFOLLOW : 0;
     const flags = fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_EXCL | O_NOFOLLOW;
     let fd;
@@ -152,9 +152,9 @@ function readFlag(flagPath) {
   }
 }
 
-// ---- Metadata (for /dummy-stats and Level-up events) ------------------------
+// ---- Metadata (for /eli-stats and Level-up events) ------------------------
 //
-// Stored at ~/.config/dummies/metadata.json (XDG respected, Windows %APPDATA%).
+// Stored at ~/.config/eli/metadata.json (XDG respected, Windows %APPDATA%).
 // Tracks install date, session count, total prompts, and stage transition history.
 // Not security-sensitive, so we skip the symlink gauntlet — but still atomic write.
 

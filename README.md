@@ -1,8 +1,8 @@
-# Claude for Dummies
+# Claude ELI
 
-> Stop asking "explain that easier." Get answers you understand on the first pass.
+> Explain like I'm ___. Pick your level (3, 10, or 25) and Claude organizes every answer for that depth.
 
-Claude for Dummies cuts the **"explain it again, but easier"** loop. The mission is simple: **help you understand** every answer the first time. Pick the depth you want — bottom line, summary, or full bookended — and Claude organizes the answer around what you actually need to decide. Code, commands, URLs, paths, errors, warnings — preserved verbatim at every stage. Always on.
+Claude ELI cuts the **"explain it again, but easier"** loop. The mission is simple: **help you understand** every answer the first time. Pick the depth — 👶 Baby (ELI 3), 🧒 Kid (ELI 10), or 🎓 Adult (ELI 25) — and Claude organizes the answer around what you actually need to decide. Code, commands, URLs, paths, errors, warnings — preserved verbatim at every stage. Always on.
 
 For vibecoders, beginners, PMs who code, or anyone tired of re-prompting Claude for a TL;DR.
 
@@ -15,7 +15,7 @@ For vibecoders, beginners, PMs who code, or anyone tired of re-prompting Claude 
 <table>
 <tr>
 <th>Default Claude (full answer)</th>
-<th>Claude for Dummies — 🧒 Kid (default)</th>
+<th>Claude ELI — 🧒 Kid (default)</th>
 </tr>
 <tr>
 <td valign="top">
@@ -51,13 +51,13 @@ For vibecoders, beginners, PMs who code, or anyone tired of re-prompting Claude 
 
 Three stages differ in **depth only, not quality** — all three fully help you understand, just with different context depth.
 
-| # | Badge | Stage | What you get |
-|---|-------|-------|--------------|
-| 1 | 👶 | **Baby** | Bottom line. 3 axes max (result / cause / action), ends with "한 줄 요약". 5-10 lines. |
-| 2 | 🧒 | **Kid** *(default)* | Summary. 4-5 axes, 2-3 bullets each, ends with "한 줄 요약". 15-25 lines. |
-| 3 | 🎓 | **Adult** | Full, bookended. TL;DR at top + body with trade-offs + "한 줄 정리". Diagrams expected. 30-60 lines. |
+| # | Badge | Stage | ≈ ELI | What you get |
+|---|-------|-------|-------|--------------|
+| 1 | 👶 | **Baby** | ELI 3 | Bottom line. 3 axes max (result / cause / action), ends with "한 줄 요약". 5-10 lines. |
+| 2 | 🧒 | **Kid** *(default)* | ELI 10 | Summary. 4-5 axes, 2-3 bullets each, ends with "한 줄 요약". 15-25 lines. |
+| 3 | 🎓 | **Adult** | ELI 25 | Full, bookended. TL;DR at top + body with trade-offs + "한 줄 정리". Diagrams expected. 30-60 lines. |
 
-Want fully uncut Claude? `/dummy off`.
+Want fully uncut Claude? `/eli off`.
 
 What every stage does equally well — the **North Star**:
 
@@ -72,8 +72,8 @@ Tables, arrows, funnels, analogies — all welcome **when they help you understa
 Claude Code:
 
 ```bash
-claude plugin marketplace add wchun26/claude-for-dummies
-claude plugin install dummies@dummies
+claude plugin marketplace add heavy-tail/claude-eli
+claude plugin install eli@eli
 ```
 
 Restart Claude Code. Default ON — no further commands needed.
@@ -84,20 +84,20 @@ Restart Claude Code. Default ON — no further commands needed.
 
 ```
 Stage
-  /dummy level       show menu
-  /dummy easier      ↓ one step (more dummy)
-  /dummy harder      ↑ one step (more detail)
-  /dummy 1..3        jump to stage (1=👶, 2=🧒 default, 3=🎓)
+  /eli level       show menu
+  /eli easier      ↓ one step (more compressed)
+  /eli harder      ↑ one step (more detail)
+  /eli 1..3        jump to stage (1=👶, 2=🧒 default, 3=🎓)
 
 Switch
-  /dummy off         disable for this session (= uncut Claude)
-  /dummy on          re-enable
+  /eli off         disable for this session (= uncut Claude)
+  /eli on          re-enable
   /expert            this response only: full technical mode
 
 Extra
-  /dummy-glossary    jargon from previous answer with plain defs
-  /dummy-stats       your evolution progress
-  /dummy-help        this card
+  /eli-glossary    jargon from previous answer with plain defs
+  /eli-stats       your evolution progress
+  /eli-help        this card
 ```
 
 ### Natural triggers (no slash needed)
@@ -105,8 +105,8 @@ Extra
 | You say | What happens |
 |---------|--------------|
 | `다시` / `again` / `한번 더` / `못 알아듣겠어` | Re-translate previous answer in current stage |
-| `stop dummies` / `normal mode` | Disable for this session |
-| `dummies mode` / `talk like dummies` | Re-enable |
+| `stop eli` / `normal mode` | Disable for this session |
+| `eli mode` / `talk like eli` | Re-enable |
 
 ---
 
@@ -119,7 +119,7 @@ We measure this with regex extraction across every prompt in `evals/prompts/`. S
 | Arm | code | inline | url | path | env_var | flag | version | error | Overall |
 |-----|------|--------|-----|------|---------|------|---------|-------|---------|
 | Plain "be terse" control | — | 50% | 0% | 25% | 0% | 100% | 0% | 0% | **25%** |
-| **Dummies** | — | **100%** | **100%** | **100%** | **100%** | **100%** | **100%** | **100%** | **100%** |
+| **ELI** | — | **100%** | **100%** | **100%** | **100%** | **100%** | **100%** | **100%** | **100%** |
 
 Reproduce: `python evals/llm_run.py && python evals/measure.py` (needs `claude` CLI authenticated).
 
@@ -127,7 +127,7 @@ Reproduce: `python evals/llm_run.py && python evals/measure.py` (needs `claude` 
 
 ## Safety Clarity Mode
 
-When Claude is about to warn you about something dangerous — destructive commands (`rm -rf`, `DROP TABLE`, `force push`), security issues, production-critical actions — Dummies **drops the analogy** and keeps the warning verbatim. Statusline shows `[⚠ safety mode]` for that response.
+When Claude is about to warn you about something dangerous — destructive commands (`rm -rf`, `DROP TABLE`, `force push`), security issues, production-critical actions — ELI **drops the analogy** and keeps the warning verbatim. Statusline shows `[⚠ safety mode]` for that response.
 
 You won't get cute metaphors when something can wipe your database.
 
@@ -153,24 +153,24 @@ If Kid isn't your jam, set a different default.
 **Environment variable** (highest priority):
 
 ```bash
-export DUMMIES_DEFAULT_STAGE=adult
+export ELI_DEFAULT_STAGE=adult
 ```
 
-**Config file** (`~/.config/dummies/config.json`):
+**Config file** (`~/.config/eli/config.json`):
 
 ```json
 { "defaultStage": "adult" }
 ```
 
-Set `"off"` to disable auto-activation entirely (you can still turn it on per-session with `/dummy on`).
+Set `"off"` to disable auto-activation entirely (you can still turn it on per-session with `/eli on`).
 
 ---
 
 ## Privacy & data
 
 Everything stays local:
-- Stage flag: `~/.claude/.dummies-active`
-- Usage stats: `~/.config/dummies/metadata.json` (XDG honored; Windows: `%APPDATA%/dummies/`)
+- Stage flag: `~/.claude/.eli-active`
+- Usage stats: `~/.config/eli/metadata.json` (XDG honored; Windows: `%APPDATA%/eli/`)
 
 Nothing leaves your machine. No telemetry, no analytics, no phone-home.
 
@@ -179,8 +179,8 @@ Nothing leaves your machine. No telemetry, no analytics, no phone-home.
 ## Uninstall
 
 ```bash
-claude plugin disable dummies
-rm -rf ~/.config/dummies/
+claude plugin disable eli
+rm -rf ~/.config/eli/
 ```
 
 That's it.
@@ -189,7 +189,7 @@ That's it.
 
 ## Inspiration
 
-Architecture inspired by [caveman](https://github.com/JuliusBrussee/caveman) (MIT) — same hook + skill plumbing pattern, different goal. caveman compresses *all* prose tokens; Dummies **organizes prose around understanding** — around decision axes, with analogies and diagrams where they clarify. See [`ATTRIBUTION.md`](./ATTRIBUTION.md) for what we reused.
+Architecture inspired by [caveman](https://github.com/JuliusBrussee/caveman) (MIT) — same hook + skill plumbing pattern, different goal. caveman compresses *all* prose tokens; ELI **organizes prose around understanding** — around decision axes, with analogies and diagrams where they clarify. See [`ATTRIBUTION.md`](./ATTRIBUTION.md) for what we reused.
 
 ## License
 

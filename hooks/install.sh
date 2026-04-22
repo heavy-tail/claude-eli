@@ -1,8 +1,8 @@
 #!/bin/bash
-# Claude for Dummies — one-command hook installer for Claude Code
+# Claude ELI — one-command hook installer for Claude Code
 # Installs: SessionStart hook (auto-load rules) + UserPromptSubmit hook (stage tracking)
 # Usage: bash hooks/install.sh
-#   or:  bash <(curl -s https://raw.githubusercontent.com/wchun26/claude-for-dummies/main/hooks/install.sh)
+#   or:  bash <(curl -s https://raw.githubusercontent.com/heavy-tail/claude-eli/main/hooks/install.sh)
 #   or:  bash hooks/install.sh --force   (re-install over existing hooks)
 #
 # Based on the installer pattern from caveman (JuliusBrussee/caveman, MIT).
@@ -28,7 +28,7 @@ esac
 
 # Require node — we use it to merge the hook config into settings.json
 if ! command -v node >/dev/null 2>&1; then
-  echo "ERROR: 'node' is required to install the Claude for Dummies hooks (used to merge"
+  echo "ERROR: 'node' is required to install the Claude ELI hooks (used to merge"
   echo "       the hook config into ~/.claude/settings.json safely)."
   echo "       Install Node.js from https://nodejs.org and re-run this script."
   exit 1
@@ -37,9 +37,9 @@ fi
 CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 HOOKS_DIR="$CLAUDE_DIR/hooks"
 SETTINGS="$CLAUDE_DIR/settings.json"
-REPO_URL="https://raw.githubusercontent.com/wchun26/claude-for-dummies/main/hooks"
+REPO_URL="https://raw.githubusercontent.com/heavy-tail/claude-eli/main/hooks"
 
-HOOK_FILES=("package.json" "dummies-config.js" "dummies-activate.js" "dummies-mode-tracker.js" "dummies-statusline.sh")
+HOOK_FILES=("package.json" "eli-config.js" "eli-activate.js" "eli-mode-tracker.js" "eli-statusline.sh")
 
 # Resolve source — works from repo clone or curl pipe
 SCRIPT_DIR=""
@@ -61,17 +61,17 @@ if [ "$FORCE" -eq 0 ]; then
   HOOKS_WIRED=0
   HAS_STATUSLINE=0
   if [ "$ALL_FILES_PRESENT" -eq 1 ] && [ -f "$SETTINGS" ]; then
-    if DUMMIES_SETTINGS="$SETTINGS" node -e "
+    if ELI_SETTINGS="$SETTINGS" node -e "
       const fs = require('fs');
-      const settings = JSON.parse(fs.readFileSync(process.env.DUMMIES_SETTINGS, 'utf8'));
-      const hasDummiesHook = (event) =>
+      const settings = JSON.parse(fs.readFileSync(process.env.ELI_SETTINGS, 'utf8'));
+      const hasELIHook = (event) =>
         Array.isArray(settings.hooks?.[event]) &&
         settings.hooks[event].some(e =>
-          e.hooks && e.hooks.some(h => h.command && h.command.includes('dummies'))
+          e.hooks && e.hooks.some(h => h.command && h.command.includes('eli'))
         );
       process.exit(
-        hasDummiesHook('SessionStart') &&
-        hasDummiesHook('UserPromptSubmit') &&
+        hasELIHook('SessionStart') &&
+        hasELIHook('UserPromptSubmit') &&
         !!settings.statusLine
           ? 0
           : 1
@@ -84,7 +84,7 @@ if [ "$FORCE" -eq 0 ]; then
 
   if [ "$ALL_FILES_PRESENT" -eq 1 ] && [ "$HOOKS_WIRED" -eq 1 ] && [ "$HAS_STATUSLINE" -eq 1 ]; then
     ALREADY_INSTALLED=1
-    echo "Claude for Dummies hooks already installed in $HOOKS_DIR"
+    echo "Claude ELI hooks already installed in $HOOKS_DIR"
     echo "  Re-run with --force to overwrite: bash hooks/install.sh --force"
     echo ""
   fi
@@ -95,10 +95,10 @@ if [ "$ALREADY_INSTALLED" -eq 1 ] && [ "$FORCE" -eq 0 ]; then
   exit 0
 fi
 
-if [ "$FORCE" -eq 1 ] && [ -f "$HOOKS_DIR/dummies-activate.js" ]; then
-  echo "Reinstalling Claude for Dummies hooks (--force)..."
+if [ "$FORCE" -eq 1 ] && [ -f "$HOOKS_DIR/eli-activate.js" ]; then
+  echo "Reinstalling Claude ELI hooks (--force)..."
 else
-  echo "Installing Claude for Dummies hooks..."
+  echo "Installing Claude ELI hooks..."
 fi
 
 # 1. Ensure hooks dir exists
@@ -115,7 +115,7 @@ for hook in "${HOOK_FILES[@]}"; do
 done
 
 # Make statusline script executable
-chmod +x "$HOOKS_DIR/dummies-statusline.sh"
+chmod +x "$HOOKS_DIR/eli-statusline.sh"
 
 # 3. Wire hooks + statusline into settings.json (idempotent)
 if [ ! -f "$SETTINGS" ]; then
@@ -126,47 +126,47 @@ fi
 cp "$SETTINGS" "$SETTINGS.bak"
 
 # Pass paths via env vars — avoids shell injection if $HOME contains single quotes
-DUMMIES_SETTINGS="$SETTINGS" DUMMIES_HOOKS_DIR="$HOOKS_DIR" node -e "
+ELI_SETTINGS="$SETTINGS" ELI_HOOKS_DIR="$HOOKS_DIR" node -e "
   const fs = require('fs');
-  const settingsPath = process.env.DUMMIES_SETTINGS;
-  const hooksDir = process.env.DUMMIES_HOOKS_DIR;
-  const managedStatusLinePath = hooksDir + '/dummies-statusline.sh';
+  const settingsPath = process.env.ELI_SETTINGS;
+  const hooksDir = process.env.ELI_HOOKS_DIR;
+  const managedStatusLinePath = hooksDir + '/eli-statusline.sh';
   const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
   if (!settings.hooks) settings.hooks = {};
 
-  // SessionStart — auto-load Dummies rules
+  // SessionStart — auto-load ELI rules
   if (!settings.hooks.SessionStart) settings.hooks.SessionStart = [];
   const hasStart = settings.hooks.SessionStart.some(e =>
-    e.hooks && e.hooks.some(h => h.command && h.command.includes('dummies'))
+    e.hooks && e.hooks.some(h => h.command && h.command.includes('eli'))
   );
   if (!hasStart) {
     settings.hooks.SessionStart.push({
       hooks: [{
         type: 'command',
-        command: 'node \"' + hooksDir + '/dummies-activate.js\"',
+        command: 'node \"' + hooksDir + '/eli-activate.js\"',
         timeout: 5,
-        statusMessage: 'Loading Claude for Dummies...'
+        statusMessage: 'Loading Claude ELI...'
       }]
     });
   }
 
-  // UserPromptSubmit — track stage changes when user types /dummy commands
+  // UserPromptSubmit — track stage changes when user types /eli commands
   if (!settings.hooks.UserPromptSubmit) settings.hooks.UserPromptSubmit = [];
   const hasPrompt = settings.hooks.UserPromptSubmit.some(e =>
-    e.hooks && e.hooks.some(h => h.command && h.command.includes('dummies'))
+    e.hooks && e.hooks.some(h => h.command && h.command.includes('eli'))
   );
   if (!hasPrompt) {
     settings.hooks.UserPromptSubmit.push({
       hooks: [{
         type: 'command',
-        command: 'node \"' + hooksDir + '/dummies-mode-tracker.js\"',
+        command: 'node \"' + hooksDir + '/eli-mode-tracker.js\"',
         timeout: 5,
-        statusMessage: 'Tracking Dummies stage...'
+        statusMessage: 'Tracking ELI stage...'
       }]
     });
   }
 
-  // Statusline — wire dummies badge (report if skipped)
+  // Statusline — wire eli badge (report if skipped)
   if (!settings.statusLine) {
     settings.statusLine = {
       type: 'command',
@@ -180,7 +180,7 @@ DUMMIES_SETTINGS="$SETTINGS" DUMMIES_HOOKS_DIR="$HOOKS_DIR" node -e "
     if (cmd.includes(managedStatusLinePath)) {
       console.log('  Statusline badge already configured.');
     } else {
-      console.log('  NOTE: Existing statusline detected — Dummies badge NOT added.');
+      console.log('  NOTE: Existing statusline detected — ELI badge NOT added.');
       console.log('        See hooks/README.md to add the badge to your existing statusline.');
     }
   }
@@ -193,7 +193,7 @@ echo ""
 echo "Done! Restart Claude Code to activate."
 echo ""
 echo "What's installed:"
-echo "  - SessionStart hook: auto-loads Dummies rules every session"
+echo "  - SessionStart hook: auto-loads ELI rules every session"
 echo "  - Stage tracker hook: updates statusline badge when you change stage"
-echo "    (/dummy 1, /dummy 2, /dummy harder, /dummy off, etc.)"
-echo "  - Statusline badge: shows [1 👶 dummies] / [2 🧒 dummies] / [3 🎓 dummies]"
+echo "    (/eli 1, /eli 2, /eli harder, /eli off, etc.)"
+echo "  - Statusline badge: shows [1 👶 eli] / [2 🧒 eli] / [3 🎓 eli]"
