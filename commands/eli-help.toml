@@ -10,14 +10,15 @@ Stage
   /eli level         show menu with examples
   /eli easier        ↓ one step (more compressed)
   /eli harder        ↑ one step (more detail)
-  /eli baby          jump to 👶 baby  (bottom line, 5-10 lines)
-  /eli kid           jump to 🧒 kid   (summary, 15-25 lines — default)
-  /eli adult         jump to 🎓 adult (full bookended, 30-60 lines)
+  /eli baby          jump to 👶 baby  (deepest translation, length = topic-required)
+  /eli kid           jump to 🧒 kid   (light translation, concise — default)
+  /eli adult         jump to 🎓 adult (near-raw but easier than raw)
+  /eli auto          ✨ Claude picks depth per question
 
 Switch
   /eli off           disable for this session (= uncut Claude)
   /eli on            re-enable
-  /expert            this response only: full technical mode
+  /eli raw           this response only: raw Claude (no ELI filter)
 
 Extra
   /eli-glossary      jargon from previous answer with plain defs

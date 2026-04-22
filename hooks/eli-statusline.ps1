@@ -29,17 +29,19 @@ try {
 $Mode = $Mode.ToLowerInvariant()
 $Mode = ($Mode -replace '[^a-z0-9-]', '')
 
-$Valid = @('off', 'baby', 'kid', 'adult')
+$Valid = @('off', 'baby', 'kid', 'adult', 'auto')
 if (-not ($Valid -contains $Mode)) { exit 0 }
 
 # Per-stage badge + color:
 #   baby  → cyan (fresh, starting)
 #   kid   → green (default, steady)
 #   adult → yellow/gold (matured)
+#   auto  → magenta (adaptive — Claude picks per question)
 $Badge = switch ($Mode) {
     'baby'  { "baby 👶 eli" }
     'kid'   { "kid 🧒 eli" }
     'adult' { "adult 🎓 eli" }
+    'auto'  { "auto ✨ eli" }
     default { exit 0 }
 }
 
@@ -47,6 +49,7 @@ $Color = switch ($Mode) {
     'baby'  { "36" }
     'kid'   { "32" }
     'adult' { "33" }
+    'auto'  { "35" }
     default { "32" }
 }
 

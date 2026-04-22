@@ -4,16 +4,19 @@ For Claude/contributors working on this repo. End-user docs live in `README.md`.
 
 ## What this project does
 
-Default-on Claude Code plugin that cuts the "explain it again, but easier" loop. **Mission: help the user understand** — every answer organized around what the user needs to decide. Six principles drive this: Completeness, MECE on decision axes, Clarity, Speed aids, Analogy when it beats prose, Diagrams when they clarify. Code, commands, URLs, paths, env vars, CLI flags, errors, warnings — preserved verbatim at every stage.
+Default-on Claude Code plugin that cuts the "explain it again, but easier" loop. **Mission: help the user understand** — every answer must be clearly easier to understand than raw Claude on the same question. Code, commands, URLs, paths, env vars, CLI flags, errors, warnings, plan files — preserved verbatim at every stage.
 
-Three stages differ in **depth only, not quality** — all three fully serve understanding:
-- `👶 baby` — bottom line + "한 줄 요약" (5-10 lines)
-- `🧒 kid` (default) — summary across 4-5 axes (15-25 lines)
-- `🎓 adult` — full, bookended with TL;DR + "한 줄 정리" + diagrams (30-60 lines)
+Four stages, differing in **translation depth** (not output length — length is an outcome):
+- `👶 baby` — deepest translation (analogies + everyday words, length follows topic)
+- `🧒 kid` (default) — light translation, pretty concise
+- `🎓 adult` — near-raw but still clearly easier than raw (better structure / emphasis / optional light analogy)
+- `✨ auto` — Claude picks baby/kid/adult per question
 
-For uncut Claude, `/eli off`. Numeric command interface; emoji + name on the statusline and inside SKILL.md.
+For one-time raw Claude, `/eli raw`. To disable for the session, `/eli off`. Stage-name-only command interface; emoji + name on the statusline.
 
-Analogies are a tool used selectively (abstract concepts, cryptic errors, multi-step flows), not a goal. Skip on code-heavy or step-by-step setup answers. Diagrams expected in Adult.
+"알잘딱깔센" judgment — v0.7 dropped rigid length/axis count rules. Each answer is judged by 4 criteria: understanding delta > 0 (must beat raw), include only what affects understanding, shape follows content, honor the stage's spirit. Anti-patterns (padding / over-compression / stage blur / hedging sprawl) are explicit.
+
+Analogies and diagrams are tools used selectively — not targets. Skip when not helping.
 
 Independent product. Architecture inspired by caveman (MIT) — different axis: caveman compresses all prose, we organize prose for understanding. See `ATTRIBUTION.md`.
 
@@ -21,7 +24,7 @@ Independent product. Architecture inspired by caveman (MIT) — different axis: 
 
 | File | Controls |
 |------|----------|
-| `skills/eli/SKILL.md` | Core eli behavior — North Star mission, 6 principles, preservation rule, 3 stages (depth-only axis), error pattern, Safety Clarity Mode, analogy + diagram rules, language handling. The hook reads it at runtime. |
+| `skills/eli/SKILL.md` | Core eli behavior — North Star mission, "알잘딱깔센" 4-criteria judgment, preservation rule (incl. plan files), 4 stages (translation-depth axis: baby/kid/adult/auto), error pattern, Safety Clarity Mode, plan-mode integration, analogy + diagram rules, language handling. The hook reads it at runtime. |
 | `rules/eli-activate.md` | Always-on rule body for non-Claude-Code agents in v2 (Cursor / Windsurf / Cline / Copilot via per-IDE rules dirs). Currently shipped but not auto-synced — v2 work. |
 | `skills/eli-glossary/SKILL.md` | `/eli-glossary` behavior. |
 | `skills/eli-stats/SKILL.md` | `/eli-stats` behavior. |
@@ -48,7 +51,7 @@ Independent product. Architecture inspired by caveman (MIT) — different axis: 
 │   ├── eli-glossary.toml
 │   ├── eli-help.toml
 │   ├── eli-stats.toml
-│   └── expert.toml
+│   └── eli-raw.toml
 ├── evals/
 │   ├── prompts/en.txt       # 15 vibecoder pain prompts
 │   ├── llm_run.py           # Claude API runner (3-arm: baseline / terse / each skill)
@@ -102,7 +105,7 @@ Silent-fails on filesystem errors. Never blocks session start.
 Per turn:
 
 1. `recordPrompt()` (cheap; writes `~/.config/eli/metadata.json`).
-2. If prompt starts with `/expert`: skip reinforcement, return (SKILL.md handles `/expert`).
+2. If prompt starts with `/eli raw`: skip reinforcement, return (commands/eli-raw.toml handles the bypass behavior; flag stays unchanged).
 3. Snapshot stage before parsing.
 4. Natural-language deactivation (`stop eli`, `normal mode`): unlink flag.
 5. Natural-language activation: write `getDefaultMode()` to flag.
@@ -177,8 +180,10 @@ ELI should hit ~100% on every preservation kind. terse should drop substantially
 
 - The `safeWriteFlag` / `readFlag` invariants (security).
 - The `package.json` `{"type": "commonjs"}` pin (interop).
-- The stage-name-only command interface (`/eli baby|kid|adult`) — v0.5 deliberately dropped numeric aliases (`/eli 1|2|3`) and stage-number traces because with three consistently-named stages there's no confusion, and two input formats add more UX drag than they save keystrokes. Don't re-add numbers as args unless stages change.
-- The plan-summary-at-bottom rule — v0.6 puts the ELI summary for plan mode at the bottom of the plan file, not the top. This is inverted pyramid on purpose: the user should skim the plan in full first and use the summary as reinforcement, not use the summary to skip reading. Don't "helpfully" move it to the top.
+- The stage-name-only command interface (`/eli baby|kid|adult|auto`) — v0.5 dropped numeric aliases (`/eli 1|2|3`), v0.7 added `auto` as a fourth stage. Don't re-add numbers as args.
+- **No rigid length / axis-count rules.** v0.7 replaced "baby = 5-10 lines / kid = 15-25 / adult = 30-60" with the "알잘딱깔센" 4-criteria judgment. The length-by-stage rule forced Claude to optimize for line count instead of understanding; complex questions at `baby` got dangerously under-sized, simple questions at `adult` got padded. Don't reintroduce per-stage length ceilings — stage controls *translation depth*, length is whatever the topic + judgment produce.
+- The summary-at-bottom rule — all summaries at the bottom of every answer (not top, not both). v0.7 dropped bookending. Reason: in CLI the last line is first-visible on scroll-up, which makes the bottom the right place for the reinforcement read. Also applies to plan-mode summaries (v0.6). Don't "helpfully" move them to the top.
+- `/eli raw` replacing `/expert` (v0.7) — `/expert` collided with `/export` autocomplete and "expert mode" as a name was ambiguous. `/eli raw` ("raw Claude, no filter") is semantically clearer and keeps every slash under the `/eli*` prefix. Don't add `/expert` back as an alias.
 - The independent-product stance — we're not a caveman funnel; no "graduate to caveman" copy anywhere.
 
 ## Inspiration

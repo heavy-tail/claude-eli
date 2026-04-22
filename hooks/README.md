@@ -20,7 +20,7 @@ If you installed ELI standalone (without the plugin marketplace), use `bash hook
 - Detects `/eli` commands and natural-language triggers, updates the stage flag
 - Records every prompt in metadata for `/eli-stats`
 - On a stage change, emits a `STAGE CHANGE: ...` line in `additionalContext` so `commands/eli.toml` can render the Level-up! message
-- Skips the per-turn reinforcement on `/expert` (so Claude can answer normally for that one turn)
+- Skips the per-turn reinforcement on `/eli raw` (so Claude can answer normally for that one turn; flag stays unchanged)
 
 ### `eli-config.js` — shared module (not a hook)
 
@@ -31,11 +31,12 @@ If you installed ELI standalone (without the plugin marketplace), use `bash hook
 
 ### `eli-statusline.sh` / `.ps1` — statusline badge
 
-Outputs a colored badge based on the flag value:
+Outputs a colored badge based on the flag value, with per-stage color for at-a-glance recognition:
 
-- `baby` → `[1 👶 eli]` (green)
-- `kid` → `[2 🧒 eli]` (green)
-- `adult` → `[3 🎓 eli]` (green)
+- `baby` → `[baby 👶 eli]` (cyan — fresh)
+- `kid` → `[kid 🧒 eli]` (green — default, steady)
+- `adult` → `[adult 🎓 eli]` (yellow/gold — matured)
+- `auto` → `[auto ✨ eli]` (magenta — adaptive, Claude picks per question)
 
 Refuses symlinks, caps reads at 64 bytes, and whitelists stage values to block terminal-escape injection through the flag file.
 
@@ -71,7 +72,7 @@ The installer writes this to your `settings.json` automatically. If you already 
 
 - `CLAUDE_CONFIG_DIR` — alternative location for `~/.claude` (respected by all scripts)
 - `XDG_CONFIG_HOME` — alternative location for `~/.config` (used for `~/.config/eli/`)
-- `ELI_DEFAULT_STAGE` — overrides the default stage (`baby|kid|adult|off`)
+- `ELI_DEFAULT_STAGE` — overrides the default stage (`baby|kid|adult|auto|off`)
 
 ## Inspiration
 

@@ -20,9 +20,16 @@ const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.cla
 const flagPath = path.join(claudeDir, '.eli-active');
 
 const STAGES = ['baby', 'kid', 'adult'];
-const VALID_STAGE_ARGS = new Set(STAGES);
+// VALID_STAGE_ARGS = explicit stage names accepted as `/eli <arg>`.
+// 'auto' is a valid stage but NOT a progression point — easier/harder from
+// auto falls back to fixed stages (see shiftStage).
+const VALID_STAGE_ARGS = new Set([...STAGES, 'auto']);
 
 function shiftStage(current, delta) {
+  // From 'auto', treat as kid (middle) so /eli easier → baby and
+  // /eli harder → adult. Exits auto into a fixed stage — intentional,
+  // since easier/harder only make sense against a concrete stage.
+  if (current === 'auto') current = 'kid';
   const i = STAGES.indexOf(current);
   if (i < 0) return getDefaultMode();
   const next = Math.max(0, Math.min(STAGES.length - 1, i + delta));
@@ -40,10 +47,11 @@ process.stdin.on('end', () => {
     // Record every prompt for /eli-stats (cheap, best-effort).
     recordPrompt();
 
-    // /expert — this response only, normal Claude. SKILL.md handles the behavior.
-    // Skip per-turn reinforcement so the "ELI ACTIVE" line doesn't fight
-    // the "/expert = normal" rule.
-    if (/^\/expert\b/.test(lower)) {
+    // /eli raw — this response only, raw Claude (bypass ELI). SKILL.md + the
+    // commands/eli-raw.toml prompt handle the actual behavior. Skip per-turn
+    // reinforcement so the "ELI ACTIVE" line doesn't fight the "raw = normal"
+    // rule. Flag file stays unchanged.
+    if (/^\/eli\s+raw\b/.test(lower)) {
       return;
     }
 
@@ -106,14 +114,22 @@ process.stdin.on('end', () => {
 
     // Detect stage transition vs snapshot. baby < kid < adult is assumed
     // obvious from the names — no numeric prefix needed in the trace.
+    // auto is orthogonal to the depth axis (it's "Claude picks per question"),
+    // so transitions to/from auto are labeled "switch" rather than
+    // upgrade/downgrade.
     const after = readFlag(flagPath);
     let transitionLine = '';
     if (after && after !== before) {
       if (before) {
         recordStageChange(before, after);
-        const oldI = STAGES.indexOf(before);
-        const newI = STAGES.indexOf(after);
-        const dir = newI > oldI ? 'upgrade' : (newI < oldI ? 'downgrade' : 'same');
+        let dir;
+        if (before === 'auto' || after === 'auto') {
+          dir = 'switch';
+        } else {
+          const oldI = STAGES.indexOf(before);
+          const newI = STAGES.indexOf(after);
+          dir = newI > oldI ? 'upgrade' : (newI < oldI ? 'downgrade' : 'same');
+        }
         transitionLine = `STAGE CHANGE: ${before} → ${after} (${dir})`;
       } else {
         // off → on transition

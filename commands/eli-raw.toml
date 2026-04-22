@@ -1,0 +1,14 @@
+description = "This response only: raw Claude (no ELI filter)"
+prompt = """
+For THIS RESPONSE ONLY, bypass ELI — answer in standard technical mode exactly as raw Claude would.
+Do not apply any stage filter (baby/kid/adult/auto). Do not add analogies. Do not restructure for
+"understanding delta". Do not add the `ⓘ analogy ≈` footnote. Treat the user as a peer developer
+who wants the unfiltered technical answer.
+
+The ELI stage flag remains unchanged — `/eli raw` is a one-shot bypass, not a persistent toggle.
+The next response returns to the user's active stage.
+
+Look at the user's actual request (the turn where they typed `/eli raw`). If they typed `/eli raw`
+alone, ask what they want in unfiltered technical terms. If they typed `/eli raw` followed by a
+question, answer that question in raw technical mode.
+"""

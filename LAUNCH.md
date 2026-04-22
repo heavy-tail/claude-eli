@@ -6,7 +6,7 @@
 - [x] `.claude-plugin/marketplace.json` — name `eli`, listing description set
 - [x] `skills/eli/SKILL.md` — full ruleset, North Star mission, 6 principles, 3 stages (Baby/Kid/Adult), preservation rule, Safety Clarity, analogy humility
 - [x] 3 sub-skills present — `eli-glossary`, `eli-stats`, `eli-help`
-- [x] 5 commands present — `eli.toml`, `eli-glossary.toml`, `eli-stats.toml`, `eli-help.toml`, `expert.toml`
+- [x] 5 commands present — `eli.toml`, `eli-glossary.toml`, `eli-stats.toml`, `eli-help.toml`, `eli-raw.toml`
 - [x] Hooks renamed and rewired — `eli-activate.js`, `eli-mode-tracker.js`, `eli-config.js`, `eli-statusline.sh/.ps1`
 - [x] `install.sh` / `install.ps1` / `uninstall.sh` / `uninstall.ps1` — all reference eli paths and `~/.config/eli/`
 - [x] `evals/` — 15 prompts in `prompts/en.txt`, `measure.py` rewritten for preservation rate
@@ -21,7 +21,7 @@
 - [x] `bash hooks/install.sh` in clean `CLAUDE_CONFIG_DIR` — copies 5 files + wires settings.json + statusline
 - [x] `node hooks/eli-activate.js` — reads SKILL.md, strips frontmatter, emits ruleset, writes flag, records session
 - [x] `echo '{"prompt":"/eli adult"}' | node hooks/eli-mode-tracker.js` — updates flag to `adult`, emits `STAGE CHANGE` line, records stageHistory
-- [x] `bash hooks/eli-statusline.sh` — emits `[3 🎓 eli]` (green)
+- [x] `bash hooks/eli-statusline.sh` — emits `[adult 🎓 eli]` (gold). baby=cyan, kid=green, auto=magenta.
 - [x] `echo '{"prompt":"/eli off"}' | node hooks/eli-mode-tracker.js` — deletes flag
 - [x] `bash hooks/uninstall.sh` — removes files, settings entries, statusline, .bak
 

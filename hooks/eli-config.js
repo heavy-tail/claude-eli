@@ -17,7 +17,7 @@ const os = require('os');
 
 const VALID_MODES = [
   'off',
-  'baby', 'kid', 'adult'
+  'baby', 'kid', 'adult', 'auto'
 ];
 
 function getConfigDir() {

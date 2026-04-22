@@ -49,21 +49,22 @@ For vibecoders, beginners, PMs who code, or anyone tired of re-prompting Claude 
 
 ## How it works
 
-Three stages differ in **depth only, not quality** — all three fully help you understand, just with different context depth.
+Four stages, each adjusting **translation depth** (not output length). Length is whatever the topic requires.
 
-| # | Badge | Stage | ≈ ELI | What you get |
-|---|-------|-------|-------|--------------|
-| 1 | 👶 | **Baby** | ELI 3 | Bottom line. 3 axes max (result / cause / action), ends with "한 줄 요약". 5-10 lines. |
-| 2 | 🧒 | **Kid** *(default)* | ELI 10 | Summary. 4-5 axes, 2-3 bullets each, ends with "한 줄 요약". 15-25 lines. |
-| 3 | 🎓 | **Adult** | ELI 25 | Full, bookended. TL;DR at top + body with trade-offs + "한 줄 정리". Diagrams expected. 30-60 lines. |
+| Badge | Stage | ≈ ELI | What you get |
+|-------|-------|-------|--------------|
+| 👶 | **baby** | ELI 3 | Deepest translation. Hard concepts made very simple with analogies and everyday words. Length follows the topic. |
+| 🧒 | **kid** *(default)* | ELI 10 | Light translation, pretty concise. Keep terms; cut to the decision-relevant core. |
+| 🎓 | **adult** | ELI 25 | Near-raw Claude, BUT must still be clearly easier than raw (better structure, emphasis, optional light analogy). |
+| ✨ | **auto** | adaptive | Claude picks baby / kid / adult per question based on how it reads. |
 
-Want fully uncut Claude? `/eli off`.
+Want one-time raw Claude (no filter)? `/eli raw`. Want to disable for the session? `/eli off`.
 
-What every stage does equally well — the **North Star**:
+The **North Star** — applied to every answer, every stage:
 
-> **Help you understand.** Include the core + anything important for the decision (Completeness). Cover every axis you need to decide — result, cause, action, trade-off, check (MECE). Everyday words. One-line summary at the end. Analogies when they beat plain prose. Diagrams when they clarify.
+> **Help you understand.** Every ELI answer must be clearly easier than raw Claude on the same question. Include only what affects the decision. Shape follows content. Honor the stage's spirit. Length is a consequence, not a target.
 
-Tables, arrows, funnels, analogies — all welcome **when they help you understand faster**, not when they look thorough.
+No fixed templates. No padding. No over-compression. Tables, diagrams, analogies — used when they make the concept click faster, skipped when they don't.
 
 ---
 
@@ -85,16 +86,17 @@ Restart Claude Code. Default ON — no further commands needed.
 ```
 Stage
   /eli level         show menu
-  /eli easier        ↓ one step (more compressed)
-  /eli harder        ↑ one step (more detail)
-  /eli baby          jump to 👶 baby  (bottom line)
-  /eli kid           jump to 🧒 kid   (summary — default)
-  /eli adult         jump to 🎓 adult (full, bookended with diagrams)
+  /eli easier        ↓ one step (deeper translation)
+  /eli harder        ↑ one step (less translation)
+  /eli baby          jump to 👶 baby  (deepest translation)
+  /eli kid           jump to 🧒 kid   (light translation — default)
+  /eli adult         jump to 🎓 adult (near-raw but still easier than raw)
+  /eli auto          ✨ Claude picks per question
 
 Switch
   /eli off           disable for this session (= uncut Claude)
   /eli on            re-enable
-  /expert            this response only: full technical mode
+  /eli raw           this response only: raw Claude (no ELI filter)
 
 Extra
   /eli-glossary      jargon from previous answer with plain defs

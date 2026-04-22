@@ -29,6 +29,7 @@ case "$MODE" in
   baby)  BADGE='baby 👶 eli';  COLOR='\033[36m' ;;  # cyan — fresh, starting
   kid)   BADGE='kid 🧒 eli';   COLOR='\033[32m' ;;  # green — default, steady
   adult) BADGE='adult 🎓 eli'; COLOR='\033[33m' ;;  # yellow/gold — matured
+  auto)  BADGE='auto ✨ eli';  COLOR='\033[35m' ;;  # magenta — adaptive magic
   *) exit 0 ;;
 esac
 

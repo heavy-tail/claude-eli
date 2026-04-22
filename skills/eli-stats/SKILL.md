@@ -47,9 +47,10 @@ Suggested: [see rules below]
 
 | Current | Suggestion |
 |---------|-----------|
-| 1 👶 Baby | "Baby — bottom line + 한 줄 요약. Try `/eli harder` when you want causes and options." |
-| 2 🧒 Kid | "Kid — summary across 4-5 axes (the sweet spot). Try `/eli harder` for trade-offs and edge cases." |
-| 3 🎓 Adult | "Adult — full bookended answer with diagrams. For uncut Claude, use `/eli off`." |
+| 👶 baby | "baby — deepest translation. Analogies and everyday words do the heavy lifting. Try `/eli harder` when you want less translation." |
+| 🧒 kid | "kid — light translation, pretty concise (the sweet spot). Try `/eli harder` for the near-raw register." |
+| 🎓 adult | "adult — near-raw but still clearer than raw (structure + emphasis). For fully raw Claude, use `/eli raw` one-time or `/eli off` for the session." |
+| ✨ auto | "auto — Claude is picking depth per question. Try `/eli kid` (or another fixed stage) if you want a consistent register." |
 
 ## Edge cases
 

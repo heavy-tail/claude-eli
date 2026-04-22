@@ -15,16 +15,17 @@ Display this reference card when invoked. **One-shot** — do NOT change stage, 
 
 Stage
   /eli level         show menu with examples
-  /eli easier        ↓ one step (more compressed)
-  /eli harder        ↑ one step (more detail)
-  /eli baby          jump to 👶 baby  (bottom line, 5-10 lines)
-  /eli kid           jump to 🧒 kid   (summary, 15-25 lines — default)
-  /eli adult         jump to 🎓 adult (full bookended, 30-60 lines)
+  /eli easier        ↓ one step (more compressed translation)
+  /eli harder        ↑ one step (less translation)
+  /eli baby          jump to 👶 baby  (deepest translation)
+  /eli kid           jump to 🧒 kid   (light translation — default)
+  /eli adult         jump to 🎓 adult (near-raw but clearer than raw)
+  /eli auto          ✨ Claude picks baby/kid/adult per question
 
 Switch
   /eli off           disable for this session (= uncut Claude)
   /eli on            re-enable
-  /expert            this response only: full technical mode
+  /eli raw           this response only: raw Claude (no ELI filter)
 
 Extra
   /eli-glossary      jargon from previous answer with plain defs
@@ -46,9 +47,11 @@ Default = `kid`. Override:
 export ELI_DEFAULT_STAGE=adult
 ```
 
+Valid values: `baby`, `kid`, `adult`, `auto`, `off`.
+
 **Config file** (`~/.config/eli/config.json`):
 ```json
-{ "defaultStage": "adult" }
+{ "defaultStage": "auto" }
 ```
 
 Set `"off"` to disable auto-activation on session start. User can still activate manually with `/eli on`.
