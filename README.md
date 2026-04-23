@@ -1,5 +1,7 @@
 # Claude ELI
 
+![tests](https://img.shields.io/badge/tests-passing-brightgreen)
+
 > Explain like I'm ___. Pick your level (3, 10, or 25) and Claude organizes every answer for that depth.
 
 Claude ELI cuts the **"explain it again, but easier"** loop. The mission is simple: **help you understand** every answer the first time. Pick the depth — 👶 Baby (ELI 3), 🧒 Kid (ELI 10), or 🎓 Adult (ELI 25) — and Claude organizes the answer around what you actually need to decide. Code, commands, URLs, paths, errors, warnings — preserved verbatim at every stage. Always on.

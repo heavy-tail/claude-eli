@@ -1,0 +1,11 @@
+{
+  "name": "claude-eli",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "fast-check": "^3.23.0"
+  }
+}
