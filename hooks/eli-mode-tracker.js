@@ -138,11 +138,20 @@ process.stdin.on('end', () => {
       }
     }
 
-    // Per-turn reinforcement: emit a compact reminder when eli is active.
-    // SessionStart injects the full SKILL.md once; this keeps eli visible in
-    // the model's attention on every user message. If a stage transition just
-    // happened, prepend a STAGE CHANGE line so commands/eli.toml can render
-    // the Level-up! message.
+    // Per-turn reinforcement.
+    //
+    // SessionStart injects the full SKILL.md once at session start; without
+    // a per-turn signal, that ruleset persists in conversation context for
+    // the entire session — even after the user types `/eli off`. So we have
+    // TWO active reinforcements:
+    //
+    //  - flag present (active stage): emit the standard ELI MODE ACTIVE
+    //    reinforcement so the model keeps the rules in attention.
+    //  - flag absent (off, mid-session): emit an explicit ELI OFF override
+    //    so the model treats the previously-injected SKILL.md as inactive
+    //    and answers as raw Claude. Without this, /eli off would be a soft
+    //    toggle — per-turn reinforcement stops, but the SKILL.md system
+    //    prompt keeps Claude applying ELI rules from memory.
     //
     // readFlag enforces symlink-safe read + size cap + VALID_MODES whitelist.
     if (after) {
@@ -159,12 +168,29 @@ process.stdin.on('end', () => {
           additionalContext: context
         }
       }));
-    } else if (transitionLine) {
-      // Stage went to off — still useful for Claude to know (e.g. confirm "ELI off").
+    } else {
+      // Flag is absent — ELI is off (either /eli off was used, or the user
+      // started a session with ELI_DEFAULT_STAGE=off, or natural-language
+      // deactivation fired earlier). Emit an explicit override so any ELI
+      // ruleset previously injected (SessionStart SKILL.md) is treated as
+      // inactive for this turn. Required for /eli off to be a true bypass,
+      // not a soft toggle.
+      const offContext = (transitionLine ? transitionLine + '\n' : '') +
+        "ELI MODE OFF. Any ELI ruleset (SKILL.md, alalddakkalsen criteria, " +
+        "stage spec, frame/TL;DR structure, analogy rules) injected earlier " +
+        "in this session is INACTIVE for this response. Answer as raw Claude " +
+        "would — no stage filter, no frame requirement, no TL;DR requirement, " +
+        "no analogy footnote, no understanding-delta self-check. The user has " +
+        "explicitly opted out of ELI for the session; respect that until they " +
+        "type `/eli on`, `eli mode`, or `talk like eli`. The LEVEL-1 code " +
+        "quality rule (production-quality code regardless of any setting) " +
+        "still applies — that's not stage-dependent and is unaffected by ELI " +
+        "being off.";
+
       process.stdout.write(JSON.stringify({
         hookSpecificOutput: {
           hookEventName: "UserPromptSubmit",
-          additionalContext: transitionLine
+          additionalContext: offContext
         }
       }));
     }
