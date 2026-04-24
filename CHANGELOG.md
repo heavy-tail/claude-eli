@@ -24,6 +24,7 @@ Dogfood-driven fixes from the first real install (Lana_AI_Trading_OS build) + tw
   * `test/eli-activate.test.js` (+4): local > user precedence; project > user middle case (plan review #5 gap); user fallback when no project files; local-scope stale plugin-cache path rewrite (symmetric to the existing user-scope stale-path test).
   * `test/skill-md-structure.test.js` (+2): SKILL.md calibration anchors (verification + context-scaling + plan iteration); rules/eli-activate.md calibration anchors.
 - Existing `standalone fallback ruleset emits when skills/ is absent` test now also asserts the v0.9.1 verification + iteration anchors are present in the fallback stdout.
+- `{ skip: isWindows }` guard on three `test/eli-config.test.js` symlink tests (safeWriteFlag symlink-target refusal, parent-symlink refusal, readFlag symlink rejection). `fs.symlinkSync` on Windows requires Developer Mode / admin; the `safeWriteFlag` invariant these pin is `O_NOFOLLOW` + `lstat`, which is POSIX-only by design. The guard matches the existing `test/e2e/install-uninstall.ps1.test.js` platform-skip pattern and was flagged by Codex review of this patch.
 
 ## v0.9.0 — test suite (unit + integration + e2e + fuzz)
 

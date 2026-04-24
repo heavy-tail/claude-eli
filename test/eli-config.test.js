@@ -67,7 +67,12 @@ test('safeWriteFlag happy path writes content with 0o600 mode', () => {
   }
 });
 
-test('safeWriteFlag refuses symlink target', () => {
+// Symlink tests (v0.9.1): skip on Windows. fs.symlinkSync there requires
+// Developer Mode or admin privileges, so a default Windows `npm test` would
+// fail before exercising safeWriteFlag. safeWriteFlag's symlink guard uses
+// O_NOFOLLOW + lstat, which are POSIX semantics; the invariant we pin here is
+// POSIX-only by design.
+test('safeWriteFlag refuses symlink target', { skip: isWindows }, () => {
   const dir = mkTmp('eli-cfg-symtgt-');
   try {
     const flagPath = path.join(dir, '.eli-active');
@@ -80,7 +85,7 @@ test('safeWriteFlag refuses symlink target', () => {
   }
 });
 
-test('safeWriteFlag refuses parent dir that is a symlink', () => {
+test('safeWriteFlag refuses parent dir that is a symlink', { skip: isWindows }, () => {
   const root = mkTmp('eli-cfg-symparent-');
   try {
     const realDir = path.join(root, 'real');
@@ -132,7 +137,7 @@ test('readFlag returns lowercased valid mode', () => {
   }
 });
 
-test('readFlag returns null when flag file is a symlink', () => {
+test('readFlag returns null when flag file is a symlink', { skip: isWindows }, () => {
   const dir = mkTmp('eli-cfg-read-sym-');
   try {
     const realFile = path.join(dir, 'real-file');
