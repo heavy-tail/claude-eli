@@ -1,5 +1,6 @@
 {
   "name": "claude-eli",
+  "version": "0.9.1",
   "private": true,
   "type": "commonjs",
   "scripts": {

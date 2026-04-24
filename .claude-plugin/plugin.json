@@ -1,5 +1,6 @@
 {
   "name": "eli",
+  "version": "0.9.1",
   "description": "Claude ELI. Translate Claude's technical explanations into plain language with analogies. Code blocks, commands, URLs, paths — preserved 100%.",
   "author": {
     "name": "WH",

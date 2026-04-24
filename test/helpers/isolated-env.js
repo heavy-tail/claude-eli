@@ -12,7 +12,7 @@ const TRACKER_JS = path.join(HOOKS_DIR, 'eli-mode-tracker.js');
 const STATUSLINE_SH = path.join(HOOKS_DIR, 'eli-statusline.sh');
 const STATUSLINE_PS1 = path.join(HOOKS_DIR, 'eli-statusline.ps1');
 
-function makeIsolatedEnv() {
+function makeIsolatedEnv(opts = {}) {
   const claudeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'eli-test-claude-'));
   const xdgDir = fs.mkdtempSync(path.join(os.tmpdir(), 'eli-test-xdg-'));
   const env = Object.assign({}, process.env, {
@@ -21,13 +21,24 @@ function makeIsolatedEnv() {
   });
   delete env.ELI_DEFAULT_STAGE;
   delete env.APPDATA;
+  delete env.CLAUDE_PROJECT_DIR;
+
+  let projectDir = null;
+  if (opts.withProjectDir) {
+    projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'eli-test-project-'));
+  }
+
   return {
     claudeDir,
     xdgDir,
+    projectDir,
     env,
     cleanup() {
       try { fs.rmSync(claudeDir, { recursive: true, force: true }); } catch (e) { /* leak tolerated */ }
       try { fs.rmSync(xdgDir, { recursive: true, force: true }); } catch (e) { /* leak tolerated */ }
+      if (projectDir) {
+        try { fs.rmSync(projectDir, { recursive: true, force: true }); } catch (e) { /* leak tolerated */ }
+      }
     },
   };
 }
@@ -64,8 +75,13 @@ function runHook(scriptAbsPath, opts = {}) {
   };
 }
 
-function runActivate(envBundle) {
-  return runHook(ACTIVATE_JS, { env: envBundle.env });
+function runActivate(envBundle, opts = {}) {
+  let env = envBundle.env;
+  const projectDir = opts.projectDir || envBundle.projectDir;
+  if (projectDir) {
+    env = Object.assign({}, env, { CLAUDE_PROJECT_DIR: projectDir });
+  }
+  return runHook(ACTIVATE_JS, { env });
 }
 
 function runTracker(envBundle, prompt) {
@@ -134,6 +150,28 @@ function readSettingsJson(claudeDir) {
   }
 }
 
+function writeProjectSettings(projectDir, fileName, obj) {
+  const dir = path.join(projectDir, '.claude');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, fileName), JSON.stringify(obj, null, 2));
+}
+
+function readProjectSettings(projectDir, fileName) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(projectDir, '.claude', fileName), 'utf8'));
+  } catch (e) {
+    return null;
+  }
+}
+
+function projectSettingsExists(projectDir, fileName) {
+  try {
+    return fs.existsSync(path.join(projectDir, '.claude', fileName));
+  } catch (e) {
+    return false;
+  }
+}
+
 function parseTrackerJsonStdout(stdout) {
   if (!stdout) return null;
   try {
@@ -169,6 +207,9 @@ module.exports = {
   readMetadata,
   writeSettingsJson,
   readSettingsJson,
+  writeProjectSettings,
+  readProjectSettings,
+  projectSettingsExists,
   parseTrackerJsonStdout,
   trackerAdditionalContext,
 };

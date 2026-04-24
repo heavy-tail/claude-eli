@@ -16,6 +16,9 @@ const {
   readMetadata,
   writeSettingsJson,
   readSettingsJson,
+  writeProjectSettings,
+  readProjectSettings,
+  projectSettingsExists,
 } = require('./helpers/isolated-env');
 
 test('default activate writes kid flag and emits SKILL.md body', () => {
@@ -127,6 +130,16 @@ test('fallback ruleset emits when skills/ is absent (standalone install)', () =>
     assert.ok(stdout.includes('LEVEL-1 INVARIANT'), 'fallback body should include LEVEL-1 INVARIANT anchor');
     assert.ok(stdout.includes('✨'), 'fallback body should include ✨ emoji');
     assert.ok(stdout.includes('**auto**'), 'fallback body should include **auto** stage anchor');
+    // v0.9.1 Fix 1E: fallback baby must include verification rule.
+    assert.ok(
+      stdout.includes('Verification questions'),
+      'fallback body should include v0.9.1 verification rule (Fix 1E)'
+    );
+    // v0.9.1 Fix 3C: fallback plan mode must include iteration clause.
+    assert.ok(
+      /EVERY plan generation|iterations included/.test(stdout),
+      'fallback body should include v0.9.1 plan-iteration rule (Fix 3C)'
+    );
   } finally {
     env.cleanup();
     try { fs.rmSync(standaloneRoot, { recursive: true, force: true }); } catch (e) { /* tolerate */ }
@@ -182,6 +195,103 @@ test('statusLine stale plugin-cache path is rewritten to current HOOKS_DIR', () 
     assert.equal(cmd.includes('/old/plugin-cache/abc123'), false, 'stale path should be dropped');
     assert.ok(cmd.includes(HOOKS_DIR), 'new command should reference the current HOOKS_DIR');
     assert.ok(/eli-statusline\.(sh|ps1)/.test(cmd), 'new command should point to eli-statusline');
+  } finally {
+    env.cleanup();
+  }
+});
+
+// v0.9.1 Fix 2 — resolveSettingsPath precedence (local > project > user).
+test('statusLine auto-wire writes to settings.local.json when present (local > user precedence)', () => {
+  const env = makeIsolatedEnv({ withProjectDir: true });
+  try {
+    writeProjectSettings(env.projectDir, 'settings.local.json', { otherKey: 'preserved' });
+    writeSettingsJson(env.claudeDir, { userKey: 'untouched' });
+    const res = runActivate(env);
+    assert.equal(res.code, 0);
+
+    const local = readProjectSettings(env.projectDir, 'settings.local.json');
+    assert.ok(local.statusLine, 'statusLine must be wired into local settings');
+    assert.ok(/eli-statusline\.(sh|ps1)/.test(local.statusLine.command), 'local command should reference eli-statusline');
+    assert.equal(local.otherKey, 'preserved', 'local non-ELI keys must be preserved');
+
+    const user = readSettingsJson(env.claudeDir);
+    assert.equal(user.statusLine, undefined, 'user settings.json must NOT have statusLine when local wins');
+    assert.equal(user.userKey, 'untouched', 'user non-ELI keys must be untouched');
+  } finally {
+    env.cleanup();
+  }
+});
+
+test('statusLine auto-wire writes to project settings.json when no local file (project > user precedence, middle case)', () => {
+  const env = makeIsolatedEnv({ withProjectDir: true });
+  try {
+    writeProjectSettings(env.projectDir, 'settings.json', { projectKey: 'preserved' });
+    writeSettingsJson(env.claudeDir, { userKey: 'untouched' });
+    const res = runActivate(env);
+    assert.equal(res.code, 0);
+
+    const project = readProjectSettings(env.projectDir, 'settings.json');
+    assert.ok(project.statusLine, 'statusLine must be wired into project settings.json');
+    assert.ok(/eli-statusline\.(sh|ps1)/.test(project.statusLine.command), 'project command should reference eli-statusline');
+    assert.equal(project.projectKey, 'preserved', 'project non-ELI keys must be preserved');
+
+    assert.equal(
+      projectSettingsExists(env.projectDir, 'settings.local.json'),
+      false,
+      'local settings file should not be created when absent'
+    );
+    const user = readSettingsJson(env.claudeDir);
+    assert.equal(user.statusLine, undefined, 'user settings.json must NOT have statusLine when project wins');
+  } finally {
+    env.cleanup();
+  }
+});
+
+test('statusLine auto-wire falls back to user settings.json when no project files', () => {
+  const env = makeIsolatedEnv({ withProjectDir: true });
+  try {
+    // No project settings files — only user settings.json exists.
+    writeSettingsJson(env.claudeDir, { userKey: 'untouched' });
+    const res = runActivate(env);
+    assert.equal(res.code, 0);
+
+    const user = readSettingsJson(env.claudeDir);
+    assert.ok(user.statusLine, 'statusLine must be wired into user settings');
+    assert.ok(/eli-statusline\.(sh|ps1)/.test(user.statusLine.command), 'user command should reference eli-statusline');
+    assert.equal(user.userKey, 'untouched', 'user non-ELI keys must be preserved');
+
+    assert.equal(
+      projectSettingsExists(env.projectDir, 'settings.json'),
+      false,
+      'project settings file should not be created'
+    );
+    assert.equal(
+      projectSettingsExists(env.projectDir, 'settings.local.json'),
+      false,
+      'local settings file should not be created'
+    );
+  } finally {
+    env.cleanup();
+  }
+});
+
+test('statusLine auto-wire rewrites local stale plugin-cache path to current HOOKS_DIR', () => {
+  const env = makeIsolatedEnv({ withProjectDir: true });
+  try {
+    writeProjectSettings(env.projectDir, 'settings.local.json', {
+      statusLine: {
+        type: 'command',
+        command: 'bash "/old/plugin-cache/xyz/eli-statusline.sh"',
+      },
+    });
+    const res = runActivate(env);
+    assert.equal(res.code, 0);
+
+    const local = readProjectSettings(env.projectDir, 'settings.local.json');
+    const cmd = local.statusLine.command;
+    assert.equal(cmd.includes('/old/plugin-cache/xyz'), false, 'stale local path should be dropped');
+    assert.ok(cmd.includes(HOOKS_DIR), 'new local command should reference the current HOOKS_DIR');
+    assert.ok(/eli-statusline\.(sh|ps1)/.test(cmd), 'new local command should point to eli-statusline');
   } finally {
     env.cleanup();
   }

@@ -269,3 +269,64 @@ test('undefined prompt (stdin JSON {}): exit 0, no flag mutation, OFF override e
     env.cleanup();
   }
 });
+
+test('ACTIVE additionalContext includes plan-mode reinforcement for every stage (v0.9.1 Fix 3B)', () => {
+  for (const stage of ['baby', 'kid', 'adult', 'auto']) {
+    const env = makeIsolatedEnv();
+    try {
+      seedFlag(env, stage);
+      const res = runTracker(env, 'hello');
+      assert.equal(res.code, 0);
+      const ctx = trackerAdditionalContext(res.stdout);
+      assert.ok(ctx, stage + ' must emit additionalContext');
+      assert.ok(
+        /plan file|EVERY plan generation/.test(ctx),
+        stage + ' missing plan-mode rule (iteration robustness)'
+      );
+      assert.ok(
+        ctx.includes('한 줄 요약'),
+        stage + ' missing Korean summary heading literal'
+      );
+    } finally {
+      env.cleanup();
+    }
+  }
+});
+
+test('baby context has BABY VERIFICATION and no "Use diagrams"; other stages have diagrams and no BABY VERIFICATION (v0.9.1 Fix 1D)', () => {
+  const envBaby = makeIsolatedEnv();
+  try {
+    seedFlag(envBaby, 'baby');
+    const res = runTracker(envBaby, 'hello');
+    assert.equal(res.code, 0);
+    const babyCtx = trackerAdditionalContext(res.stdout);
+    assert.ok(babyCtx, 'baby must emit additionalContext');
+    assert.match(babyCtx, /BABY VERIFICATION/, 'baby must include verification override');
+    assert.doesNotMatch(
+      babyCtx,
+      /Use diagrams \(tables/,
+      'baby must NOT include diagrams rule (drift vector)'
+    );
+  } finally {
+    envBaby.cleanup();
+  }
+
+  for (const stage of ['kid', 'adult', 'auto']) {
+    const env = makeIsolatedEnv();
+    try {
+      seedFlag(env, stage);
+      const res = runTracker(env, 'hello');
+      assert.equal(res.code, 0);
+      const ctx = trackerAdditionalContext(res.stdout);
+      assert.ok(ctx, stage + ' must emit additionalContext');
+      assert.match(ctx, /Use diagrams \(tables/, stage + ' must include diagrams rule');
+      assert.doesNotMatch(
+        ctx,
+        /BABY VERIFICATION/,
+        stage + ' must NOT include BABY VERIFICATION'
+      );
+    } finally {
+      env.cleanup();
+    }
+  }
+});

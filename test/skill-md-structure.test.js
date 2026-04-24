@@ -48,3 +48,37 @@ test('rules/eli-activate.md contains Code quality + Plan mode + 알잘딱깔센 
   assert.ok(rulesBody.includes('Plan mode'), 'Plan mode anchor present');
   assert.ok(rulesBody.includes('알잘딱깔센'), 'Korean 4-criteria anchor present');
 });
+
+test('SKILL.md contains v0.9.1 calibration anchors (baby verification + context-scaling + plan iteration)', () => {
+  // Fix 1A — baby verification rule.
+  assert.ok(
+    skillBody.includes('Verification questions'),
+    'Fix 1A: baby section must contain "Verification questions" literal'
+  );
+  // Fix 1B — anti context-scaling rule.
+  assert.match(
+    skillBody,
+    /Length is shaped by the TOPIC, not by preceding context/,
+    'Fix 1B: must contain anti-context-scaling rule'
+  );
+  // Fix 3A — plan-mode iteration clause.
+  assert.match(
+    skillBody,
+    /Applies on EVERY plan generation/,
+    'Fix 3A: plan mode section must strengthen iteration wording'
+  );
+});
+
+test('rules/eli-activate.md contains v0.9.1 calibration anchors (baby verification + plan iteration)', () => {
+  // Fix 1F — baby verification rule (v2 agents consistency).
+  assert.ok(
+    rulesBody.includes('Verification questions'),
+    'Fix 1F: baby line must contain "Verification questions" literal'
+  );
+  // Fix 3D — plan-mode iteration clause.
+  assert.match(
+    rulesBody,
+    /EVERY plan generation|iterations included/,
+    'Fix 3D: plan section must include iteration clause'
+  );
+});

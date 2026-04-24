@@ -15,7 +15,25 @@ const { getDefaultMode, safeWriteFlag, recordSession } = require('./eli-config')
 
 const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
 const flagPath = path.join(claudeDir, '.eli-active');
-const settingsPath = path.join(claudeDir, 'settings.json');
+
+// Resolve the settings file to write/read by Claude Code config precedence:
+// <project>/.claude/settings.local.json > <project>/.claude/settings.json > <user>/.claude/settings.json.
+// statusLine auto-wire must target the "winning" file or the local scope overrides our write.
+function resolveSettingsPath(claudeDirArg) {
+  const projectDir = process.env.CLAUDE_PROJECT_DIR;
+  const candidates = [];
+  if (projectDir) {
+    candidates.push(path.join(projectDir, '.claude', 'settings.local.json'));
+    candidates.push(path.join(projectDir, '.claude', 'settings.json'));
+  }
+  candidates.push(path.join(claudeDirArg, 'settings.json'));
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return path.join(claudeDirArg, 'settings.json');
+}
+
+const settingsPath = resolveSettingsPath(claudeDir);
 
 const mode = getDefaultMode();
 
@@ -74,7 +92,7 @@ if (skillContent) {
     '## Preservation (LEVEL-1 RULE — NEVER VIOLATE)\n\n' +
     'Never rewrite, shorten, paraphrase, or "simplify" any of the following — copy verbatim: code blocks, inline code and commands, URLs, file paths, env var names, CLI flags, error messages, stack traces, warning sentences, version numbers, hashes, API keys, tokens, plan files (`~/.claude/plans/*.md`). Only explanatory prose gets filtered.\n\n' +
     '## Stages — translation depth, not length\n\n' +
-    '- 👶 **baby** — "the simplest version I can act on". One recommended path (others mentioned, not detailed). 3-5 steps OR one analogy. 0-1 gotcha (only the absolute most likely trap for THIS question). Frame + answer often fused into one opening sentence. ≤3 distinct sections.\n' +
+    '- 👶 **baby** — "the simplest version I can act on". One recommended path (others mentioned, not detailed). 3-5 steps OR one analogy. 0-1 gotcha (only the absolute most likely trap for THIS question). Frame + answer often fused into one opening sentence. ≤3 distinct sections. Verification questions ("다 했어?" / "is this right?") in baby = yes/no + 1-2 lines why/caveat. No tables, no checklists, no §-number citations for verification questions specifically. Length follows TOPIC, not preceding context length.\n' +
     '- 🧒 **kid** (DEFAULT) — "the recommended path + 1-2 things that\'ll bite first". Recommended path **flagged** ("처음이면 이거"), inline one-line gloss for unfamiliar terms. 1-2 gotchas, only those that apply NOW. ≤4 distinct sections.\n' +
     '- 🎓 **adult** — **lossless restructuring of raw**. Same content as raw Claude would answer, just transformed: frame at top + restructured body (tables, headers, emphasis, "pick X if Y" picks for raw\'s ambiguous trade-offs) + TL;DR at bottom. **No new content added** — no extra "흔한 실수" / "피해야 할 패턴" / "확인 절차" sections raw didn\'t include. Length budget: ~1.0-1.3x raw, not 2-3x. Self-check: "could every fact in this answer match raw\'s content?" — if you\'re adding new facts, that\'s tutorial creep, prune.\n' +
     '- ✨ **auto** — Claude picks per question among baby/kid/adult. Signals: beginner cues ("explain like I\'m 5", jargon questions) → baby; "production-grade", "architecture", "trade-offs" → adult; Yes/No or simple how-to → kid; complex trade-offs → adult; when uncertain → kid.\n\n' +
@@ -92,7 +110,7 @@ if (skillContent) {
     '## Safety Clarity Mode\n\n' +
     'On security warnings, vulnerability notes, irreversible/destructive commands, or production-critical actions (with keyword context confirmed): drop analogies, preserve the warning/command verbatim, allow one short plain sentence only.\n\n' +
     '## Plan mode integration\n\n' +
-    'When writing a Claude Code plan file (`~/.claude/plans/*.md`) or preparing `ExitPlanMode`: write the plan in full detail (no ELI compression). Existing plan sections are verbatim — never edit, reorder, or paraphrase. Append `## 한 줄 요약 (ELI <stage>)` section at the BOTTOM of the plan (baby: very easy translation of what/why/scope; kid: summary across 뭐함/왜/핵심파일/리스크/검증/완료기준 axes; adult: TL;DR + axes + 한 줄 정리; auto: Claude picks one of the three). Bottom not top — force user to skim full plan first, summary is reinforcement.\n\n' +
+    'When writing a Claude Code plan file (`~/.claude/plans/*.md`) or preparing `ExitPlanMode`: write the plan in full detail (no ELI compression). Existing plan sections are verbatim — never edit, reorder, or paraphrase. Append `## 한 줄 요약 (ELI <stage>)` section at the BOTTOM of the plan (baby: very easy translation of what/why/scope; kid: summary across 뭐함/왜/핵심파일/리스크/검증/완료기준 axes; adult: TL;DR + axes + 한 줄 정리; auto: Claude picks one of the three). Bottom not top — force user to skim full plan first, summary is reinforcement. Applies on EVERY plan generation — iterations included, not just the first. Replace any previous ELI summary.\n\n' +
     '## Code quality (LEVEL-1 INVARIANT — NEVER VIOLATE)\n\n' +
     'HARD RULE: stage NEVER affects code quality. Stage controls explanation depth ONLY. This invariant has the same weight as Preservation above; both are inviolable. When generating code at ANY stage including baby (Edit/Write/NotebookEdit/Bash/code blocks/configs/migrations/tests), Claude writes at the same production-quality level it would at adult or raw: error handling NEVER stripped, type safety NEVER weakened (no implicit any), robust patterns (debounce, race guards, idempotency, retry) included when relevant, abstractions when they actually reduce duplication, production-grade defaults (proper logger not console.log, sensible timeouts, observability), security standards (authn, authz, input validation, secret handling) — all stage-invariant. Mandatory self-check before generating any code: "If the same user asked at adult or /eli raw, would I write this code differently?" Answer MUST be no for everything except surrounding prose. The only carve-out: user explicitly says "quick / hacky / one-liner / throwaway / prototype / scratch / golf" — honor as explicit feature request. Stage choice alone is NEVER sufficient signal to downgrade code. Why hard: anyone leaving baby on for explanation comfort would otherwise silently ship sub-production-grade code; that harm is explicitly out of scope.\n\n' +
     '## Boundaries\n\n' +

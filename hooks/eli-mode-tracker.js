@@ -155,12 +155,30 @@ process.stdin.on('end', () => {
     //
     // readFlag enforces symlink-safe read + size cap + VALID_MODES whitelist.
     if (after) {
-      const context = (transitionLine ? transitionLine + '\n' : '') +
-        "ELI MODE ACTIVE (stage: " + after + "). " +
-        "Mission: help the user understand. Include the core and everything important for the decision (Completeness). Cover every axis needed — result, cause, action, trade-off, check (MECE). Use everyday words, question-form axis names, and a one-line summary at the end (long answers also open with one). " +
-        "Preserve code, commands, URLs, paths, env vars, CLI flags, error messages, warnings, version numbers verbatim. " +
-        "Use analogies as a tool (abstract concepts, cryptic errors, multi-step flows) — not for code-heavy or step-by-step answers. Culturally neutral, one per concept across the session. Append `ⓘ analogy ≈` after major analogies. " +
-        "Use diagrams (tables, arrows, funnels, ASCII boxes) when they clarify structure better than prose.";
+      const header = (transitionLine ? transitionLine + '\n' : '') +
+        "ELI MODE ACTIVE (stage: " + after + "). ";
+      const mission =
+        "Mission: help the user understand. Include the core and everything important for the decision (Completeness). Cover every axis needed — result, cause, action, trade-off, check (MECE). Use everyday words, question-form axis names, and a one-line summary at the end (long answers also open with one). ";
+      const preservation =
+        "Preserve code, commands, URLs, paths, env vars, CLI flags, error messages, warnings, version numbers verbatim. ";
+      const analogy =
+        "Use analogies as a tool (abstract concepts, cryptic errors, multi-step flows) — not for code-heavy or step-by-step answers. Culturally neutral, one per concept across the session. Append `ⓘ analogy ≈` after major analogies. ";
+      const diagramsRule =
+        "Use diagrams (tables, arrows, funnels, ASCII boxes) when they clarify structure better than prose. ";
+      const babyVerification =
+        "BABY VERIFICATION: for verification / confirmation questions (\"다 했어?\" / \"is this right?\" / \"진짜 끝났어?\"), answer = \"응/아니 + 1-2 lines why/caveat\". NO tables, NO §-number citations, NO multi-section structure for these verification questions specifically. Proof already lives in the prior response + code. Answer length follows the TOPIC, not preceding context length. ";
+      const planRule =
+        "If currently writing to a plan file (~/.claude/plans/*.md) or about to call ExitPlanMode, append `## 한 줄 요약 (ELI <stage>)` at the BOTTOM of the plan body. Applies to EVERY plan generation — first, second, N-th iteration alike. Replace any prior ELI summary (one summary per plan at a time). Do NOT compress the plan body; only the summary is stage-shaped.";
+
+      let context;
+      if (after === 'baby') {
+        // Baby: exclude diagramsRule entirely (pushes toward tables under context pressure).
+        // Include verification-scoped override — narrow scope preserves baby's base rule
+        // (3-5 concrete steps) for non-verification questions.
+        context = header + mission + preservation + analogy + babyVerification + planRule;
+      } else {
+        context = header + mission + preservation + analogy + diagramsRule + planRule;
+      }
 
       process.stdout.write(JSON.stringify({
         hookSpecificOutput: {

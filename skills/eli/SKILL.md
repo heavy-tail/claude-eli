@@ -72,11 +72,14 @@ All four stages serve understanding. They differ in **how much translation** fro
 
 Hard concepts made *very easy* through analogies and everyday words. Length is whatever the topic requires, **but baby's spirit is "drop everything not needed for this one decision."**
 
+**Length is shaped by the TOPIC, not by preceding context.** Long spec / plan / prior message ≠ long answer. Evidence-stacking reflex ("I must prove I did everything") is a kid/adult tic, not baby.
+
 What baby includes:
 - ONE recommended path (other paths mentioned, not detailed)
 - 3-5 concrete steps OR a single explanatory analogy
 - 0-1 gotcha — only the absolute most likely trap for THIS question
 - Frame + action often **fused into one opening sentence** (see Structure below)
+- **Verification questions** ("다 했어?" / "is this right?" / "진짜 끝났어?") in baby = "응/아니 + 1-2 lines why/caveat". NEVER a table, NEVER a checklist, NEVER §-number citations. Proof already lives in the prior response + the code — baby confirms the decision-relevant state only.
 
 What baby excludes:
 - Multiple methods presented equally
@@ -315,7 +318,7 @@ When Claude Code is in plan mode — writing to a plan file (`~/.claude/plans/*.
    - Summary is reinforcement / confirmation — not a replacement for reading.
    - Inverted pyramid on purpose.
 
-5. **If the plan already has an ELI summary** (previous iteration), replace it with the new one. One summary per plan at a time.
+5. **If the plan already has an ELI summary** (previous iteration), replace it with the new one. One summary per plan at a time. **Applies on EVERY plan generation — first, second, N-th iteration alike.** Missing this on subsequent iterations is a regression, not a feature.
 
 The plan is an execution contract. ELI's job is to help the user understand it, not change it.
 
@@ -353,6 +356,16 @@ Question: same as above, baby stage.
 **What baby should have been (the user typed `좀 더 쉽게` and got this)**: ~15 lines. Opening fused frame+answer ("코드 GitHub 올리면 → Vercel 이 보고 → 자동으로 사이트 만듦. 끝."). One analogy (post office). 3 numbered steps. One closing line about auto-redeploy. Optional brief TL;DR.
 
 The drift was the same disease at a smaller scale: presenting CLI as a co-equal alternative when baby's spirit is "the simplest version", and adding environment-variable info that was relevant but not strictly required for the FIRST deploy.
+
+### Baby drift: verification question (new cause — evidence-stacking under long context)
+
+Question: "계획대로 다 구현한거야?" (verification) asked in a session where the assistant had just emitted a 1,500-line spec + a smoke-test report.
+
+**What baby produced (drift)**: ~45 lines. 3-column table (spec section / status / evidence) with 5 rows. 4 separate sections: 완전 구현 핵심 / placeholder 3종 / 한 줄 / 레스토랑 비유. §-number citations back to the spec ("스펙 §28 에 명시"). Multiple hedges explaining why each placeholder wasn't a shortfall.
+
+**What baby should have been**: ~3 lines. "응, 다 함. placeholder 4개만 스펙이 허락해서 정직하게 표시 (Square 크롤러 / auto-post / 스크린샷 / 백테스트 replay). ⓘ analogy ≈ 가게 오픈 완료, 배달 앱만 나중에 연결."
+
+The drift came from evidence-stacking reflex under long preceding context: the assistant felt it had to **prove** completion because the spec was long. But verification questions already have the proof elsewhere (prior response + the code) — baby's job is only to confirm the decision-relevant state. **Length is shaped by the TOPIC of THIS question, not by the length of preceding context.**
 
 ### The general lesson
 

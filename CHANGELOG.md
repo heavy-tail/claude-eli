@@ -2,6 +2,29 @@
 
 All notable changes to Claude ELI.
 
+## v0.9.1 — calibration patch (2026-04-24)
+
+Dogfood-driven fixes from the first real install (Lana_AI_Trading_OS build) + two Codex reviews of the v0.9.1 plan. No source refactor — 4-layer consistent patch across SKILL.md / eli-mode-tracker / eli-activate fallback / rules/eli-activate.md. Test count: **72 → 80** (8 new tests + assertions added to existing `standalone fallback ruleset` test).
+
+### Fixed
+
+- **Baby stage drift on verification questions** (e.g. "다 했어?" / "is this right?") when a long spec/plan preceded the question. Root cause had four layers; all four patched:
+  * `skills/eli/SKILL.md`: new baby verification rule ("응/아니 + 1-2 lines, no tables/checklists/§citations"), new anti-context-scaling rule ("length shaped by TOPIC, not preceding context"), new Calibration before/after example.
+  * `hooks/eli-mode-tracker.js`: ACTIVE context is now stage-branched. Baby drops the "Use diagrams (tables, arrows, funnels)" reinforcement (drift vector) and adds a verification-scoped `BABY VERIFICATION` override. Kid / adult / auto keep the diagrams rule. The override is scoped to verification questions specifically — baby's base 3-5 concrete-step rule is unchanged for non-verification questions.
+  * `hooks/eli-activate.js` fallback ruleset (standalone install) + `rules/eli-activate.md` (v2 non-Claude-Code agents): same verification rule propagated for consistency.
+- **Statusline missing on local-scope plugin install** (`/plugin install eli@eli` → "Install for you, in this repo only"). `eli-activate.js` used to hardcode `<claudeDir>/settings.json`, which Claude Code's local-scope precedence then overrode. New `resolveSettingsPath()` walks candidates in precedence order: `<projectDir>/.claude/settings.local.json` → `<projectDir>/.claude/settings.json` → `<claudeDir>/settings.json`. statusLine is written into the winning file so the auto-wire actually sticks. Idempotent / stale-path rewrite logic unchanged — both now operate on the resolved path.
+- **Plan mode `한 줄 요약 (ELI <stage>)` regression on iteration 2+**. The first plan got the summary; subsequent regenerations did not. Root cause: the plan-mode rule lived only in the SessionStart-injected SKILL.md, so it faded under context decay while the UserPromptSubmit hook said nothing about plan mode. Fix: `eli-mode-tracker.js` ACTIVE context now includes a self-gating plan-mode reinforcement on every turn, all stages. SKILL.md plan-mode section + `eli-activate.js` fallback + `rules/eli-activate.md` all strengthened with "Applies on EVERY plan generation — iterations included".
+
+### Added
+
+- `version: "0.9.1"` field in `.claude-plugin/plugin.json` and `package.json` (first formal version field — v0.9.0 shipped without one). `package-lock.json` root metadata synced via `npm install --package-lock-only`.
+- Helper extensions in `test/helpers/isolated-env.js`: `makeIsolatedEnv({ withProjectDir: true })`, `runActivate(env, { projectDir })`, `writeProjectSettings`, `readProjectSettings`, `projectSettingsExists`. `CLAUDE_PROJECT_DIR` is now explicitly scrubbed from the base env so host-env leakage can't mask a missing test injection.
+- 8 new tests:
+  * `test/eli-mode-tracker.test.js` (+2): plan-mode reinforcement present for every stage (`baby|kid|adult|auto`); baby context contains `BABY VERIFICATION` and excludes `Use diagrams (tables`, other stages contain diagrams and exclude `BABY VERIFICATION`.
+  * `test/eli-activate.test.js` (+4): local > user precedence; project > user middle case (plan review #5 gap); user fallback when no project files; local-scope stale plugin-cache path rewrite (symmetric to the existing user-scope stale-path test).
+  * `test/skill-md-structure.test.js` (+2): SKILL.md calibration anchors (verification + context-scaling + plan iteration); rules/eli-activate.md calibration anchors.
+- Existing `standalone fallback ruleset emits when skills/ is absent` test now also asserts the v0.9.1 verification + iteration anchors are present in the fallback stdout.
+
 ## v0.9.0 — test suite (unit + integration + e2e + fuzz)
 
 First test infrastructure for the project. Behavior pinned end-to-end; no source changes. Runner is Node's built-in `node --test` — zero runtime deps, one dev-dep (`fast-check` for PBT).
