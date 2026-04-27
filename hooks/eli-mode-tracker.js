@@ -167,17 +167,36 @@ process.stdin.on('end', () => {
         "Use diagrams (tables, arrows, funnels, ASCII boxes) when they clarify structure better than prose. ";
       const babyVerification =
         "BABY VERIFICATION: for verification / confirmation questions (\"다 했어?\" / \"is this right?\" / \"진짜 끝났어?\"), answer = \"응/아니 + 1-2 lines why/caveat\". NO tables, NO §-number citations, NO multi-section structure for these verification questions specifically. Proof already lives in the prior response + code. Answer length follows the TOPIC, not preceding context length. ";
+      // v0.9.2 — per-stage anti-drift reinforcement (additive). Each fragment is
+      // scoped to exactly one stage (cross-stage exclusivity pinned by tests).
+      const babyTranslation =
+        "BABY TRANSLATION DEPTH: jargon (cold start / middleware / hydration / Vercel function / serverless / preflight 등) → 일상어 inline gloss is mandatory. Analogy is decoration; translation is the core baby work. If a sentence still reads like raw Claude with technical terms intact, baby failed regardless of structure or analogy presence. ";
+      const kidPathFlag =
+        "KID PATH-FLAG + KID GLOSS: when 2+ methods exist, flag the recommended path for THIS question's situation (\"처음이면 이거\" / \"이미 X 쓰는 중이면 이거\") — never present them as equally weighted (path-equality anti-pattern). Unfamiliar terms get a one-line inline gloss (e.g. `cold start (첫 요청에 함수 깨어나는 시간)`); bare jargon dropped without translation is a kid failure mode. ";
+      const adultLossless =
+        "ADULT LOSSLESS + ADULT BUDGET: adult is a transformation of raw, NOT an extension. Do NOT add sections raw didn't include — no extra \"흔한 실수\", no \"피해야 할 패턴\", no \"확인 절차\", no edge-case enumeration raw didn't have. Length budget: ~1.0-1.3x raw. 1.5x+ is tutorial creep — stop and prune. ";
+      const autoPick =
+        "AUTO PICK: judge per question, don't default-kid. Beginner cues (\"explain like I'm 5\", \"쉽게\", jargon-unknown question) → baby. Production / architecture / trade-offs / at-scale → adult. Yes/No or simple how-to → kid. Genuinely ambiguous intent → kid (safe middle). Default-kid habit defeats auto's purpose. ";
       const planRule =
         "If currently writing to a plan file (~/.claude/plans/*.md) or about to call ExitPlanMode, append `## 한 줄 요약 (ELI <stage>)` at the BOTTOM of the plan body. Applies to EVERY plan generation — first, second, N-th iteration alike. Replace any prior ELI summary (one summary per plan at a time). Do NOT compress the plan body; only the summary is stage-shaped.";
 
       let context;
       if (after === 'baby') {
         // Baby: exclude diagramsRule entirely (pushes toward tables under context pressure).
-        // Include verification-scoped override — narrow scope preserves baby's base rule
-        // (3-5 concrete steps) for non-verification questions.
-        context = header + mission + preservation + analogy + babyVerification + planRule;
+        // BABY VERIFICATION (v0.9.1) handles verification-question scope.
+        // BABY TRANSLATION DEPTH (v0.9.2) handles jargon-translation axis on all baby answers.
+        context = header + mission + preservation + analogy +
+                  babyVerification + babyTranslation + planRule;
+      } else if (after === 'kid') {
+        context = header + mission + preservation + analogy +
+                  diagramsRule + kidPathFlag + planRule;
+      } else if (after === 'adult') {
+        context = header + mission + preservation + analogy +
+                  diagramsRule + adultLossless + planRule;
       } else {
-        context = header + mission + preservation + analogy + diagramsRule + planRule;
+        // auto — only remaining VALID stage (off branch handled below).
+        context = header + mission + preservation + analogy +
+                  diagramsRule + autoPick + planRule;
       }
 
       process.stdout.write(JSON.stringify({

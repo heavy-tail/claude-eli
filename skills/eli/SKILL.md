@@ -367,6 +367,18 @@ Question: "계획대로 다 구현한거야?" (verification) asked in a session 
 
 The drift came from evidence-stacking reflex under long preceding context: the assistant felt it had to **prove** completion because the spec was long. But verification questions already have the proof elsewhere (prior response + the code) — baby's job is only to confirm the decision-relevant state. **Length is shaped by the TOPIC of THIS question, not by the length of preceding context.**
 
+### Baby drift: translation depth fade (24h dogfood — long session)
+
+Question: "Vercel 에 deploy 하니까 cold start 가 길어. 어떻게 줄여?" — baby stage, 1 week of accumulated session context preceding it.
+
+**What baby produced (drift)**: Frame + post-office analogy + 4 numbered steps + TL;DR — structure is baby-spec-correct. Length ~20 lines. But the prose itself contained `cold start`, `Vercel function`, `Edge runtime`, `serverless`, `bundle size` all inline without translation. Vibecoder reading it cannot tell the answer apart from raw Claude at the sentence level — only the analogy and shape feel different.
+
+**What baby should have been**: same length, same structure, same analogy — but jargon gets inline gloss. "cold start (첫 요청에 함수 깨어나는 시간)", "Edge runtime (CDN 가까운 곳에서 도는 가벼운 함수)", "bundle size (앱 첫 로드 때 받는 파일 크기)". Same information, different register.
+
+The drift is structural: SessionStart-injected SKILL.md says "deepest translation, everyday words" but that fades over a long session. The per-turn hook reinforcement covered structure (analogy / planRule / verification) but not translation depth. Baby kept the *costume* (analogy, "한 줄") and lost the *core work* (jargon→일상어 inline).
+
+**Lesson**: Analogy is decoration; **translation is the core baby work**. Structure / analogy / length 다 맞아도 sentence 자체가 raw Claude 의 technical register 그대로면 baby failed regardless. Stage controls *translation depth* — depth fade 시 baby ≈ raw, answer 의 shape 관계없이.
+
 ### The general lesson
 
 For both stages, the fix isn't "cut to a line count". It's: **pick the recommended path for this specific question's situation, include only what trips you up RIGHT NOW, fold related info into existing steps instead of separate sections.**

@@ -2,6 +2,41 @@
 
 All notable changes to Claude ELI.
 
+## v0.9.2 — calibration patch (2026-04-27)
+
+24h-dogfood-driven follow-up to v0.9.1. Per-stage hook reinforcement — extends v0.9.1's baby-only branching to all 4 stages so each stage's anti-patterns survive context decay in long sessions. No source refactor, additive only. Test count: **80 → 84** (4 new tests + assertions added to existing `standalone fallback ruleset` test).
+
+### Fixed (per-stage drift in long sessions)
+
+- **Baby translation depth fade** — analogy + structure correct but jargon (cold start / middleware / hydration / Vercel function / serverless) untranslated; sentence-level register matches raw Claude. v0.9.1's `BABY VERIFICATION` covered verification questions only; this is a separate axis (translation depth) that fades on normal questions too. Directly observed in 2026-04-25 dogfood.
+- **Kid path-equality drift** — multiple methods presented equally (path-equality anti-pattern resurfaces under context pressure), bare jargon dropped without inline gloss.
+- **Adult tutorial creep** — extra "흔한 실수" / "피해야 할 패턴" / "확인 절차" sections raw didn't include, length 1.5x+ raw (over 1.0-1.3x budget).
+- **Auto default-kid habit** — beginner / production cues ignored, every question defaults to kid even when signal clearly points elsewhere.
+
+### Patched (4-layer, additive only)
+
+- `hooks/eli-mode-tracker.js` ACTIVE context: 2-way (baby vs else) → 4-way (baby/kid/adult/auto) branch. New fragments — `BABY TRANSLATION DEPTH`, `KID PATH-FLAG + KID GLOSS`, `ADULT LOSSLESS + ADULT BUDGET`, `AUTO PICK` — each scoped to its single stage. v0.9.1 invariants preserved (baby excludes `diagramsRule`, `BABY VERIFICATION` baby-only, `planRule` on every active stage).
+- `skills/eli/SKILL.md`: Calibration 4th example added (translation depth fade, 24h dogfood case). Kid/adult covered by existing v0.7 examples (path equality / completeness disease).
+- `hooks/eli-activate.js` fallback ruleset (lines 95-98): one reinforcement sentence appended per stage definition.
+- `rules/eli-activate.md` (lines 17-20): same spec propagated for v2 agents.
+
+### Added
+
+- `version: "0.9.2"` in `.claude-plugin/plugin.json` + `package.json`. `package-lock.json` root metadata synced via `npm install --package-lock-only`.
+- 4 new tests:
+  * `test/eli-mode-tracker.test.js` (+2): per-stage reinforcement literal present for each of baby/kid/adult/auto; cross-stage exclusivity (each fragment scoped to one stage, no scope leak).
+  * `test/skill-md-structure.test.js` (+2): SKILL.md v0.9.2 calibration anchor; rules/eli-activate.md v0.9.2 per-stage reinforcement anchors (4 stages).
+- Existing `standalone fallback ruleset emits when skills/ is absent` test now also asserts the v0.9.2 4-stage reinforcements present in fallback stdout.
+
+### Token cost (per turn, additive)
+
+- baby: +~110 tokens (`babyTranslation` on top of v0.9.1's `babyVerification`)
+- kid: +~120 tokens (`kidPathFlag`)
+- adult: +~120 tokens (`adultLossless`)
+- auto: +~120 tokens (`autoPick`)
+
+One additional fragment per turn; replaces nothing.
+
 ## v0.9.1 — calibration patch (2026-04-24)
 
 Dogfood-driven fixes from the first real install (Lana_AI_Trading_OS build) + two Codex reviews of the v0.9.1 plan. No source refactor — 4-layer consistent patch across SKILL.md / eli-mode-tracker / eli-activate fallback / rules/eli-activate.md. Test count: **72 → 80** (8 new tests + assertions added to existing `standalone fallback ruleset` test).

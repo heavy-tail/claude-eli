@@ -82,3 +82,35 @@ test('rules/eli-activate.md contains v0.9.1 calibration anchors (baby verificati
     'Fix 3D: plan section must include iteration clause'
   );
 });
+
+// v0.9.2 — per-stage anti-drift reinforcement anchors.
+test('SKILL.md contains v0.9.2 calibration anchor (translation depth fade example)', () => {
+  assert.match(
+    skillBody,
+    /translation depth fade|Analogy is decoration; translation is the core baby work/,
+    'v0.9.2: SKILL.md Calibration must include translation-depth-fade example'
+  );
+});
+
+test('rules/eli-activate.md contains v0.9.2 per-stage reinforcement anchors (4 stages)', () => {
+  assert.match(
+    rulesBody,
+    /Translation > analogy/,
+    'v0.9.2 Layer 4 baby: rules baby must reinforce translation depth'
+  );
+  assert.match(
+    rulesBody,
+    /path-equality|Path-flag is mandatory/,
+    'v0.9.2 Layer 4 kid: rules kid must reinforce path flag'
+  );
+  assert.match(
+    rulesBody,
+    /Lossless: NEVER add sections raw didn't include/,
+    'v0.9.2 Layer 4 adult: rules adult must reinforce lossless'
+  );
+  assert.match(
+    rulesBody,
+    /Don't default-kid|default-kid habit/,
+    'v0.9.2 Layer 4 auto: rules auto must reinforce per-question pick'
+  );
+});

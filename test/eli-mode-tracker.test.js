@@ -330,3 +330,58 @@ test('baby context has BABY VERIFICATION and no "Use diagrams"; other stages hav
     }
   }
 });
+
+// v0.9.2 — per-stage anti-drift reinforcement (4 stages, additive).
+// Each fragment is scoped to exactly one stage (cross-stage exclusivity pinned below).
+test('ACTIVE additionalContext includes per-stage reinforcement (v0.9.2)', () => {
+  const expected = {
+    baby:  /BABY TRANSLATION DEPTH/,
+    kid:   /KID PATH-FLAG \+ KID GLOSS/,
+    adult: /ADULT LOSSLESS \+ ADULT BUDGET/,
+    auto:  /AUTO PICK/,
+  };
+  for (const [stage, re] of Object.entries(expected)) {
+    const env = makeIsolatedEnv();
+    try {
+      seedFlag(env, stage);
+      const res = runTracker(env, 'hello');
+      assert.equal(res.code, 0);
+      const ctx = trackerAdditionalContext(res.stdout);
+      assert.ok(ctx, stage + ' must emit additionalContext');
+      assert.match(ctx, re, stage + ' missing v0.9.2 reinforcement literal');
+    } finally {
+      env.cleanup();
+    }
+  }
+});
+
+test('per-stage reinforcement fragments are stage-scoped (v0.9.2 cross-stage exclusivity)', () => {
+  const fragments = {
+    baby:  /BABY TRANSLATION DEPTH/,
+    kid:   /KID PATH-FLAG \+ KID GLOSS/,
+    adult: /ADULT LOSSLESS \+ ADULT BUDGET/,
+    auto:  /AUTO PICK/,
+  };
+  for (const stage of ['baby', 'kid', 'adult', 'auto']) {
+    const env = makeIsolatedEnv();
+    try {
+      seedFlag(env, stage);
+      const res = runTracker(env, 'hello');
+      assert.equal(res.code, 0);
+      const ctx = trackerAdditionalContext(res.stdout);
+      assert.ok(ctx, stage + ' must emit additionalContext');
+      for (const [otherStage, re] of Object.entries(fragments)) {
+        if (otherStage === stage) {
+          assert.match(ctx, re, stage + ' must include its own reinforcement');
+        } else {
+          assert.doesNotMatch(
+            ctx, re,
+            stage + ' must NOT contain ' + otherStage + ' fragment (scope leak)'
+          );
+        }
+      }
+    } finally {
+      env.cleanup();
+    }
+  }
+});

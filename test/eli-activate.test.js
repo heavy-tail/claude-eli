@@ -140,6 +140,23 @@ test('fallback ruleset emits when skills/ is absent (standalone install)', () =>
       /EVERY plan generation|iterations included/.test(stdout),
       'fallback body should include v0.9.1 plan-iteration rule (Fix 3C)'
     );
+    // v0.9.2: fallback baby/kid/adult/auto must each carry per-stage reinforcement.
+    assert.ok(
+      stdout.includes('Translation > analogy'),
+      'fallback v0.9.2: baby reinforcement (Layer 3 line 95)'
+    );
+    assert.ok(
+      /Path-flag is mandatory|path-equality/.test(stdout),
+      'fallback v0.9.2: kid reinforcement (Layer 3 line 96)'
+    );
+    assert.ok(
+      /Lossless: NEVER add sections raw didn't include/.test(stdout),
+      'fallback v0.9.2: adult reinforcement (Layer 3 line 97)'
+    );
+    assert.ok(
+      /Don't default-kid|default-kid habit/.test(stdout),
+      'fallback v0.9.2: auto reinforcement (Layer 3 line 98)'
+    );
   } finally {
     env.cleanup();
     try { fs.rmSync(standaloneRoot, { recursive: true, force: true }); } catch (e) { /* tolerate */ }
