@@ -335,3 +335,42 @@ test('stage-specific rule is scoped to exactly one stage (v1.0 cross-stage exclu
     }
   }
 });
+
+// v1.0 Codex review fix — preservation fragment must enumerate full LEVEL-1
+// artifact list (was a regression vs SKILL.md's full list — hook fights
+// context decay so partial enumeration weakens the invariant).
+test('preservation fragment includes full LEVEL-1 artifact list (v1.0 Codex P1.1)', () => {
+  const env = makeIsolatedEnv();
+  try {
+    seedFlag(env, 'kid');
+    const res = runTracker(env, 'hello');
+    const ctx = trackerAdditionalContext(res.stdout);
+    assert.ok(ctx, 'must emit additionalContext');
+    // High-risk artifacts that were missing in v1.0 initial commit:
+    assert.match(ctx, /inline code/i, 'preservation must list inline code');
+    assert.match(ctx, /stack traces/i, 'preservation must list stack traces');
+    assert.match(ctx, /hashes/i, 'preservation must list hashes');
+    assert.match(ctx, /API keys/i, 'preservation must list API keys');
+    assert.match(ctx, /tokens/i, 'preservation must list tokens');
+    assert.match(ctx, /plan files/i, 'preservation must list plan files');
+  } finally {
+    env.cleanup();
+  }
+});
+
+// v1.0 Codex review fix — /eli on must NOT write 'off' to flag when
+// getDefaultMode() returns 'off' (env ELI_DEFAULT_STAGE=off or config).
+// Writing 'off' was producing an "ACTIVE (stage: off)" state that fell
+// through to auto/else branch — contradicting "/eli on activates."
+test('/eli on falls back to kid when ELI_DEFAULT_STAGE=off (v1.0 Codex P1.3)', () => {
+  const env = makeIsolatedEnv();
+  try {
+    env.env.ELI_DEFAULT_STAGE = 'off';
+    const res = runTracker(env, '/eli on');
+    assert.equal(res.code, 0);
+    assert.equal(readRawFlag(env.claudeDir), 'kid',
+      '/eli on must fall back to kid when default would be off (never write off as active stage)');
+  } finally {
+    env.cleanup();
+  }
+});

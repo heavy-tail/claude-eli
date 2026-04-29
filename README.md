@@ -4,7 +4,7 @@
 
 > Explain like I'm ___. Pick your level (3, 10, or 25) and Claude organizes every answer for that depth.
 
-Claude ELI cuts the **"explain it again, but easier"** loop. The mission is simple: **help you understand** every answer the first time. Pick the depth — 👶 Baby (ELI 3), 🧒 Kid (ELI 10), or 🎓 Adult (ELI 25) — and Claude organizes the answer around what you actually need to decide. Code, commands, URLs, paths, errors, warnings — preserved verbatim at every stage. Always on.
+Claude ELI cuts the **"explain it again, but easier"** loop. The mission is simple: **help you understand** every answer the first time. Pick a stage on the simplification axis — 🎓 Adult (lossless, every detail kept), 🧒 Kid (strongly simplified, default), or 👶 Baby (second-pass essence) — and Claude organizes the answer around what you actually need to decide. Visual aids (analogies + diagrams) default ON. Code, commands, URLs, paths, errors, warnings — preserved verbatim at every stage. Always on.
 
 For vibecoders, beginners, PMs who code, or anyone tired of re-prompting Claude for a TL;DR.
 
@@ -51,22 +51,22 @@ For vibecoders, beginners, PMs who code, or anyone tired of re-prompting Claude 
 
 ## How it works
 
-Four stages, each adjusting **translation depth** (not output length). Length is whatever the topic requires.
+Four stages on a single axis: **simplification strength × passes**. Each stage is defined by the prompt that would produce its answer from raw Claude.
 
-| Badge | Stage | ≈ ELI | What you get |
-|-------|-------|-------|--------------|
-| 👶 | **baby** | ELI 3 | Deepest translation. Hard concepts made very simple with analogies and everyday words. Length follows the topic. |
-| 🧒 | **kid** *(default)* | ELI 10 | Light translation, pretty concise. Keep terms; cut to the decision-relevant core. |
-| 🎓 | **adult** | ELI 25 | Near-raw Claude, BUT must still be clearly easier than raw (better structure, emphasis, optional light analogy). |
-| ✨ | **auto** | adaptive | Claude picks baby / kid / adult per question based on how it reads. |
+| Badge | Stage | What it is | Length vs raw |
+|-------|-------|-----------|---------------|
+| 🎓 | **adult** | "이해하기 쉽게 설명해줘" × 1, **lossless** — every fact in raw preserved + visual structure (table / decision tree / flow) + Frame at top + TL;DR at bottom | ≥ raw |
+| 🧒 | **kid** *(default)* | "아주 쉽게 설명해줘" × 1 — strong simplification, drop nuance OK, recommended path flagged ("처음이면 이거") | usually ≤ raw |
+| 👶 | **baby** | "아주 쉽게 설명해줘" × 2 (internal 2-pass) — kid-quality answer mentally, then "더 쉽게" pass, output only the second pass: single dominant analogy + single concrete action | shortest |
+| ✨ | **auto** | Claude picks adult / kid / baby per question. "쉽게" / "초보" → baby; "production / architecture / trade-offs" → adult; everything else → kid | varies |
+
+**Visual aids (analogies + diagrams) are default ON at every stage.** Skip only for: (1) yes/no answer, (2) single-line answer, (3) pure code dump, (4) precise number/threshold IS the answer.
 
 Want one-time raw Claude (no filter)? `/eli raw`. Want to disable for the session? `/eli off`.
 
 The **North Star** — applied to every answer, every stage:
 
-> **Help you understand.** Every ELI answer must be clearly easier than raw Claude on the same question. Include only what affects the decision. Shape follows content. Honor the stage's spirit. Length is a consequence, not a target.
-
-No fixed templates. No padding. No over-compression. Tables, diagrams, analogies — used when they make the concept click faster, skipped when they don't.
+> **Help you understand.** Every ELI answer must be **obviously** easier than raw Claude on the same question — not subtly tweaked, clearly easier. If your answer reads like raw with cosmetic changes, the stage failed.
 
 ---
 
@@ -90,9 +90,9 @@ Stage
   /eli level         show menu
   /eli easier        ↓ one step (deeper translation)
   /eli harder        ↑ one step (less translation)
-  /eli baby          jump to 👶 baby  (deepest translation)
-  /eli kid           jump to 🧒 kid   (light translation — default)
-  /eli adult         jump to 🎓 adult (near-raw but still easier than raw)
+  /eli adult         jump to 🎓 adult ("이해하기 쉽게" ×1, lossless)
+  /eli kid           jump to 🧒 kid   ("아주 쉽게" ×1 — default)
+  /eli baby          jump to 👶 baby  ("아주 쉽게" ×2, second-pass essence)
   /eli auto          ✨ Claude picks per question
 
 Switch

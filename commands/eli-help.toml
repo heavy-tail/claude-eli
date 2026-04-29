@@ -6,14 +6,14 @@ do not add explanations before or after.
 ```
 🧒 ELI — commands
 
-Stage
-  /eli level         show menu with examples
-  /eli easier        ↓ one step (more compressed)
+Stage  (simplification strength × passes)
+  /eli level         show menu
+  /eli easier        ↓ one step (more simplified)
   /eli harder        ↑ one step (more detail)
-  /eli baby          jump to 👶 baby  (deepest translation, length = topic-required)
-  /eli kid           jump to 🧒 kid   (light translation, concise — default)
-  /eli adult         jump to 🎓 adult (near-raw but easier than raw)
-  /eli auto          ✨ Claude picks depth per question
+  /eli adult         🎓 "이해하기 쉽게" ×1, lossless — every detail preserved + structure
+  /eli kid           🧒 "아주 쉽게" ×1 — strong simplification, default
+  /eli baby          👶 "아주 쉽게" ×2 — second-pass essence
+  /eli auto          ✨ Claude picks per question
 
 Switch
   /eli off           disable for this session (= uncut Claude)
@@ -24,6 +24,9 @@ Extra
   /eli-glossary      jargon from previous answer with plain defs
   /eli-stats         your evolution progress
   /eli-help          this card
+
+All stages: visual aids (analogies + diagrams) default ON.
+Code, URLs, paths, errors, plan files preserved verbatim.
 
 Natural (just say it, no slash)
   "다시" / "again" / "한번 더"     re-translate previous answer

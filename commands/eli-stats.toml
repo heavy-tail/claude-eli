@@ -1,4 +1,4 @@
-description = "Show current evolution stage and usage stats"
+description = "Show current ELI stage and usage stats"
 prompt = """
 Show the user's ELI progress card.
 
@@ -10,17 +10,21 @@ Render like:
 ```
 [stage badge] ELI stats
 
-Current stage: [stage name] ([N]/3)
+Current stage: [stage emoji + name]
 Installed: [days since install, or "today"]
 Sessions so far: [approximate count, or "first session"]
 
-Next stage: [stage+1 name + emoji, or "you're at Adult — try /eli off for uncut Claude"]
-Suggested: [
-  stage 1: "Baby — deepest translation. Analogies and everyday words. Try /eli harder for less translation."
-  stage 2: "Kid — light translation, pretty concise (the sweet spot). Try /eli harder for the near-raw, structured register."
-  stage 3: "Adult — lossless restructuring of raw (structure + frame + TL;DR, no new content). For fully raw Claude, /eli raw one-time or /eli off for the session."
-  auto:    "Auto — Claude picks depth per question. Try /eli kid (or another fixed stage) for a consistent register."
-]
+Stage descriptions (simplification strength × passes):
+  🎓 adult: "이해하기 쉽게" ×1, lossless — every detail preserved + structure
+  🧒 kid:   "아주 쉽게" ×1 — strong simplification, recommended path flagged (default)
+  👶 baby:  "아주 쉽게" ×2 — second-pass essence
+  ✨ auto:  Claude picks per question
+
+Suggested next:
+  - On adult? Try /eli kid for the default sweet spot, or /eli raw for uncut Claude.
+  - On kid? Try /eli baby for the most aggressive simplification, or /eli adult for lossless detail.
+  - On baby? Try /eli kid for slightly more detail, or /eli auto to let Claude pick per question.
+  - On auto? Try /eli kid (or another fixed stage) for a consistent register.
 ```
 
 Keep it concise (no paragraph). If no data yet, say: "Installed today — /eli-stats shows more once you've used it a while."

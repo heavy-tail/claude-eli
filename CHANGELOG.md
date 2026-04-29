@@ -4,6 +4,25 @@ All notable changes to Claude ELI.
 
 ## v1.0.0 — fundamental redesign (single-axis spec) (2026-04-28)
 
+> Includes Codex review fixes (P1+P2+P3, applied before public push).
+
+### Codex review fixes (rolled into v1.0.0)
+
+- **P1.1 LEVEL-1 preservation regression** (`hooks/eli-mode-tracker.js`): per-turn preservation fragment was missing inline code, stack traces, hashes, API keys, tokens, and plan files (which SKILL.md preservation rule lists). Hook list now matches SKILL.md.
+- **P1.2 Public-surface stale copy**: `commands/eli.toml`, `commands/eli-help.toml`, `commands/eli-stats.toml`, `README.md`, `CLAUDE.md`, `skills/eli-help/SKILL.md`, `skills/eli-stats/SKILL.md` were still teaching v0.x framings ("translation depth", "near-raw", "ELI 3/10/25", "알잘딱깔센"). All migrated to v1.0 single-axis copy.
+- **P1.3 `/eli on` writes 'off' bug** (`hooks/eli-mode-tracker.js:93`): when `ELI_DEFAULT_STAGE=off` or config `defaultStage='off'`, `/eli on` was writing `off` to the flag (since 'off' is in VALID_MODES whitelist), producing an "ACTIVE (stage: off)" state contradicting "/eli on activates." Fixed: `/eli on` now falls back to `kid` if default would be `off`.
+- **P2.1 Visual-aids inconsistency** (`skills/eli/SKILL.md:78`): SKILL said "default to both unless redundant", hook/fallback/rules said "at least one." Aligned to "at least one must appear; both is fine when each adds distinct clarification."
+- **P2.2 Baby root-metaphor missing in fallback/rules**: SKILL.md and hook had "compress N causes into 1 root metaphor"; fallback (`hooks/eli-activate.js`) and `rules/eli-activate.md` did not. Added to both.
+- **P2.3 Auto mixed-signal undefined** (`skills/eli/SKILL.md:60`): added explicit tie-break — "production cue wins over 'easy' cue → adult" with reasoning.
+- **P3.1 OFF override stale text** (`hooks/eli-mode-tracker.js:212`): referenced removed concepts (alalddakkalsen, frame/TL;DR). Updated to v1.0 vocabulary.
+- **Test additions**:
+  - `test/eli-mode-tracker.test.js`: preservation fragment must list full LEVEL-1 artifacts (P1.1 regression guard); `/eli on` falls back to kid when default is off (P1.3 regression guard).
+  - `test/skill-md-structure.test.js`: public surface (commands + README + sub-skill helps) must not contain removed v0.x framings (P1.2 regression guard).
+
+### Original v1.0.0 changes follow.
+
+
+
 72h dogfood across v0.9.0 → v0.9.1 → v0.9.2 surfaced a fundamental product issue: **kid and adult often felt "wordier without easier"**. Translation-depth axis was too vague; per-stage calibration patches (v0.9.1 BABY VERIFICATION, v0.9.2 BABY TRANSLATION DEPTH / KID PATH-FLAG / ADULT LOSSLESS / AUTO PICK) addressed symptoms but not the root spec issue.
 
 v1.0 reframes the four stages on a **single axis: simplification strength × passes**. Each stage is defined by the prompt that would produce its answer from raw Claude:

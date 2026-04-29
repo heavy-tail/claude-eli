@@ -74,6 +74,45 @@ test('rules/eli-activate.md is non-empty', () => {
   assert.ok(rulesBody.trim().length > 0, 'rules/eli-activate.md should have real content');
 });
 
+// v1.0 Codex review fix — public-facing copy (commands + README + sub-skills
+// help/stats) must NOT teach the removed v0.x framings. Catches stale docs.
+test('public surface contains no removed v0.x framings (v1.0 Codex P1.2)', () => {
+  const COMMANDS_DIR = path.join(REPO_ROOT, 'commands');
+  const README = path.join(REPO_ROOT, 'README.md');
+  const ELI_HELP_SKILL = path.join(REPO_ROOT, 'skills', 'eli-help', 'SKILL.md');
+  const ELI_STATS_SKILL = path.join(REPO_ROOT, 'skills', 'eli-stats', 'SKILL.md');
+
+  const surfaces = [
+    path.join(COMMANDS_DIR, 'eli.toml'),
+    path.join(COMMANDS_DIR, 'eli-help.toml'),
+    path.join(COMMANDS_DIR, 'eli-stats.toml'),
+    README,
+    ELI_HELP_SKILL,
+    ELI_STATS_SKILL,
+  ];
+
+  // Removed v0.x framings — must NOT appear on user-facing surface.
+  const removedFramings = [
+    /translation depth/i,
+    /near-raw/i,
+    /light translation/i,
+    /deepest translation/i,
+    /ELI 3\b/i,
+    /ELI 10\b/i,
+    /ELI 25\b/i,
+    /알잘딱깔센/,
+  ];
+
+  for (const surfacePath of surfaces) {
+    const body = fs.readFileSync(surfacePath, 'utf8');
+    const fileName = path.basename(surfacePath);
+    for (const re of removedFramings) {
+      assert.doesNotMatch(body, re,
+        fileName + ' must not contain removed v0.x framing: ' + re);
+    }
+  }
+});
+
 test('rules/eli-activate.md mirrors v1.0 spec (4 stages + LEVEL-1 + plan iteration)', () => {
   // 4 stages
   assert.match(rulesBody, /이해하기 쉽게 설명.*×1.*lossless/i, 'rules adult missing');

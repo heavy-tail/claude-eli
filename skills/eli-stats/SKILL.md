@@ -47,10 +47,10 @@ Suggested: [see rules below]
 
 | Current | Suggestion |
 |---------|-----------|
-| 👶 baby | "baby — deepest translation. Analogies and everyday words do the heavy lifting. Try `/eli harder` when you want less translation." |
-| 🧒 kid | "kid — light translation, pretty concise (the sweet spot). Try `/eli harder` for the near-raw register." |
-| 🎓 adult | "adult — lossless restructuring of raw (frame + structure + TL;DR, no new content added). For fully raw Claude, use `/eli raw` one-time or `/eli off` for the session." |
-| ✨ auto | "auto — Claude is picking depth per question. Try `/eli kid` (or another fixed stage) if you want a consistent register." |
+| 👶 baby | "baby — \"아주 쉽게\" ×2 (second-pass essence). Single dominant analogy + single concrete action. Try `/eli harder` for slightly more detail (kid)." |
+| 🧒 kid | "kid — \"아주 쉽게\" ×1 (default sweet spot). Strong simplification, recommended path flagged. Try `/eli harder` for lossless detail (adult)." |
+| 🎓 adult | "adult — \"이해하기 쉽게\" ×1, lossless. Every fact in raw preserved + visual structure + Frame/TL;DR. For fully raw Claude, use `/eli raw` one-time or `/eli off` for the session." |
+| ✨ auto | "auto — Claude picks per question (\"쉽게\" cues → baby, production/architecture/trade-offs → adult, else → kid). Try `/eli kid` (or another fixed stage) for a consistent register." |
 
 ## Edge cases
 

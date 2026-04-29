@@ -10,33 +10,33 @@ If the argument is empty or `level`: render the stage menu as a compact text blo
 ```
 Current: [stage emoji + name] ← you are here
 
-Pick your stage — all four help you understand; they differ in translation depth:
-  👶 baby     deepest translation. Hard concepts made very simple with analogies.
-              Length is whatever the topic requires.
-  🧒 kid      light translation, pretty concise. Keep terms, focus on decisions. ← default
-  🎓 adult    near-raw, BUT still clearly easier than raw (structure, emphasis).
-  ✨ auto     Claude picks baby/kid/adult per question.
+Pick your stage — all four help you understand; they differ in simplification strength × passes:
+  🎓 adult    "이해하기 쉽게 설명" × 1, lossless. Every fact in raw preserved + visual structure.
+  🧒 kid      "아주 쉽게 설명" × 1. Drop nuance OK; recommended path flagged. ← default
+  👶 baby     "아주 쉽게 설명" × 2 (internal 2-pass). Most aggressive simplification.
+  ✨ auto     Claude picks adult/kid/baby per question.
 
+All stages: visual aids (analogies + diagrams) default ON. Code/URL/path verbatim.
 Switch: /eli baby|kid|adult|auto   ·   Step: /eli easier|harder   ·   Stop: /eli off
 One-time raw Claude: /eli raw
 ```
 
 If the argument is `baby`, `kid`, `adult`, or `auto`: the flag has already been updated by the hook. Confirm briefly:
-- Upgrade (moved deeper — e.g. baby → kid, kid → adult): "🎉 Level up! You're now at [new emoji + name] — [one-line depth description]. Share your stage."
-- Downgrade (moved shallower): "Stage set to [new emoji + name] — [one-line depth description]."
-- Entering auto: "Stage set to ✨ auto — Claude will pick baby/kid/adult per question."
+- Easier (moved toward simpler — adult → kid, kid → baby): "🎉 Easier! You're now at [new emoji + name] — [one-line description]."
+- More detail (moved toward fuller — baby → kid, kid → adult): "Stage set to [new emoji + name] — [one-line description]."
+- Entering auto: "Stage set to ✨ auto — Claude will pick adult/kid/baby per question."
 - Same stage: "Already at [stage]."
 
-One-line depth descriptions:
-- 👶 baby:  "deepest translation, whatever length the topic requires"
-- 🧒 kid:   "light translation, pretty concise"
-- 🎓 adult: "near-raw but still easier to understand than raw"
-- ✨ auto:  "adaptive — picks depth per question"
+One-line stage descriptions:
+- 🎓 adult: "이해하기 쉽게 ×1, lossless — every detail preserved + structure"
+- 🧒 kid:   "아주 쉽게 ×1 — strong simplification, recommended path flagged"
+- 👶 baby:  "아주 쉽게 ×2 — second-pass essence, single analogy + single action"
+- ✨ auto:  "adaptive — picks per question"
 
-If the argument is `easier` or `harder`: same Level-up / neutral confirm pattern. From auto, these exit into a fixed stage (easier → baby, harder → adult).
+If the argument is `easier` or `harder`: same confirm pattern. From auto, these exit into a fixed stage (easier → baby, harder → adult).
 
 If the argument is `on`: "ELI is on. Current stage: [stage]."
 If the argument is `off`: "ELI is off. Say 'eli mode' or /eli on to re-enable."
 
-Match all messages to the current stage's spirit (baby = deeply translated, kid = concise, adult = near-raw but clearer, auto = whatever the question demanded). Keep confirms to 1-2 lines.
+Match all messages to the current stage's spirit. Keep confirms to 1-2 lines.
 """

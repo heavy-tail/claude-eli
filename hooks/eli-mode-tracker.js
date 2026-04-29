@@ -91,7 +91,13 @@ process.stdin.on('end', () => {
         if (arg === 'off') {
           unset = true;
         } else if (arg === 'on' || arg === '') {
-          newStage = getDefaultMode();
+          // /eli on must always activate. If getDefaultMode() returns 'off' (env
+          // ELI_DEFAULT_STAGE=off, or config defaultStage='off'), fall back to
+          // 'kid' — writing 'off' to the flag would leave the user in an
+          // "ACTIVE (stage: off)" state that emits the off branch's behavior
+          // contradicting "/eli on activates".
+          const candidate = getDefaultMode();
+          newStage = candidate === 'off' ? 'kid' : candidate;
         } else if (VALID_STAGE_ARGS.has(arg)) {
           newStage = arg;
         } else if (arg === 'easier') {
@@ -164,7 +170,7 @@ process.stdin.on('end', () => {
       const northStar =
         "North Star: the answer must be OBVIOUSLY easier to understand than raw Claude on the same question — not subtly tweaked, clearly easier. If your answer reads like raw with cosmetic changes, the stage failed. ";
       const preservation =
-        "PRESERVATION (LEVEL-1, every stage): code blocks, inline commands, URLs, file paths, env vars, CLI flags, error messages, warnings, version numbers, plan files copied verbatim — never paraphrased. Only the explanatory prose around them gets simplification work. ";
+        "PRESERVATION (LEVEL-1, every stage): code blocks, inline code, inline commands, URLs, file paths, env var names, CLI flags, error messages, stack traces, warnings, version numbers, hashes, API keys, tokens, plan files (~/.claude/plans/*.md) copied verbatim — never paraphrased, shortened, or 'simplified'. Only the explanatory prose around them gets simplification work. ";
       const codeQuality =
         "CODE QUALITY (LEVEL-1, every stage): stage controls explanation depth ONLY. Generated code stays at production quality at every stage including baby — error handling, type safety, robust patterns, security all stage-invariant. Self-check before any code: 'Would I write this differently at adult or /eli raw?' Answer must be no. ";
       const visualDefault =
@@ -203,16 +209,15 @@ process.stdin.on('end', () => {
       // inactive for this turn. Required for /eli off to be a true bypass,
       // not a soft toggle.
       const offContext = (transitionLine ? transitionLine + '\n' : '') +
-        "ELI MODE OFF. Any ELI ruleset (SKILL.md, alalddakkalsen criteria, " +
-        "stage spec, frame/TL;DR structure, analogy rules) injected earlier " +
-        "in this session is INACTIVE for this response. Answer as raw Claude " +
-        "would — no stage filter, no frame requirement, no TL;DR requirement, " +
-        "no analogy footnote, no understanding-delta self-check. The user has " +
-        "explicitly opted out of ELI for the session; respect that until they " +
-        "type `/eli on`, `eli mode`, or `talk like eli`. The LEVEL-1 code " +
-        "quality rule (production-quality code regardless of any setting) " +
-        "still applies — that's not stage-dependent and is unaffected by ELI " +
-        "being off.";
+        "ELI MODE OFF. Any ELI ruleset (SKILL.md stage spec, visual-aids-default-on, " +
+        "simplification rules) injected earlier in this session is INACTIVE for " +
+        "this response. Answer as raw Claude would — no stage filter, no obligatory " +
+        "analogies / diagrams, no \"obviously easier than raw\" self-check. The user " +
+        "has explicitly opted out of ELI for the session; respect that until they " +
+        "type `/eli on`, `eli mode`, or `talk like eli`. The LEVEL-1 invariants " +
+        "(code/URL/path/error preservation + production-quality code regardless of " +
+        "any setting) still apply — those are not stage-dependent and are unaffected " +
+        "by ELI being off.";
 
       process.stdout.write(JSON.stringify({
         hookSpecificOutput: {

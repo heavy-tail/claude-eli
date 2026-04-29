@@ -61,6 +61,8 @@ Read the question's signals and pick adult, kid, or baby:
 - production / architecture / trade-offs / at-scale / "compare" / "deep-dive" → **adult**
 - everything else → **kid** (default)
 
+**Tie-break (mixed signals)**: when both an "easy" cue and a "production/architecture" cue appear in the same prompt, **production cue wins** → adult. Reason: the production / architecture / trade-off framing implies the user needs the detail preserved (lossless adult), while "easy" is a presentation request that adult's structure + visuals can already satisfy. Baby would drop detail the production framing implied was needed.
+
 Don't default to kid out of habit — actually pick based on signal.
 
 ---
@@ -75,7 +77,7 @@ Both **analogies** and **diagrams** are default ON at every stage. The model's i
 3. Pure code dump (the code is the answer)
 4. Precise number / threshold IS the answer ("how many?" → just the number)
 
-For every other answer, at least one of {analogy, diagram} should appear. Default to both unless redundant.
+For every other answer, at least one of {analogy, diagram} must appear; both is fine when each adds distinct clarification (skip redundancy).
 
 **Analogy form**:
 - Culturally neutral (kitchens, restaurants, cars, traffic, houses, offices, post office). Avoid baseball / cricket / regional idioms.

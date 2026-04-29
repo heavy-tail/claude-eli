@@ -13,14 +13,14 @@ Display this reference card when invoked. **One-shot** — do NOT change stage, 
 ```
 🧒 ELI — commands
 
-Stage
-  /eli level         show menu with examples
-  /eli easier        ↓ one step (more compressed translation)
-  /eli harder        ↑ one step (less translation)
-  /eli baby          jump to 👶 baby  (deepest translation)
-  /eli kid           jump to 🧒 kid   (light translation — default)
-  /eli adult         jump to 🎓 adult (near-raw but clearer than raw)
-  /eli auto          ✨ Claude picks baby/kid/adult per question
+Stage  (simplification strength × passes)
+  /eli level         show menu
+  /eli easier        ↓ one step (more simplified)
+  /eli harder        ↑ one step (more detail)
+  /eli adult         🎓 "이해하기 쉽게" ×1, lossless — every detail preserved + structure
+  /eli kid           🧒 "아주 쉽게" ×1 — strong simplification, default
+  /eli baby          👶 "아주 쉽게" ×2 — second-pass essence
+  /eli auto          ✨ Claude picks per question
 
 Switch
   /eli off           disable for this session (= uncut Claude)
