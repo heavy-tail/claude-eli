@@ -13,29 +13,60 @@ const RULES_MD = path.join(REPO_ROOT, 'rules', 'eli-activate.md');
 const skillBody = fs.readFileSync(SKILL_MD, 'utf8');
 const rulesBody = fs.readFileSync(RULES_MD, 'utf8');
 
-test('SKILL.md preserves code-quality LEVEL-1 INVARIANT anchor', () => {
-  assert.match(skillBody, /Code quality is stage-independent.*LEVEL-1 INVARIANT — NEVER VIOLATE/);
+// v1.0 — single-axis spec anchors (simplification strength × passes).
+
+test('SKILL.md is non-empty', () => {
+  assert.ok(skillBody.length > 0, 'SKILL.md should not be empty');
+  assert.ok(skillBody.trim().length > 0, 'SKILL.md should have real content');
 });
 
-test('SKILL.md preserves Plan mode integration heading', () => {
-  assert.match(skillBody, /## Plan mode integration/);
+test('SKILL.md contains v1.0 North Star (obviously easier than raw)', () => {
+  assert.match(
+    skillBody,
+    /obviously easier to understand than raw Claude/i,
+    'North Star — answer must be obviously easier than raw'
+  );
 });
 
-test('SKILL.md contains Korean "알잘딱깔센" identifier', () => {
-  assert.ok(skillBody.includes('알잘딱깔센'));
+test('SKILL.md defines all 4 stages with v1.0 prompt-equivalent definitions', () => {
+  // adult — "이해하기 쉽게" × 1, lossless
+  assert.match(skillBody, /이해하기 쉽게 설명해줘.*×.*1.*lossless/i,
+    'adult definition (이해하기 쉽게 ×1 lossless) missing');
+  // kid — "아주 쉽게" × 1
+  assert.match(skillBody, /아주 쉽게 설명해줘.*×.*1.*\(DEFAULT\)/i,
+    'kid definition (아주 쉽게 ×1 default) missing');
+  // baby — "아주 쉽게" × 2 internal 2-pass
+  assert.match(skillBody, /아주 쉽게 설명해줘.*×.*2.*internal 2-pass/i,
+    'baby definition (아주 쉽게 ×2 internal 2-pass) missing');
+  // auto — Claude picks per question
+  assert.match(skillBody, /auto.*Claude picks per question/i,
+    'auto definition (Claude picks) missing');
 });
 
-test('SKILL.md references the ✨ auto stage', () => {
-  assert.ok(skillBody.includes('✨'), 'sparkles emoji anchor');
-  assert.ok(skillBody.includes('auto'), 'auto stage name anchor');
+test('SKILL.md contains visual-aids-default-on rule with skip conditions', () => {
+  assert.match(skillBody, /Visual aids default ON/i,
+    'visual aids default ON heading missing');
+  assert.match(skillBody, /Yes\/No answer/i, 'skip condition (yes/no) missing');
+  assert.match(skillBody, /Single-line answer/i, 'skip condition (single-line) missing');
+  assert.match(skillBody, /Pure code dump/i, 'skip condition (pure code) missing');
+  assert.match(skillBody, /Precise number \/ threshold/i,
+    'skip condition (precise number) missing');
 });
 
-test('SKILL.md preserves Preservation LEVEL-1 heading', () => {
-  assert.match(skillBody, /## Preservation \(LEVEL-1 rule/);
+test('SKILL.md preserves LEVEL-1 invariants (preservation + code quality)', () => {
+  assert.match(skillBody, /Preservation \(LEVEL-1 INVARIANT/,
+    'preservation LEVEL-1 heading missing');
+  assert.match(skillBody, /Code quality \(LEVEL-1 INVARIANT/,
+    'code quality LEVEL-1 heading missing');
 });
 
-test('SKILL.md preserves Structure frame/TL;DR heading', () => {
-  assert.match(skillBody, /## Structure — Frame at top, TL;DR at bottom/);
+test('SKILL.md preserves Plan mode integration with EVERY-iteration clause', () => {
+  assert.match(skillBody, /## Plan mode integration/,
+    'plan mode integration heading missing');
+  assert.match(skillBody, /Applies on EVERY plan generation/,
+    'plan-mode iteration clause missing');
+  assert.ok(skillBody.includes('한 줄 요약'),
+    'Korean summary heading literal missing');
 });
 
 test('rules/eli-activate.md is non-empty', () => {
@@ -43,74 +74,18 @@ test('rules/eli-activate.md is non-empty', () => {
   assert.ok(rulesBody.trim().length > 0, 'rules/eli-activate.md should have real content');
 });
 
-test('rules/eli-activate.md contains Code quality + Plan mode + 알잘딱깔센 anchors', () => {
-  assert.ok(rulesBody.includes('Code quality'), 'Code quality anchor present');
-  assert.ok(rulesBody.includes('Plan mode'), 'Plan mode anchor present');
-  assert.ok(rulesBody.includes('알잘딱깔센'), 'Korean 4-criteria anchor present');
-});
-
-test('SKILL.md contains v0.9.1 calibration anchors (baby verification + context-scaling + plan iteration)', () => {
-  // Fix 1A — baby verification rule.
-  assert.ok(
-    skillBody.includes('Verification questions'),
-    'Fix 1A: baby section must contain "Verification questions" literal'
-  );
-  // Fix 1B — anti context-scaling rule.
-  assert.match(
-    skillBody,
-    /Length is shaped by the TOPIC, not by preceding context/,
-    'Fix 1B: must contain anti-context-scaling rule'
-  );
-  // Fix 3A — plan-mode iteration clause.
-  assert.match(
-    skillBody,
-    /Applies on EVERY plan generation/,
-    'Fix 3A: plan mode section must strengthen iteration wording'
-  );
-});
-
-test('rules/eli-activate.md contains v0.9.1 calibration anchors (baby verification + plan iteration)', () => {
-  // Fix 1F — baby verification rule (v2 agents consistency).
-  assert.ok(
-    rulesBody.includes('Verification questions'),
-    'Fix 1F: baby line must contain "Verification questions" literal'
-  );
-  // Fix 3D — plan-mode iteration clause.
-  assert.match(
-    rulesBody,
-    /EVERY plan generation|iterations included/,
-    'Fix 3D: plan section must include iteration clause'
-  );
-});
-
-// v0.9.2 — per-stage anti-drift reinforcement anchors.
-test('SKILL.md contains v0.9.2 calibration anchor (translation depth fade example)', () => {
-  assert.match(
-    skillBody,
-    /translation depth fade|Analogy is decoration; translation is the core baby work/,
-    'v0.9.2: SKILL.md Calibration must include translation-depth-fade example'
-  );
-});
-
-test('rules/eli-activate.md contains v0.9.2 per-stage reinforcement anchors (4 stages)', () => {
-  assert.match(
-    rulesBody,
-    /Translation > analogy/,
-    'v0.9.2 Layer 4 baby: rules baby must reinforce translation depth'
-  );
-  assert.match(
-    rulesBody,
-    /path-equality|Path-flag is mandatory/,
-    'v0.9.2 Layer 4 kid: rules kid must reinforce path flag'
-  );
-  assert.match(
-    rulesBody,
-    /Lossless: NEVER add sections raw didn't include/,
-    'v0.9.2 Layer 4 adult: rules adult must reinforce lossless'
-  );
-  assert.match(
-    rulesBody,
-    /Don't default-kid|default-kid habit/,
-    'v0.9.2 Layer 4 auto: rules auto must reinforce per-question pick'
-  );
+test('rules/eli-activate.md mirrors v1.0 spec (4 stages + LEVEL-1 + plan iteration)', () => {
+  // 4 stages
+  assert.match(rulesBody, /이해하기 쉽게 설명.*×1.*lossless/i, 'rules adult missing');
+  assert.match(rulesBody, /아주 쉽게 설명.*×1/i, 'rules kid missing');
+  assert.match(rulesBody, /아주 쉽게 설명.*×2.*internal 2-pass/i, 'rules baby missing');
+  assert.match(rulesBody, /picking per question/i, 'rules auto missing');
+  // Visual aids default ON
+  assert.match(rulesBody, /Visual aids default ON/i, 'rules visual-aids missing');
+  // LEVEL-1 invariants
+  assert.match(rulesBody, /Preservation \(LEVEL-1/i, 'rules preservation missing');
+  assert.match(rulesBody, /Code quality.*LEVEL-1 INVARIANT/i, 'rules code quality missing');
+  // Plan mode iteration
+  assert.match(rulesBody, /Applies on EVERY plan generation/i,
+    'rules plan-mode iteration missing');
 });

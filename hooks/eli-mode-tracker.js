@@ -155,49 +155,39 @@ process.stdin.on('end', () => {
     //
     // readFlag enforces symlink-safe read + size cap + VALID_MODES whitelist.
     if (after) {
+      // v1.0 — single-axis spec: each stage = simplification strength × passes.
+      // adult = "이해하기 쉽게" ×1 lossless / kid = "아주 쉽게" ×1 / baby = "아주 쉽게" ×2 (internal 2-pass) / auto = picking.
+      // Visual aids (analogy + diagram) are default ON every stage (skip only for yes/no, single-line, pure code, exact-number answers).
+      // LEVEL-1 invariants (preservation + code quality) are stage-independent.
       const header = (transitionLine ? transitionLine + '\n' : '') +
         "ELI MODE ACTIVE (stage: " + after + "). ";
-      const mission =
-        "Mission: help the user understand. Include the core and everything important for the decision (Completeness). Cover every axis needed — result, cause, action, trade-off, check (MECE). Use everyday words, question-form axis names, and a one-line summary at the end (long answers also open with one). ";
+      const northStar =
+        "North Star: the answer must be OBVIOUSLY easier to understand than raw Claude on the same question — not subtly tweaked, clearly easier. If your answer reads like raw with cosmetic changes, the stage failed. ";
       const preservation =
-        "Preserve code, commands, URLs, paths, env vars, CLI flags, error messages, warnings, version numbers verbatim. ";
-      const analogy =
-        "Use analogies as a tool (abstract concepts, cryptic errors, multi-step flows) — not for code-heavy or step-by-step answers. Culturally neutral, one per concept across the session. Append `ⓘ analogy ≈` after major analogies. ";
-      const diagramsRule =
-        "Use diagrams (tables, arrows, funnels, ASCII boxes) when they clarify structure better than prose. ";
-      const babyVerification =
-        "BABY VERIFICATION: for verification / confirmation questions (\"다 했어?\" / \"is this right?\" / \"진짜 끝났어?\"), answer = \"응/아니 + 1-2 lines why/caveat\". NO tables, NO §-number citations, NO multi-section structure for these verification questions specifically. Proof already lives in the prior response + code. Answer length follows the TOPIC, not preceding context length. ";
-      // v0.9.2 — per-stage anti-drift reinforcement (additive). Each fragment is
-      // scoped to exactly one stage (cross-stage exclusivity pinned by tests).
-      const babyTranslation =
-        "BABY TRANSLATION DEPTH: jargon (cold start / middleware / hydration / Vercel function / serverless / preflight 등) → 일상어 inline gloss is mandatory. Analogy is decoration; translation is the core baby work. If a sentence still reads like raw Claude with technical terms intact, baby failed regardless of structure or analogy presence. ";
-      const kidPathFlag =
-        "KID PATH-FLAG + KID GLOSS: when 2+ methods exist, flag the recommended path for THIS question's situation (\"처음이면 이거\" / \"이미 X 쓰는 중이면 이거\") — never present them as equally weighted (path-equality anti-pattern). Unfamiliar terms get a one-line inline gloss (e.g. `cold start (첫 요청에 함수 깨어나는 시간)`); bare jargon dropped without translation is a kid failure mode. ";
-      const adultLossless =
-        "ADULT LOSSLESS + ADULT BUDGET: adult is a transformation of raw, NOT an extension. Do NOT add sections raw didn't include — no extra \"흔한 실수\", no \"피해야 할 패턴\", no \"확인 절차\", no edge-case enumeration raw didn't have. Length budget: ~1.0-1.3x raw. 1.5x+ is tutorial creep — stop and prune. ";
-      const autoPick =
-        "AUTO PICK: judge per question, don't default-kid. Beginner cues (\"explain like I'm 5\", \"쉽게\", jargon-unknown question) → baby. Production / architecture / trade-offs / at-scale → adult. Yes/No or simple how-to → kid. Genuinely ambiguous intent → kid (safe middle). Default-kid habit defeats auto's purpose. ";
+        "PRESERVATION (LEVEL-1, every stage): code blocks, inline commands, URLs, file paths, env vars, CLI flags, error messages, warnings, version numbers, plan files copied verbatim — never paraphrased. Only the explanatory prose around them gets simplification work. ";
+      const codeQuality =
+        "CODE QUALITY (LEVEL-1, every stage): stage controls explanation depth ONLY. Generated code stays at production quality at every stage including baby — error handling, type safety, robust patterns, security all stage-invariant. Self-check before any code: 'Would I write this differently at adult or /eli raw?' Answer must be no. ";
+      const visualDefault =
+        "VISUAL AIDS DEFAULT ON: analogies and diagrams (ASCII flow / tables / decision trees / boxes) are default at every stage. Skip ONLY for: (1) yes/no answer, (2) single-line answer, (3) pure code dump, (4) precise number/threshold IS the answer. Otherwise at least one of {analogy, diagram} must appear. Analogies culturally neutral (kitchens, cars, post office — not regional sports/idioms), one per concept per session, append `ⓘ analogy ≈` after major ones. ";
       const planRule =
-        "If currently writing to a plan file (~/.claude/plans/*.md) or about to call ExitPlanMode, append `## 한 줄 요약 (ELI <stage>)` at the BOTTOM of the plan body. Applies to EVERY plan generation — first, second, N-th iteration alike. Replace any prior ELI summary (one summary per plan at a time). Do NOT compress the plan body; only the summary is stage-shaped.";
+        "If currently writing to a plan file (~/.claude/plans/*.md) or about to call ExitPlanMode, append `## 한 줄 요약 (ELI <stage>)` at the BOTTOM of the plan body — apply current stage's simplification work to the summary section only, NOT to the plan body (plan body stays full-detail verbatim). Applies to EVERY plan generation — first, second, N-th iteration alike. Replace any prior ELI summary. ";
+      // Stage-specific simplification instruction.
+      const adultRule =
+        "ADULT — '이해하기 쉽게 설명' ×1, LOSSLESS: take what raw would answer and make it understandable WITHOUT dropping any information. Every fact, caveat, detail in raw is preserved. Add visual structure (table / decision tree / flow), Frame at top, TL;DR at bottom, light analogy if it clarifies. Length ≥ raw (detail + structure added). FAILURE MODE: reads identical to raw with no structure-add, OR drops detail to fit a shorter answer.";
+      const kidRule =
+        "KID — '아주 쉽게 설명' ×1: take what raw would answer and explain it VERY EASILY in one pass. Drop nuance that doesn't change the decision; flag the recommended path explicitly (\"처음이면 이거\" / \"이미 X 쓰는 중이면 이거\") — never present 2+ paths as equally weighted. Visual + analogy default ON. Length usually ≤ raw, but follows what's needed. FAILURE MODE: visual / structure added but prose stays at raw's technical register; OR multiple paths presented equally.";
+      const babyRule =
+        "BABY — '아주 쉽게 설명' ×2 (internal 2-pass): MENTALLY produce kid-quality answer first (Pass 1), then re-read and ask 'if I had to explain this to someone who barely knows the topic, what's the absolute essence?' Strip everything not core. Compress N causes into 1 root metaphor. Output ONLY the second-pass result: single dominant analogy, single concrete action, minimal sections. SHORTER than kid almost always. FAILURE MODE: just paraphrasing kid (no second-pass compression), OR reads like raw with one analogy bolted on.";
+      const autoRule =
+        "AUTO — picking per question: read the question's signals and pick adult/kid/baby. \"explain like I'm 5\" / \"쉽게\" / \"초보\" / jargon-unknown question → baby. production / architecture / trade-offs / at-scale / \"compare\" / \"deep-dive\" → adult. Everything else → kid. Don't default to kid out of habit — actually pick based on signal.";
 
-      let context;
-      if (after === 'baby') {
-        // Baby: exclude diagramsRule entirely (pushes toward tables under context pressure).
-        // BABY VERIFICATION (v0.9.1) handles verification-question scope.
-        // BABY TRANSLATION DEPTH (v0.9.2) handles jargon-translation axis on all baby answers.
-        context = header + mission + preservation + analogy +
-                  babyVerification + babyTranslation + planRule;
-      } else if (after === 'kid') {
-        context = header + mission + preservation + analogy +
-                  diagramsRule + kidPathFlag + planRule;
-      } else if (after === 'adult') {
-        context = header + mission + preservation + analogy +
-                  diagramsRule + adultLossless + planRule;
-      } else {
-        // auto — only remaining VALID stage (off branch handled below).
-        context = header + mission + preservation + analogy +
-                  diagramsRule + autoPick + planRule;
-      }
+      const stageRule =
+        after === 'adult' ? adultRule :
+        after === 'kid'   ? kidRule :
+        after === 'baby'  ? babyRule :
+                            autoRule;
+
+      const context = header + northStar + preservation + codeQuality + visualDefault + planRule + stageRule;
 
       process.stdout.write(JSON.stringify({
         hookSpecificOutput: {

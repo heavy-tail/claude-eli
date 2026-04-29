@@ -31,8 +31,11 @@ test('default activate writes kid flag and emits SKILL.md body', () => {
       res.stdout.includes('ELI MODE ACTIVE — current stage: kid'),
       'stdout should announce current stage'
     );
-    // SKILL.md body anchor — Korean heading of the alalddakkalsen section.
-    assert.ok(res.stdout.includes('알잘딱깔센'), 'stdout should contain SKILL.md body anchor');
+    // SKILL.md body anchor — v1.0 stages-by-simplification-strength heading.
+    assert.ok(
+      res.stdout.includes('Stages — defined by simplification strength'),
+      'stdout should contain SKILL.md body anchor (v1.0 stages heading)'
+    );
   } finally {
     env.cleanup();
   }
@@ -125,38 +128,29 @@ test('fallback ruleset emits when skills/ is absent (standalone install)', () =>
     });
     assert.equal(result.status, 0);
     const stdout = result.stdout || '';
+    // v1.0 — fallback ruleset (when SKILL.md absent) must mirror SKILL.md's spec.
     assert.ok(stdout.includes('Mission:'), 'fallback body should include "Mission:"');
-    assert.ok(stdout.includes('알잘딱깔센'), 'fallback body should include Korean 4-criteria anchor');
     assert.ok(stdout.includes('LEVEL-1 INVARIANT'), 'fallback body should include LEVEL-1 INVARIANT anchor');
     assert.ok(stdout.includes('✨'), 'fallback body should include ✨ emoji');
     assert.ok(stdout.includes('**auto**'), 'fallback body should include **auto** stage anchor');
-    // v0.9.1 Fix 1E: fallback baby must include verification rule.
-    assert.ok(
-      stdout.includes('Verification questions'),
-      'fallback body should include v0.9.1 verification rule (Fix 1E)'
-    );
-    // v0.9.1 Fix 3C: fallback plan mode must include iteration clause.
-    assert.ok(
-      /EVERY plan generation|iterations included/.test(stdout),
-      'fallback body should include v0.9.1 plan-iteration rule (Fix 3C)'
-    );
-    // v0.9.2: fallback baby/kid/adult/auto must each carry per-stage reinforcement.
-    assert.ok(
-      stdout.includes('Translation > analogy'),
-      'fallback v0.9.2: baby reinforcement (Layer 3 line 95)'
-    );
-    assert.ok(
-      /Path-flag is mandatory|path-equality/.test(stdout),
-      'fallback v0.9.2: kid reinforcement (Layer 3 line 96)'
-    );
-    assert.ok(
-      /Lossless: NEVER add sections raw didn't include/.test(stdout),
-      'fallback v0.9.2: adult reinforcement (Layer 3 line 97)'
-    );
-    assert.ok(
-      /Don't default-kid|default-kid habit/.test(stdout),
-      'fallback v0.9.2: auto reinforcement (Layer 3 line 98)'
-    );
+    // v1.0 North Star.
+    assert.match(stdout, /OBVIOUSLY easier to understand than raw/i,
+      'fallback v1.0: North Star (obviously easier than raw)');
+    // v1.0 — 4 stages defined by simplification strength × passes.
+    assert.match(stdout, /이해하기 쉽게 설명.*×1.*lossless/i,
+      'fallback v1.0: adult definition');
+    assert.match(stdout, /아주 쉽게 설명.*×1/i,
+      'fallback v1.0: kid definition');
+    assert.match(stdout, /아주 쉽게 설명.*×2.*internal 2-pass/i,
+      'fallback v1.0: baby definition');
+    assert.match(stdout, /picking per question/i,
+      'fallback v1.0: auto definition');
+    // v1.0 — visual aids default ON.
+    assert.match(stdout, /Visual aids default ON/i,
+      'fallback v1.0: visual-aids-default-on rule');
+    // v1.0 — plan mode iteration.
+    assert.match(stdout, /EVERY plan generation/i,
+      'fallback v1.0: plan-mode iteration clause');
   } finally {
     env.cleanup();
     try { fs.rmSync(standaloneRoot, { recursive: true, force: true }); } catch (e) { /* tolerate */ }

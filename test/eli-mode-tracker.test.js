@@ -270,7 +270,12 @@ test('undefined prompt (stdin JSON {}): exit 0, no flag mutation, OFF override e
   }
 });
 
-test('ACTIVE additionalContext includes plan-mode reinforcement for every stage (v0.9.1 Fix 3B)', () => {
+// v1.0 — single-axis spec. Each stage = simplification strength × passes.
+// Common fragments (northStar / preservation / codeQuality / visualDefault / planRule)
+// must be present at every stage; stage-specific rule (adultRule / kidRule / babyRule /
+// autoRule) is scoped to exactly one stage.
+
+test('ACTIVE additionalContext includes common LEVEL-1 + visual-default + plan rules at every stage (v1.0)', () => {
   for (const stage of ['baby', 'kid', 'adult', 'auto']) {
     const env = makeIsolatedEnv();
     try {
@@ -279,88 +284,35 @@ test('ACTIVE additionalContext includes plan-mode reinforcement for every stage 
       assert.equal(res.code, 0);
       const ctx = trackerAdditionalContext(res.stdout);
       assert.ok(ctx, stage + ' must emit additionalContext');
-      assert.ok(
-        /plan file|EVERY plan generation/.test(ctx),
-        stage + ' missing plan-mode rule (iteration robustness)'
-      );
-      assert.ok(
-        ctx.includes('한 줄 요약'),
-        stage + ' missing Korean summary heading literal'
-      );
+      // North Star — "obviously easier than raw" must be every stage.
+      assert.match(ctx, /OBVIOUSLY easier to understand than raw/,
+        stage + ' missing North Star (obviously-easier-than-raw)');
+      // LEVEL-1 preservation — every stage.
+      assert.match(ctx, /PRESERVATION \(LEVEL-1, every stage\)/,
+        stage + ' missing LEVEL-1 preservation invariant');
+      // LEVEL-1 code quality — every stage.
+      assert.match(ctx, /CODE QUALITY \(LEVEL-1, every stage\)/,
+        stage + ' missing LEVEL-1 code quality invariant');
+      // Visual aids default ON — every stage.
+      assert.match(ctx, /VISUAL AIDS DEFAULT ON/,
+        stage + ' missing visual-aids-default-on rule');
+      // Plan-mode rule with EVERY-iteration clause + Korean summary literal.
+      assert.match(ctx, /EVERY plan generation/,
+        stage + ' missing plan-mode iteration clause');
+      assert.ok(ctx.includes('한 줄 요약'),
+        stage + ' missing Korean summary heading literal');
     } finally {
       env.cleanup();
     }
   }
 });
 
-test('baby context has BABY VERIFICATION and no "Use diagrams"; other stages have diagrams and no BABY VERIFICATION (v0.9.1 Fix 1D)', () => {
-  const envBaby = makeIsolatedEnv();
-  try {
-    seedFlag(envBaby, 'baby');
-    const res = runTracker(envBaby, 'hello');
-    assert.equal(res.code, 0);
-    const babyCtx = trackerAdditionalContext(res.stdout);
-    assert.ok(babyCtx, 'baby must emit additionalContext');
-    assert.match(babyCtx, /BABY VERIFICATION/, 'baby must include verification override');
-    assert.doesNotMatch(
-      babyCtx,
-      /Use diagrams \(tables/,
-      'baby must NOT include diagrams rule (drift vector)'
-    );
-  } finally {
-    envBaby.cleanup();
-  }
-
-  for (const stage of ['kid', 'adult', 'auto']) {
-    const env = makeIsolatedEnv();
-    try {
-      seedFlag(env, stage);
-      const res = runTracker(env, 'hello');
-      assert.equal(res.code, 0);
-      const ctx = trackerAdditionalContext(res.stdout);
-      assert.ok(ctx, stage + ' must emit additionalContext');
-      assert.match(ctx, /Use diagrams \(tables/, stage + ' must include diagrams rule');
-      assert.doesNotMatch(
-        ctx,
-        /BABY VERIFICATION/,
-        stage + ' must NOT include BABY VERIFICATION'
-      );
-    } finally {
-      env.cleanup();
-    }
-  }
-});
-
-// v0.9.2 — per-stage anti-drift reinforcement (4 stages, additive).
-// Each fragment is scoped to exactly one stage (cross-stage exclusivity pinned below).
-test('ACTIVE additionalContext includes per-stage reinforcement (v0.9.2)', () => {
-  const expected = {
-    baby:  /BABY TRANSLATION DEPTH/,
-    kid:   /KID PATH-FLAG \+ KID GLOSS/,
-    adult: /ADULT LOSSLESS \+ ADULT BUDGET/,
-    auto:  /AUTO PICK/,
-  };
-  for (const [stage, re] of Object.entries(expected)) {
-    const env = makeIsolatedEnv();
-    try {
-      seedFlag(env, stage);
-      const res = runTracker(env, 'hello');
-      assert.equal(res.code, 0);
-      const ctx = trackerAdditionalContext(res.stdout);
-      assert.ok(ctx, stage + ' must emit additionalContext');
-      assert.match(ctx, re, stage + ' missing v0.9.2 reinforcement literal');
-    } finally {
-      env.cleanup();
-    }
-  }
-});
-
-test('per-stage reinforcement fragments are stage-scoped (v0.9.2 cross-stage exclusivity)', () => {
-  const fragments = {
-    baby:  /BABY TRANSLATION DEPTH/,
-    kid:   /KID PATH-FLAG \+ KID GLOSS/,
-    adult: /ADULT LOSSLESS \+ ADULT BUDGET/,
-    auto:  /AUTO PICK/,
+test('stage-specific rule is scoped to exactly one stage (v1.0 cross-stage exclusivity)', () => {
+  const stageRules = {
+    adult: /ADULT — '이해하기 쉽게 설명' ×1, LOSSLESS/,
+    kid:   /KID — '아주 쉽게 설명' ×1/,
+    baby:  /BABY — '아주 쉽게 설명' ×2 \(internal 2-pass\)/,
+    auto:  /AUTO — picking per question/,
   };
   for (const stage of ['baby', 'kid', 'adult', 'auto']) {
     const env = makeIsolatedEnv();
@@ -370,14 +322,12 @@ test('per-stage reinforcement fragments are stage-scoped (v0.9.2 cross-stage exc
       assert.equal(res.code, 0);
       const ctx = trackerAdditionalContext(res.stdout);
       assert.ok(ctx, stage + ' must emit additionalContext');
-      for (const [otherStage, re] of Object.entries(fragments)) {
+      for (const [otherStage, re] of Object.entries(stageRules)) {
         if (otherStage === stage) {
-          assert.match(ctx, re, stage + ' must include its own reinforcement');
+          assert.match(ctx, re, stage + ' must include its own stage rule');
         } else {
-          assert.doesNotMatch(
-            ctx, re,
-            stage + ' must NOT contain ' + otherStage + ' fragment (scope leak)'
-          );
+          assert.doesNotMatch(ctx, re,
+            stage + ' must NOT contain ' + otherStage + ' rule (scope leak)');
         }
       }
     } finally {
